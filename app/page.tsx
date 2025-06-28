@@ -188,7 +188,7 @@ function HomePageContent() {
   const [selectedPizza, setSelectedPizza] = useState<Produto | null>(null)
   const [showStoreInfo, setShowStoreInfo] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [multiFlavorMode, setMultiFlavorMode] = useState(false)
+  const [flavorMode, setFlavorMode] = useState<1 | 2 | 3>(1)
   const [selectedFlavorsForMulti, setSelectedFlavorsForMulti] = useState<Produto[]>([])
   const [showSecondFlavorPopup, setShowSecondFlavorPopup] = useState(false)
   const { dispatch } = useCart()
@@ -200,24 +200,24 @@ function HomePageContent() {
 
   // Controlar popup "Escolha o segundo sabor"
   useEffect(() => {
-    if (multiFlavorMode && selectedFlavorsForMulti.length === 1) {
+    if (flavorMode > 1 && selectedFlavorsForMulti.length === 1) {
       setShowSecondFlavorPopup(true)
       const timer = setTimeout(() => {
         setShowSecondFlavorPopup(false)
       }, 2000)
       return () => clearTimeout(timer)
     }
-  }, [multiFlavorMode, selectedFlavorsForMulti.length])
+  }, [flavorMode, selectedFlavorsForMulti.length])
 
   // Redirecionamento automático para checkout
   useEffect(() => {
-    if (multiFlavorMode && selectedFlavorsForMulti.length === 2) {
+    if (flavorMode > 1 && selectedFlavorsForMulti.length === flavorMode) {
       const timer = setTimeout(() => {
         router.push('/checkout')
       }, 500) // Pequeno delay para o usuário ver a seleção
       return () => clearTimeout(timer)
     }
-  }, [multiFlavorMode, selectedFlavorsForMulti.length, router])
+  }, [flavorMode, selectedFlavorsForMulti.length, router])
 
   const loadData = async () => {
     try {
@@ -255,14 +255,14 @@ function HomePageContent() {
     if (selectedFlavorsForMulti.find(p => p.id === pizza.id)) {
       // Remove se já estiver selecionado
       setSelectedFlavorsForMulti(prev => prev.filter(p => p.id !== pizza.id))
-    } else if (selectedFlavorsForMulti.length < 2) {
-      // Adiciona se ainda não atingiu o limite de 2
+    } else if (selectedFlavorsForMulti.length < flavorMode) {
+      // Adiciona se ainda não atingiu o limite
       setSelectedFlavorsForMulti(prev => [...prev, pizza])
     }
   }
 
   const handleAddMultiFlavorToCart = (tamanho: "broto" | "tradicional") => {
-    if (selectedFlavorsForMulti.length !== 2) return
+    if (selectedFlavorsForMulti.length !== flavorMode) return
 
     // Calcula o maior preço entre os sabores selecionados
     const prices = selectedFlavorsForMulti.map(pizza => 
@@ -376,38 +376,64 @@ function HomePageContent() {
                   <div className="text-sm text-gray-600">
                     Pizzas doces e salgadas (Tradicional 8 fatias / Broto 4 fatias)
                   </div>
-                  <div className="text-sm text-red-600">Você pode escolher até 2 sabores</div>
+                  <div className="text-sm text-red-600">Você pode escolher até 3 sabores</div>
 
                   {/* Botões de seleção de sabores */}
-                  <div className="flex space-x-4">
+                  <div className="flex space-x-3">
                     <Button
                       variant="outline"
                       className={`flex-1 h-20 flex flex-col items-center justify-center bg-transparent ${
-                        !multiFlavorMode ? "border-red-500 bg-red-50" : ""
+                        flavorMode === 1 ? "border-teal-500 bg-teal-50" : ""
                       }`}
                       onClick={() => {
-                        setMultiFlavorMode(false)
+                        setFlavorMode(1)
                         setSelectedFlavorsForMulti([])
                       }}
                     >
-                      <div className="w-8 h-8 aspect-square rounded-full bg-gray-200 border-2 border-gray-300 mb-2 flex-shrink-0"></div>
+                      <div className="w-8 h-8 mb-2 flex-shrink-0 flex items-center justify-center">
+                        <svg width="32" height="32" viewBox="0 0 32 32" className="text-gray-700">
+                          <circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+                        </svg>
+                      </div>
                       <span className="text-xs">1</span>
                     </Button>
                     <Button
                       variant="outline"
                       className={`flex-1 h-20 flex flex-col items-center justify-center bg-transparent ${
-                        multiFlavorMode ? "border-red-500 bg-red-50" : ""
+                        flavorMode === 2 ? "border-teal-500 bg-teal-50" : ""
                       }`}
                       onClick={() => {
-                        setMultiFlavorMode(true)
+                        setFlavorMode(2)
                         setSelectedFlavorsForMulti([])
                       }}
                     >
-                      <div className="w-8 h-8 aspect-square rounded-full border-2 border-gray-300 relative mb-2 overflow-hidden flex-shrink-0">
-                        <div className="absolute left-0 top-0 w-1/2 h-full bg-gray-200"></div>
-                        <div className="absolute left-1/2 top-0 w-px h-full bg-gray-300"></div>
+                      <div className="w-8 h-8 mb-2 flex-shrink-0 flex items-center justify-center">
+                        <svg width="32" height="32" viewBox="0 0 32 32" className="text-gray-700">
+                          <circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+                          <line x1="16" y1="4" x2="16" y2="28" stroke="currentColor" strokeWidth="1.5"/>
+                        </svg>
                       </div>
                       <span className="text-xs">2</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className={`flex-1 h-20 flex flex-col items-center justify-center bg-transparent ${
+                        flavorMode === 3 ? "border-teal-500 bg-teal-50" : ""
+                      }`}
+                      onClick={() => {
+                        setFlavorMode(3)
+                        setSelectedFlavorsForMulti([])
+                      }}
+                    >
+                      <div className="w-8 h-8 mb-2 flex-shrink-0 flex items-center justify-center">
+                        <svg width="32" height="32" viewBox="0 0 32 32" className="text-gray-700">
+                          <circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+                          <line x1="16" y1="4" x2="16" y2="28" stroke="currentColor" strokeWidth="1.5"/>
+                          <line x1="4" y1="16" x2="28" y2="16" stroke="currentColor" strokeWidth="1.5" transform="rotate(60 16 16)"/>
+                          <line x1="4" y1="16" x2="28" y2="16" stroke="currentColor" strokeWidth="1.5" transform="rotate(-60 16 16)"/>
+                        </svg>
+                      </div>
+                      <span className="text-xs">3</span>
                     </Button>
                   </div>
 
@@ -415,13 +441,13 @@ function HomePageContent() {
                   <div className="space-y-3">
                     {[...pizzasSalgadas, ...pizzasDoces].map((pizza) => {
                       const isSelected = selectedFlavorsForMulti.find(p => p.id === pizza.id)
-                      const isDisabled = multiFlavorMode && selectedFlavorsForMulti.length >= 2 && !isSelected
+                      const isDisabled = flavorMode > 1 && selectedFlavorsForMulti.length >= flavorMode && !isSelected
                       
                       return (
                         <div
                           key={pizza.id}
                           className={`flex items-center justify-between p-3 border rounded-lg transition-colors ${
-                            multiFlavorMode 
+                            flavorMode > 1 
                               ? (isSelected 
                                   ? "border-red-500 bg-red-50" 
                                   : isDisabled 
@@ -430,9 +456,9 @@ function HomePageContent() {
                               : "cursor-pointer hover:bg-gray-50"
                           }`}
                           onClick={() => {
-                            if (multiFlavorMode && !isDisabled) {
+                            if (flavorMode > 1 && !isDisabled) {
                               handleMultiFlavorSelection(pizza)
-                            } else if (!multiFlavorMode) {
+                            } else if (flavorMode === 1) {
                               setSelectedPizza(pizza)
                             }
                           }}
@@ -459,7 +485,7 @@ function HomePageContent() {
                           </div>
                         </div>
                         
-                        {multiFlavorMode ? (
+                        {flavorMode > 1 ? (
                           <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
                             isSelected
                               ? "border-red-500 bg-red-500"
@@ -478,7 +504,7 @@ function HomePageContent() {
                   </div>
 
                   {/* Resumo dos sabores selecionados */}
-                  {multiFlavorMode && selectedFlavorsForMulti.length === 2 && (
+                  {flavorMode > 1 && selectedFlavorsForMulti.length === flavorMode && (
                     <div className="space-y-3 pt-4 border-t">
                       <div className="text-center">
                         <div className="text-sm text-gray-600 mb-2">
@@ -530,7 +556,7 @@ function HomePageContent() {
         </div>
 
         {/* Modals */}
-        {selectedPizza && !multiFlavorMode && (
+        {selectedPizza && flavorMode === 1 && (
           <PizzaSelectionModal 
             pizza={selectedPizza} 
             isOpen={!!selectedPizza} 
@@ -542,11 +568,13 @@ function HomePageContent() {
 
         <StoreInfoModal isOpen={showStoreInfo} onClose={() => setShowStoreInfo(false)} config={config} />
 
-        {/* Popup temporário "Escolha o segundo sabor" */}
+        {/* Popup temporário "Escolha mais sabores" */}
         {showSecondFlavorPopup && (
           <div className="fixed bottom-20 left-4 right-4 z-50 animate-in slide-in-from-left duration-300">
             <div className="bg-black/70 text-white text-center py-3 px-4 rounded-lg shadow-lg">
-              <span className="text-sm font-medium">Escolha o segundo sabor</span>
+              <span className="text-sm font-medium">
+                Escolha {flavorMode === 2 ? "mais 1 sabor" : `mais ${flavorMode - selectedFlavorsForMulti.length} sabores`}
+              </span>
             </div>
           </div>
         )}
