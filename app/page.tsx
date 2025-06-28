@@ -184,6 +184,7 @@ const mockProdutos: Produto[] = [
 function HomePageContent() {
   const [config, setConfig] = useState<PizzariaConfig>(mockConfig)
   const [produtos, setProdutos] = useState<Produto[]>(mockProdutos)
+  const [opcoesSabores, setOpcoesSabores] = useState<any[]>([])
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({})
   const [selectedPizza, setSelectedPizza] = useState<Produto | null>(null)
   const [showStoreInfo, setShowStoreInfo] = useState(false)
@@ -223,9 +224,10 @@ function HomePageContent() {
     try {
       if (isSupabaseConfigured()) {
         // Try to load from Supabase
-        const [configResult, produtosResult] = await Promise.all([
+        const [configResult, produtosResult, opcoesResult] = await Promise.all([
           supabase.from("pizzaria_config").select("*").single(),
           supabase.from("produtos").select("*").eq("ativo", true).order("ordem"),
+          supabase.from("opcoes_sabores").select("*").eq("ativo", true).order("ordem"),
         ])
 
         if (configResult.data) {
@@ -235,10 +237,33 @@ function HomePageContent() {
         if (produtosResult.data && produtosResult.data.length > 0) {
           setProdutos(produtosResult.data)
         }
+
+        if (opcoesResult.data && opcoesResult.data.length > 0) {
+          setOpcoesSabores(opcoesResult.data)
+        } else {
+          // Fallback para opções padrão
+          setOpcoesSabores([
+            { id: "1", nome: "1 Sabor", maximo_sabores: 1, ordem: 1 },
+            { id: "2", nome: "2 Sabores", maximo_sabores: 2, ordem: 2 },
+            { id: "3", nome: "3 Sabores", maximo_sabores: 3, ordem: 3 }
+          ])
+        }
+      } else {
+        // Usar opções padrão quando Supabase não estiver configurado
+        setOpcoesSabores([
+          { id: "1", nome: "1 Sabor", maximo_sabores: 1, ordem: 1 },
+          { id: "2", nome: "2 Sabores", maximo_sabores: 2, ordem: 2 },
+          { id: "3", nome: "3 Sabores", maximo_sabores: 3, ordem: 3 }
+        ])
       }
     } catch (error) {
       console.error("Error loading data:", error)
-      // Keep using mock data on error
+      // Usar opções padrão em caso de erro
+      setOpcoesSabores([
+        { id: "1", nome: "1 Sabor", maximo_sabores: 1, ordem: 1 },
+        { id: "2", nome: "2 Sabores", maximo_sabores: 2, ordem: 2 },
+        { id: "3", nome: "3 Sabores", maximo_sabores: 3, ordem: 3 }
+      ])
     } finally {
       setLoading(false)
     }
@@ -376,65 +401,58 @@ function HomePageContent() {
                   <div className="text-sm text-gray-600">
                     Pizzas doces e salgadas (Tradicional 8 fatias / Broto 4 fatias)
                   </div>
-                  <div className="text-sm text-red-600">Você pode escolher até 3 sabores</div>
+                  <div className="text-sm text-red-600">
+                    Você pode escolher até {Math.max(...opcoesSabores.map(o => o.maximo_sabores))} sabores
+                  </div>
 
-                  {/* Botões de seleção de sabores */}
+                  {/* Botões de seleção de sabores dinamicos */}
                   <div className="flex space-x-3">
-                    <Button
-                      variant="outline"
-                      className={`flex-1 h-20 flex flex-col items-center justify-center bg-transparent ${
-                        flavorMode === 1 ? "border-teal-500 bg-teal-50" : ""
-                      }`}
-                      onClick={() => {
-                        setFlavorMode(1)
-                        setSelectedFlavorsForMulti([])
-                      }}
-                    >
-                      <div className="w-8 h-8 mb-2 flex-shrink-0 flex items-center justify-center">
-                        <svg width="32" height="32" viewBox="0 0 32 32" className="text-gray-700">
-                          <circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" strokeWidth="1.5"/>
-                        </svg>
-                      </div>
-                      <span className="text-xs">1</span>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className={`flex-1 h-20 flex flex-col items-center justify-center bg-transparent ${
-                        flavorMode === 2 ? "border-teal-500 bg-teal-50" : ""
-                      }`}
-                      onClick={() => {
-                        setFlavorMode(2)
-                        setSelectedFlavorsForMulti([])
-                      }}
-                    >
-                      <div className="w-8 h-8 mb-2 flex-shrink-0 flex items-center justify-center">
-                        <svg width="32" height="32" viewBox="0 0 32 32" className="text-gray-700">
-                          <circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" strokeWidth="1.5"/>
-                          <line x1="16" y1="4" x2="16" y2="28" stroke="currentColor" strokeWidth="1.5"/>
-                        </svg>
-                      </div>
-                      <span className="text-xs">2</span>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className={`flex-1 h-20 flex flex-col items-center justify-center bg-transparent ${
-                        flavorMode === 3 ? "border-teal-500 bg-teal-50" : ""
-                      }`}
-                      onClick={() => {
-                        setFlavorMode(3)
-                        setSelectedFlavorsForMulti([])
-                      }}
-                    >
-                      <div className="w-8 h-8 mb-2 flex-shrink-0 flex items-center justify-center">
-                        <svg width="32" height="32" viewBox="0 0 32 32" className="text-gray-700">
-                          <circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" strokeWidth="1.5"/>
-                          <line x1="16" y1="4" x2="16" y2="28" stroke="currentColor" strokeWidth="1.5"/>
-                          <line x1="4" y1="16" x2="28" y2="16" stroke="currentColor" strokeWidth="1.5" transform="rotate(60 16 16)"/>
-                          <line x1="4" y1="16" x2="28" y2="16" stroke="currentColor" strokeWidth="1.5" transform="rotate(-60 16 16)"/>
-                        </svg>
-                      </div>
-                      <span className="text-xs">3</span>
-                    </Button>
+                    {opcoesSabores.map((opcao, index) => {
+                      const IconComponent = () => {
+                        if (opcao.maximo_sabores === 1) {
+                          return (
+                            <svg width="32" height="32" viewBox="0 0 32 32" className="text-gray-700">
+                              <circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+                            </svg>
+                          )
+                        } else if (opcao.maximo_sabores === 2) {
+                          return (
+                            <svg width="32" height="32" viewBox="0 0 32 32" className="text-gray-700">
+                              <circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+                              <line x1="16" y1="4" x2="16" y2="28" stroke="currentColor" strokeWidth="1.5"/>
+                            </svg>
+                          )
+                        } else {
+                          return (
+                            <svg width="32" height="32" viewBox="0 0 32 32" className="text-gray-700">
+                              <circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+                              <line x1="16" y1="4" x2="16" y2="28" stroke="currentColor" strokeWidth="1.5"/>
+                              <line x1="4" y1="16" x2="28" y2="16" stroke="currentColor" strokeWidth="1.5" transform="rotate(60 16 16)"/>
+                              <line x1="4" y1="16" x2="28" y2="16" stroke="currentColor" strokeWidth="1.5" transform="rotate(-60 16 16)"/>
+                            </svg>
+                          )
+                        }
+                      }
+
+                      return (
+                        <Button
+                          key={opcao.id}
+                          variant="outline"
+                          className={`flex-1 h-20 flex flex-col items-center justify-center bg-transparent ${
+                            flavorMode === opcao.maximo_sabores ? "border-teal-500 bg-teal-50" : ""
+                          }`}
+                          onClick={() => {
+                            setFlavorMode(opcao.maximo_sabores as 1 | 2 | 3)
+                            setSelectedFlavorsForMulti([])
+                          }}
+                        >
+                          <div className="w-8 h-8 mb-2 flex-shrink-0 flex items-center justify-center">
+                            <IconComponent />
+                          </div>
+                          <span className="text-xs">{opcao.maximo_sabores}</span>
+                        </Button>
+                      )
+                    })}
                   </div>
 
                   {/* Lista de pizzas */}
