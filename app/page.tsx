@@ -248,16 +248,14 @@ export default function HomePage() {
             className="h-48 bg-cover bg-center"
             style={{ backgroundImage: `url(${config.foto_capa || "/placeholder.jpg"})` }}
           />
-          <div className="absolute -bottom-12 right-4">
-            <img
-              src={config.foto_perfil || "/placeholder-logo.png"}
-              alt="Logo da pizzaria"
-              className="w-24 h-24 rounded-lg border-4 border-white shadow-lg object-cover"
-            />
-          </div>
         </div>
 
-        <div className="px-4 pt-12 pb-4">
+        <div className="px-4 pt-4 pb-4 flex items-center space-x-4">
+          <img
+            src={config.foto_perfil || "/placeholder-logo.png"}
+            alt="Logo da pizzaria"
+            className="w-24 h-24 rounded-lg border-4 border-white shadow-lg object-cover flex-shrink-0"
+          />
           <h1 className="text-2xl font-bold text-gray-900">{config.nome}</h1>
         </div>
 
