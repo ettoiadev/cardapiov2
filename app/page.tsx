@@ -266,13 +266,8 @@ export default function HomePage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-6">
               <div className="text-center">
-                <div className="text-sm font-medium text-gray-900">ver taxas</div>
-                <div className="text-xs text-gray-500">entregas</div>
-              </div>
-
-              <div className="text-center">
                 <div className="text-sm font-medium text-gray-900">
-                  {config.tempo_entrega_min}-{config.tempo_entrega_max}
+                  {config.tempo_entrega_min}–{config.tempo_entrega_max}
                 </div>
                 <div className="text-xs text-gray-500">minutos</div>
               </div>
@@ -282,10 +277,17 @@ export default function HomePage() {
                 <div className="text-xs text-gray-500">mínimo</div>
               </div>
 
-              <div className="text-center flex space-x-1">
-                {config.aceita_dinheiro && <Banknote className="w-4 h-4" />}
-                {config.aceita_cartao && <CreditCard className="w-4 h-4" />}
-                <div className="text-xs text-gray-500 ml-1">pagamento</div>
+              <div className="text-center">
+                <div className="text-sm font-medium text-gray-900">ver taxas</div>
+                <div className="text-xs text-gray-500">entregas</div>
+              </div>
+
+              <div className="text-center">
+                <div className="flex justify-center items-center space-x-1 mb-1">
+                  {config.aceita_dinheiro && <Banknote className="w-4 h-4" />}
+                  {config.aceita_cartao && <CreditCard className="w-4 h-4" />}
+                </div>
+                <div className="text-xs text-gray-500">pagamento</div>
               </div>
             </div>
 
