@@ -28,6 +28,8 @@ interface PizzariaConfig {
 }
 
 export default function AdminConfigPage() {
+  const daysOrder = ["segunda", "terca", "quarta", "quinta", "sexta", "sabado", "domingo"]
+  
   const [config, setConfig] = useState<PizzariaConfig>({
     nome: "",
     foto_capa: "",
@@ -272,21 +274,24 @@ export default function AdminConfigPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(config.horario_funcionamento || {}).map(([dia, horario]) => (
-                  <div key={dia}>
-                    <Label htmlFor={dia} className="capitalize">
-                      {dia === 'terca' ? 'Terça' : 
-                       dia === 'sabado' ? 'Sábado' : 
-                       dia.charAt(0).toUpperCase() + dia.slice(1)}
-                    </Label>
-                    <Input
-                      id={dia}
-                      value={horario as string}
-                      onChange={(e) => updateHorario(dia, e.target.value)}
-                      placeholder="18:00-23:00 ou Fechado"
-                    />
-                  </div>
-                ))}
+                {daysOrder.map((dia) => {
+                  const horario = config.horario_funcionamento?.[dia] || ""
+                  return (
+                    <div key={dia}>
+                      <Label htmlFor={dia} className="capitalize">
+                        {dia === 'terca' ? 'Terça' : 
+                         dia === 'sabado' ? 'Sábado' : 
+                         dia.charAt(0).toUpperCase() + dia.slice(1)}
+                      </Label>
+                      <Input
+                        id={dia}
+                        value={horario}
+                        onChange={(e) => updateHorario(dia, e.target.value)}
+                        placeholder="18:00-23:00 ou Fechado"
+                      />
+                    </div>
+                  )
+                })}
               </div>
               <div className="text-sm text-gray-600">
                 Use o formato "HH:MM-HH:MM" (ex: 18:00-23:00) ou digite "Fechado" para dias sem funcionamento.

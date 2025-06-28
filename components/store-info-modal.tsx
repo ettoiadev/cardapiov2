@@ -28,6 +28,8 @@ interface StoreInfoModalProps {
 }
 
 export function StoreInfoModal({ isOpen, onClose, config }: StoreInfoModalProps) {
+  const daysOrder = ["segunda", "terca", "quarta", "quinta", "sexta", "sabado", "domingo"]
+  
   const formatDayName = (day: string) => {
     const days: { [key: string]: string } = {
       segunda: "segunda",
@@ -84,12 +86,15 @@ export function StoreInfoModal({ isOpen, onClose, config }: StoreInfoModalProps)
                 horários de funcionamento
               </h3>
               <div className="space-y-1 text-sm text-gray-600">
-                {Object.entries(config.horario_funcionamento).map(([dia, horario]) => (
-                  <div key={dia} className="flex justify-between">
-                    <span className="capitalize">{formatDayName(dia)}:</span>
-                    <span>{formatSchedule(horario as string)}</span>
-                  </div>
-                ))}
+                {daysOrder.map((dia) => {
+                  const horario = config.horario_funcionamento?.[dia] || "Fechado"
+                  return (
+                    <div key={dia} className="flex justify-between">
+                      <span className="capitalize">{formatDayName(dia)}:</span>
+                      <span>{formatSchedule(horario)}</span>
+                    </div>
+                  )
+                })}
               </div>
             </div>
           )}
