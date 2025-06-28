@@ -187,6 +187,7 @@ export default function HomePage() {
   const [selectedPizza, setSelectedPizza] = useState<Produto | null>(null)
   const [showStoreInfo, setShowStoreInfo] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [multiFlavorMode, setMultiFlavorMode] = useState(false)
 
   useEffect(() => {
     loadData()
@@ -318,20 +319,20 @@ export default function HomePage() {
                   <div className="flex space-x-4">
                     <Button
                       variant="outline"
-                      className="flex-1 h-16 flex flex-col items-center justify-center bg-transparent"
-                      onClick={() => {
-                        /* Implementar seleção 1 sabor */
-                      }}
+                      className={`flex-1 h-16 flex flex-col items-center justify-center bg-transparent ${
+                        !multiFlavorMode ? "border-red-500 bg-red-50" : ""
+                      }`}
+                      onClick={() => setMultiFlavorMode(false)}
                     >
                       <div className="w-8 h-8 aspect-square rounded-full bg-gray-200 border-2 border-gray-300 mb-1 flex-shrink-0"></div>
                       <span className="text-xs">1</span>
                     </Button>
                     <Button
                       variant="outline"
-                      className="flex-1 h-16 flex flex-col items-center justify-center bg-transparent"
-                      onClick={() => {
-                        /* Implementar seleção 2 sabores */
-                      }}
+                      className={`flex-1 h-16 flex flex-col items-center justify-center bg-transparent ${
+                        multiFlavorMode ? "border-red-500 bg-red-50" : ""
+                      }`}
+                      onClick={() => setMultiFlavorMode(true)}
                     >
                       <div className="w-8 h-8 aspect-square rounded-full border-2 border-gray-300 relative mb-1 overflow-hidden flex-shrink-0">
                         <div className="absolute left-0 top-0 w-1/2 h-full bg-gray-200"></div>
@@ -415,7 +416,13 @@ export default function HomePage() {
 
         {/* Modals */}
         {selectedPizza && (
-          <PizzaSelectionModal pizza={selectedPizza} isOpen={!!selectedPizza} onClose={() => setSelectedPizza(null)} />
+          <PizzaSelectionModal 
+            pizza={selectedPizza} 
+            isOpen={!!selectedPizza} 
+            onClose={() => setSelectedPizza(null)}
+            multiFlavorMode={multiFlavorMode}
+            availablePizzas={[...pizzasSalgadas, ...pizzasDoces]}
+          />
         )}
 
         <StoreInfoModal isOpen={showStoreInfo} onClose={() => setShowStoreInfo(false)} config={config} />
