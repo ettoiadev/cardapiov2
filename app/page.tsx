@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Minus, CreditCard, Banknote } from "lucide-react"
+import { Plus, Minus, CreditCard, Banknote, Check } from "lucide-react"
 import { supabase, isSupabaseConfigured } from "@/lib/supabase"
 import { CartProvider, useCart } from "@/lib/cart-context"
 import { PizzaSelectionModal } from "@/components/pizza-selection-modal"
@@ -189,11 +190,34 @@ function HomePageContent() {
   const [loading, setLoading] = useState(true)
   const [multiFlavorMode, setMultiFlavorMode] = useState(false)
   const [selectedFlavorsForMulti, setSelectedFlavorsForMulti] = useState<Produto[]>([])
+  const [showSecondFlavorPopup, setShowSecondFlavorPopup] = useState(false)
   const { dispatch } = useCart()
+  const router = useRouter()
 
   useEffect(() => {
     loadData()
   }, [])
+
+  // Controlar popup "Escolha o segundo sabor"
+  useEffect(() => {
+    if (multiFlavorMode && selectedFlavorsForMulti.length === 1) {
+      setShowSecondFlavorPopup(true)
+      const timer = setTimeout(() => {
+        setShowSecondFlavorPopup(false)
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [multiFlavorMode, selectedFlavorsForMulti.length])
+
+  // Redirecionamento automático para checkout
+  useEffect(() => {
+    if (multiFlavorMode && selectedFlavorsForMulti.length === 2) {
+      const timer = setTimeout(() => {
+        router.push('/checkout')
+      }, 500) // Pequeno delay para o usuário ver a seleção
+      return () => clearTimeout(timer)
+    }
+  }, [multiFlavorMode, selectedFlavorsForMulti.length, router])
 
   const loadData = async () => {
     try {
@@ -389,18 +413,30 @@ function HomePageContent() {
 
                   {/* Lista de pizzas */}
                   <div className="space-y-3">
-                    {[...pizzasSalgadas, ...pizzasDoces].map((pizza) => (
-                      <div
-                        key={pizza.id}
-                        className={`flex items-center justify-between p-3 border rounded-lg transition-colors ${
-                          multiFlavorMode 
-                            ? (selectedFlavorsForMulti.find(p => p.id === pizza.id) 
-                                ? "border-red-500 bg-red-50" 
-                                : "border-gray-200 hover:border-gray-300")
-                            : "cursor-pointer hover:bg-gray-50"
-                        }`}
-                        onClick={() => multiFlavorMode ? handleMultiFlavorSelection(pizza) : setSelectedPizza(pizza)}
-                      >
+                    {[...pizzasSalgadas, ...pizzasDoces].map((pizza) => {
+                      const isSelected = selectedFlavorsForMulti.find(p => p.id === pizza.id)
+                      const isDisabled = multiFlavorMode && selectedFlavorsForMulti.length >= 2 && !isSelected
+                      
+                      return (
+                        <div
+                          key={pizza.id}
+                          className={`flex items-center justify-between p-3 border rounded-lg transition-colors ${
+                            multiFlavorMode 
+                              ? (isSelected 
+                                  ? "border-red-500 bg-red-50" 
+                                  : isDisabled 
+                                    ? "border-gray-200 opacity-50 cursor-not-allowed"
+                                    : "border-gray-200 hover:border-gray-300 cursor-pointer")
+                              : "cursor-pointer hover:bg-gray-50"
+                          }`}
+                          onClick={() => {
+                            if (multiFlavorMode && !isDisabled) {
+                              handleMultiFlavorSelection(pizza)
+                            } else if (!multiFlavorMode) {
+                              setSelectedPizza(pizza)
+                            }
+                          }}
+                        >
                         <div className="flex-1">
                           <div className="flex items-center space-x-2">
                             <h3 className="font-medium">{pizza.nome}</h3>
@@ -424,41 +460,33 @@ function HomePageContent() {
                         </div>
                         
                         {multiFlavorMode ? (
-                          <div className={`w-6 h-6 rounded border-2 flex items-center justify-center ${
-                            selectedFlavorsForMulti.find(p => p.id === pizza.id)
+                          <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
+                            isSelected
                               ? "border-red-500 bg-red-500"
                               : "border-gray-300"
                           }`}>
-                            {selectedFlavorsForMulti.find(p => p.id === pizza.id) && (
-                              <div className="w-3 h-3 rounded bg-white"></div>
+                            {isSelected && (
+                              <Check className="w-4 h-4 text-white" />
                             )}
                           </div>
                         ) : (
                           <Plus className="w-5 h-5 text-red-600" />
                         )}
-                      </div>
-                    ))}
+                        </div>
+                      )
+                    })}
                   </div>
 
-                  {/* Botão para adicionar pizza de 2 sabores ao carrinho */}
+                  {/* Resumo dos sabores selecionados */}
                   {multiFlavorMode && selectedFlavorsForMulti.length === 2 && (
                     <div className="space-y-3 pt-4 border-t">
-                      <div className="text-sm text-gray-600">
-                        Sabores selecionados: {selectedFlavorsForMulti.map(p => p.nome).join(" + ")}
-                      </div>
-                      <div className="flex space-x-3">
-                        <Button
-                          onClick={() => handleAddMultiFlavorToCart("broto")}
-                          className="flex-1 bg-red-600 hover:bg-red-700"
-                        >
-                          Adicionar Broto - R${Math.max(...selectedFlavorsForMulti.map(p => p.preco_broto || 0)).toFixed(2)}
-                        </Button>
-                        <Button
-                          onClick={() => handleAddMultiFlavorToCart("tradicional")}
-                          className="flex-1 bg-red-600 hover:bg-red-700"
-                        >
-                          Adicionar Tradicional - R${Math.max(...selectedFlavorsForMulti.map(p => p.preco_tradicional || 0)).toFixed(2)}
-                        </Button>
+                      <div className="text-center">
+                        <div className="text-sm text-gray-600 mb-2">
+                          Sabores selecionados: {selectedFlavorsForMulti.map(p => p.nome).join(" + ")}
+                        </div>
+                        <div className="text-sm text-green-600 font-medium">
+                          Redirecionando para finalizar pedido...
+                        </div>
                       </div>
                     </div>
                   )}
@@ -513,6 +541,15 @@ function HomePageContent() {
         )}
 
         <StoreInfoModal isOpen={showStoreInfo} onClose={() => setShowStoreInfo(false)} config={config} />
+
+        {/* Popup temporário "Escolha o segundo sabor" */}
+        {showSecondFlavorPopup && (
+          <div className="fixed bottom-20 left-4 right-4 z-50 animate-in slide-in-from-left duration-300">
+            <div className="bg-black/70 text-white text-center py-3 px-4 rounded-lg shadow-lg">
+              <span className="text-sm font-medium">Escolha o segundo sabor</span>
+            </div>
+          </div>
+        )}
 
         {/* Carrinho fixo no rodapé */}
         <CartFooter />
