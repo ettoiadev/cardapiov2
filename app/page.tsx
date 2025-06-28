@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Minus, CreditCard, Banknote } from "lucide-react"
 import { supabase, isSupabaseConfigured } from "@/lib/supabase"
-import { CartProvider } from "@/lib/cart-context"
+import { CartProvider, useCart } from "@/lib/cart-context"
 import { PizzaSelectionModal } from "@/components/pizza-selection-modal"
 import { StoreInfoModal } from "@/components/store-info-modal"
 import { CartFooter } from "@/components/cart-footer"
@@ -180,7 +180,7 @@ const mockProdutos: Produto[] = [
   },
 ]
 
-export default function HomePage() {
+function HomePageContent() {
   const [config, setConfig] = useState<PizzariaConfig>(mockConfig)
   const [produtos, setProdutos] = useState<Produto[]>(mockProdutos)
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({})
@@ -188,6 +188,8 @@ export default function HomePage() {
   const [showStoreInfo, setShowStoreInfo] = useState(false)
   const [loading, setLoading] = useState(true)
   const [multiFlavorMode, setMultiFlavorMode] = useState(false)
+  const [selectedFlavorsForMulti, setSelectedFlavorsForMulti] = useState<Produto[]>([])
+  const { dispatch } = useCart()
 
   useEffect(() => {
     loadData()
@@ -225,6 +227,44 @@ export default function HomePage() {
     }))
   }
 
+  const handleMultiFlavorSelection = (pizza: Produto) => {
+    if (selectedFlavorsForMulti.find(p => p.id === pizza.id)) {
+      // Remove se já estiver selecionado
+      setSelectedFlavorsForMulti(prev => prev.filter(p => p.id !== pizza.id))
+    } else if (selectedFlavorsForMulti.length < 2) {
+      // Adiciona se ainda não atingiu o limite de 2
+      setSelectedFlavorsForMulti(prev => [...prev, pizza])
+    }
+  }
+
+  const handleAddMultiFlavorToCart = (tamanho: "broto" | "tradicional") => {
+    if (selectedFlavorsForMulti.length !== 2) return
+
+    // Calcula o maior preço entre os sabores selecionados
+    const prices = selectedFlavorsForMulti.map(pizza => 
+      tamanho === "broto" ? pizza.preco_broto || 0 : pizza.preco_tradicional || 0
+    )
+    const preco = Math.max(...prices)
+
+    const sabores = selectedFlavorsForMulti.map(p => p.nome)
+    const nomeItem = `Pizza ${sabores.join(" + ")}`
+
+    dispatch({
+      type: "ADD_ITEM",
+      payload: {
+        id: `multi-${sabores.sort().join("-")}-${tamanho}`,
+        nome: nomeItem,
+        tamanho: tamanho,
+        sabores: sabores,
+        preco: preco,
+        tipo: selectedFlavorsForMulti[0].tipo,
+      },
+    })
+
+    // Reset das seleções
+    setSelectedFlavorsForMulti([])
+  }
+
   const pizzasSalgadas = produtos.filter((p) => p.tipo === "salgada")
   const pizzasDoces = produtos.filter((p) => p.tipo === "doce")
   const bebidas = produtos.filter((p) => p.tipo === "bebida")
@@ -241,7 +281,6 @@ export default function HomePage() {
   }
 
   return (
-    <CartProvider>
       <div className="min-h-screen bg-gray-50">
         {/* Header com foto de capa e perfil */}
         <div className="relative">
@@ -322,7 +361,10 @@ export default function HomePage() {
                       className={`flex-1 h-16 flex flex-col items-center justify-center bg-transparent ${
                         !multiFlavorMode ? "border-red-500 bg-red-50" : ""
                       }`}
-                      onClick={() => setMultiFlavorMode(false)}
+                      onClick={() => {
+                        setMultiFlavorMode(false)
+                        setSelectedFlavorsForMulti([])
+                      }}
                     >
                       <div className="w-8 h-8 aspect-square rounded-full bg-gray-200 border-2 border-gray-300 mb-1 flex-shrink-0"></div>
                       <span className="text-xs">1</span>
@@ -332,7 +374,10 @@ export default function HomePage() {
                       className={`flex-1 h-16 flex flex-col items-center justify-center bg-transparent ${
                         multiFlavorMode ? "border-red-500 bg-red-50" : ""
                       }`}
-                      onClick={() => setMultiFlavorMode(true)}
+                      onClick={() => {
+                        setMultiFlavorMode(true)
+                        setSelectedFlavorsForMulti([])
+                      }}
                     >
                       <div className="w-8 h-8 aspect-square rounded-full border-2 border-gray-300 relative mb-1 overflow-hidden flex-shrink-0">
                         <div className="absolute left-0 top-0 w-1/2 h-full bg-gray-200"></div>
@@ -347,8 +392,14 @@ export default function HomePage() {
                     {[...pizzasSalgadas, ...pizzasDoces].map((pizza) => (
                       <div
                         key={pizza.id}
-                        className="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
-                        onClick={() => setSelectedPizza(pizza)}
+                        className={`flex items-center justify-between p-3 border rounded-lg transition-colors ${
+                          multiFlavorMode 
+                            ? (selectedFlavorsForMulti.find(p => p.id === pizza.id) 
+                                ? "border-red-500 bg-red-50" 
+                                : "border-gray-200 hover:border-gray-300")
+                            : "cursor-pointer hover:bg-gray-50"
+                        }`}
+                        onClick={() => multiFlavorMode ? handleMultiFlavorSelection(pizza) : setSelectedPizza(pizza)}
                       >
                         <div className="flex-1">
                           <div className="flex items-center space-x-2">
@@ -371,10 +422,46 @@ export default function HomePage() {
                             )}
                           </div>
                         </div>
-                        <Plus className="w-5 h-5 text-red-600" />
+                        
+                        {multiFlavorMode ? (
+                          <div className={`w-6 h-6 rounded border-2 flex items-center justify-center ${
+                            selectedFlavorsForMulti.find(p => p.id === pizza.id)
+                              ? "border-red-500 bg-red-500"
+                              : "border-gray-300"
+                          }`}>
+                            {selectedFlavorsForMulti.find(p => p.id === pizza.id) && (
+                              <div className="w-3 h-3 rounded bg-white"></div>
+                            )}
+                          </div>
+                        ) : (
+                          <Plus className="w-5 h-5 text-red-600" />
+                        )}
                       </div>
                     ))}
                   </div>
+
+                  {/* Botão para adicionar pizza de 2 sabores ao carrinho */}
+                  {multiFlavorMode && selectedFlavorsForMulti.length === 2 && (
+                    <div className="space-y-3 pt-4 border-t">
+                      <div className="text-sm text-gray-600">
+                        Sabores selecionados: {selectedFlavorsForMulti.map(p => p.nome).join(" + ")}
+                      </div>
+                      <div className="flex space-x-3">
+                        <Button
+                          onClick={() => handleAddMultiFlavorToCart("broto")}
+                          className="flex-1 bg-red-600 hover:bg-red-700"
+                        >
+                          Adicionar Broto - R${Math.max(...selectedFlavorsForMulti.map(p => p.preco_broto || 0)).toFixed(2)}
+                        </Button>
+                        <Button
+                          onClick={() => handleAddMultiFlavorToCart("tradicional")}
+                          className="flex-1 bg-red-600 hover:bg-red-700"
+                        >
+                          Adicionar Tradicional - R${Math.max(...selectedFlavorsForMulti.map(p => p.preco_tradicional || 0)).toFixed(2)}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </CardContent>
@@ -415,12 +502,12 @@ export default function HomePage() {
         </div>
 
         {/* Modals */}
-        {selectedPizza && (
+        {selectedPizza && !multiFlavorMode && (
           <PizzaSelectionModal 
             pizza={selectedPizza} 
             isOpen={!!selectedPizza} 
             onClose={() => setSelectedPizza(null)}
-            multiFlavorMode={multiFlavorMode}
+            multiFlavorMode={false}
             availablePizzas={[...pizzasSalgadas, ...pizzasDoces]}
           />
         )}
@@ -430,6 +517,13 @@ export default function HomePage() {
         {/* Carrinho fixo no rodapé */}
         <CartFooter />
       </div>
+  )
+}
+
+export default function HomePage() {
+  return (
+    <CartProvider>
+      <HomePageContent />
     </CartProvider>
   )
 }
