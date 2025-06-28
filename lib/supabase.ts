@@ -1,0 +1,225 @@
+import { createClient } from "@supabase/supabase-js"
+
+// Remove the fallback values and warnings since Supabase is now configured
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+export type Database = {
+  public: {
+    Tables: {
+      pizzaria_config: {
+        Row: {
+          id: string
+          nome: string
+          foto_capa: string | null
+          foto_perfil: string | null
+          taxa_entrega: number
+          tempo_entrega_min: number
+          tempo_entrega_max: number
+          valor_minimo: number
+          aceita_dinheiro: boolean
+          aceita_cartao: boolean
+          endereco: string | null
+          telefone: string | null
+          whatsapp: string | null
+          horario_funcionamento: any
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          nome: string
+          foto_capa?: string | null
+          foto_perfil?: string | null
+          taxa_entrega?: number
+          tempo_entrega_min?: number
+          tempo_entrega_max?: number
+          valor_minimo?: number
+          aceita_dinheiro?: boolean
+          aceita_cartao?: boolean
+          endereco?: string | null
+          telefone?: string | null
+          whatsapp?: string | null
+          horario_funcionamento?: any
+        }
+        Update: {
+          nome?: string
+          foto_capa?: string | null
+          foto_perfil?: string | null
+          taxa_entrega?: number
+          tempo_entrega_min?: number
+          tempo_entrega_max?: number
+          valor_minimo?: number
+          aceita_dinheiro?: boolean
+          aceita_cartao?: boolean
+          endereco?: string | null
+          telefone?: string | null
+          whatsapp?: string | null
+          horario_funcionamento?: any
+        }
+      }
+      categorias: {
+        Row: {
+          id: string
+          nome: string
+          descricao: string | null
+          ordem: number
+          ativo: boolean
+          created_at: string
+        }
+        Insert: {
+          nome: string
+          descricao?: string | null
+          ordem?: number
+          ativo?: boolean
+        }
+        Update: {
+          nome?: string
+          descricao?: string | null
+          ordem?: number
+          ativo?: boolean
+        }
+      }
+      produtos: {
+        Row: {
+          id: string
+          categoria_id: string | null
+          nome: string
+          descricao: string | null
+          preco_tradicional: number | null
+          preco_broto: number | null
+          tipo: string
+          ativo: boolean
+          ordem: number
+          created_at: string
+        }
+        Insert: {
+          categoria_id?: string | null
+          nome: string
+          descricao?: string | null
+          preco_tradicional?: number | null
+          preco_broto?: number | null
+          tipo?: string
+          ativo?: boolean
+          ordem?: number
+        }
+        Update: {
+          categoria_id?: string | null
+          nome?: string
+          descricao?: string | null
+          preco_tradicional?: number | null
+          preco_broto?: number | null
+          tipo?: string
+          ativo?: boolean
+          ordem?: number
+        }
+      }
+      clientes: {
+        Row: {
+          id: string
+          nome: string
+          email: string | null
+          telefone: string | null
+          endereco: string | null
+          cep: string | null
+          cidade: string | null
+          estado: string | null
+          created_at: string
+        }
+        Insert: {
+          nome: string
+          email?: string | null
+          telefone?: string | null
+          endereco?: string | null
+          cep?: string | null
+          cidade?: string | null
+          estado?: string | null
+        }
+        Update: {
+          nome?: string
+          email?: string | null
+          telefone?: string | null
+          endereco?: string | null
+          cep?: string | null
+          cidade?: string | null
+          estado?: string | null
+        }
+      }
+      pedidos: {
+        Row: {
+          id: string
+          cliente_id: string | null
+          tipo_entrega: string
+          endereco_entrega: string | null
+          forma_pagamento: string | null
+          subtotal: number
+          taxa_entrega: number
+          total: number
+          status: string
+          observacoes: string | null
+          enviado_whatsapp: boolean
+          created_at: string
+        }
+        Insert: {
+          cliente_id?: string | null
+          tipo_entrega: string
+          endereco_entrega?: string | null
+          forma_pagamento?: string | null
+          subtotal: number
+          taxa_entrega?: number
+          total: number
+          status?: string
+          observacoes?: string | null
+          enviado_whatsapp?: boolean
+        }
+        Update: {
+          cliente_id?: string | null
+          tipo_entrega?: string
+          endereco_entrega?: string | null
+          forma_pagamento?: string | null
+          subtotal?: number
+          taxa_entrega?: number
+          total?: number
+          status?: string
+          observacoes?: string | null
+          enviado_whatsapp?: boolean
+        }
+      }
+      pedido_itens: {
+        Row: {
+          id: string
+          pedido_id: string
+          produto_id: string | null
+          nome_produto: string
+          tamanho: string | null
+          sabores: any
+          quantidade: number
+          preco_unitario: number
+          preco_total: number
+          created_at: string
+        }
+        Insert: {
+          pedido_id: string
+          produto_id?: string | null
+          nome_produto: string
+          tamanho?: string | null
+          sabores?: any
+          quantidade?: number
+          preco_unitario: number
+          preco_total: number
+        }
+        Update: {
+          pedido_id?: string
+          produto_id?: string | null
+          nome_produto?: string
+          tamanho?: string | null
+          sabores?: any
+          quantidade?: number
+          preco_unitario?: number
+          preco_total?: number
+        }
+      }
+    }
+  }
+}
