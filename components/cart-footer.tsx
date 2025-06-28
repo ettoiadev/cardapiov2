@@ -1,27 +1,34 @@
 "use client"
 
-import { ShoppingBag } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { useCart } from "@/lib/cart-context"
+import { Button } from "@/components/ui/button"
+import { ShoppingBag } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 export function CartFooter() {
   const { state } = useCart()
   const router = useRouter()
 
-  if (state.quantidade === 0) return null
+  if (state.items.length === 0) {
+    return null
+  }
+
+  const totalItems = state.items.reduce((sum, item) => sum + item.quantidade, 0)
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 z-50">
-      <Button onClick={() => router.push("/checkout")} className="w-full flex items-center justify-between" size="lg">
+    <div className="fixed bottom-0 left-0 right-0 bg-red-600 text-white p-4 shadow-lg">
+      <Button
+        onClick={() => router.push("/checkout")}
+        className="w-full bg-transparent hover:bg-red-700 border-none flex items-center justify-between text-white"
+      >
         <div className="flex items-center space-x-2">
-          <ShoppingBag className="h-5 w-5" />
+          <ShoppingBag className="w-5 h-5" />
           <span>
-            {state.quantidade} {state.quantidade === 1 ? "item" : "itens"}
+            {totalItems} {totalItems === 1 ? "item" : "itens"}
           </span>
         </div>
         <span>Fechar pedido</span>
-        <span className="font-bold">R$ {state.total.toFixed(2)}</span>
+        <span className="font-bold">R${state.total.toFixed(2)}</span>
       </Button>
     </div>
   )

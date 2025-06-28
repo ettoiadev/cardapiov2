@@ -1,14 +1,15 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { ChevronDown, ChevronUp, Plus, CreditCard, Banknote } from "lucide-react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { supabase } from "@/lib/supabase"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Plus, Minus, CreditCard, Banknote } from "lucide-react"
+import { supabase, isSupabaseConfigured } from "@/lib/supabase"
+import { CartProvider } from "@/lib/cart-context"
 import { PizzaSelectionModal } from "@/components/pizza-selection-modal"
 import { StoreInfoModal } from "@/components/store-info-modal"
 import { CartFooter } from "@/components/cart-footer"
-import { useCart } from "@/lib/cart-context"
 
 interface PizzariaConfig {
   id: string
@@ -24,32 +25,168 @@ interface PizzariaConfig {
   endereco: string | null
   telefone: string | null
   whatsapp: string | null
-}
-
-interface Categoria {
-  id: string
-  nome: string
-  descricao: string | null
+  horario_funcionamento: any
 }
 
 interface Produto {
   id: string
-  categoria_id: string | null
   nome: string
   descricao: string | null
   preco_tradicional: number | null
   preco_broto: number | null
   tipo: string
+  ativo: boolean
 }
 
+// Mock data for when Supabase is not configured
+const mockConfig: PizzariaConfig = {
+  id: "1",
+  nome: "Pizzaria Bella Vista",
+  foto_capa: "/placeholder.jpg",
+  foto_perfil: "/placeholder-logo.png",
+  taxa_entrega: 5.0,
+  tempo_entrega_min: 60,
+  tempo_entrega_max: 90,
+  valor_minimo: 20.0,
+  aceita_dinheiro: true,
+  aceita_cartao: true,
+  endereco: "Rua das Flores, 123 - Centro",
+  telefone: "(11) 99999-9999",
+  whatsapp: "5511999999999",
+  horario_funcionamento: {
+    segunda: "18:00-23:00",
+    terca: "18:00-23:00",
+    quarta: "18:00-23:00",
+    quinta: "18:00-23:00",
+    sexta: "18:00-00:00",
+    sabado: "18:00-00:00",
+    domingo: "18:00-23:00",
+  },
+}
+
+const mockProdutos: Produto[] = [
+  // Pizzas Salgadas
+  {
+    id: "1",
+    nome: "Margherita",
+    descricao: "Molho de tomate, mussarela, manjericão",
+    preco_tradicional: 35.0,
+    preco_broto: 25.0,
+    tipo: "salgada",
+    ativo: true,
+  },
+  {
+    id: "2",
+    nome: "Calabresa",
+    descricao: "Molho de tomate, mussarela, calabresa, cebola",
+    preco_tradicional: 38.0,
+    preco_broto: 28.0,
+    tipo: "salgada",
+    ativo: true,
+  },
+  {
+    id: "3",
+    nome: "Portuguesa",
+    descricao: "Molho de tomate, mussarela, presunto, ovos, cebola, azeitona",
+    preco_tradicional: 42.0,
+    preco_broto: 32.0,
+    tipo: "salgada",
+    ativo: true,
+  },
+  {
+    id: "4",
+    nome: "Frango Catupiry",
+    descricao: "Molho de tomate, mussarela, frango desfiado, catupiry",
+    preco_tradicional: 40.0,
+    preco_broto: 30.0,
+    tipo: "salgada",
+    ativo: true,
+  },
+  {
+    id: "5",
+    nome: "Quatro Queijos",
+    descricao: "Molho de tomate, mussarela, provolone, parmesão, gorgonzola",
+    preco_tradicional: 45.0,
+    preco_broto: 35.0,
+    tipo: "salgada",
+    ativo: true,
+  },
+
+  // Pizzas Doces
+  {
+    id: "6",
+    nome: "Chocolate",
+    descricao: "Chocolate ao leite derretido",
+    preco_tradicional: 32.0,
+    preco_broto: 22.0,
+    tipo: "doce",
+    ativo: true,
+  },
+  {
+    id: "7",
+    nome: "Brigadeiro",
+    descricao: "Chocolate, leite condensado, granulado",
+    preco_tradicional: 35.0,
+    preco_broto: 25.0,
+    tipo: "doce",
+    ativo: true,
+  },
+  {
+    id: "8",
+    nome: "Romeu e Julieta",
+    descricao: "Queijo minas, goiabada",
+    preco_tradicional: 38.0,
+    preco_broto: 28.0,
+    tipo: "doce",
+    ativo: true,
+  },
+
+  // Bebidas
+  {
+    id: "9",
+    nome: "Coca-Cola 2L",
+    descricao: "Refrigerante Coca-Cola 2 litros",
+    preco_tradicional: 8.0,
+    preco_broto: null,
+    tipo: "bebida",
+    ativo: true,
+  },
+  {
+    id: "10",
+    nome: "Guaraná Antarctica 2L",
+    descricao: "Refrigerante Guaraná Antarctica 2 litros",
+    preco_tradicional: 7.0,
+    preco_broto: null,
+    tipo: "bebida",
+    ativo: true,
+  },
+  {
+    id: "11",
+    nome: "Água Mineral",
+    descricao: "Água mineral 500ml",
+    preco_tradicional: 3.0,
+    preco_broto: null,
+    tipo: "bebida",
+    ativo: true,
+  },
+  {
+    id: "12",
+    nome: "Suco de Laranja",
+    descricao: "Suco natural de laranja 500ml",
+    preco_tradicional: 6.0,
+    preco_broto: null,
+    tipo: "bebida",
+    ativo: true,
+  },
+]
+
 export default function HomePage() {
-  const [config, setConfig] = useState<PizzariaConfig | null>(null)
-  const [categorias, setCategorias] = useState<Categoria[]>([])
-  const [produtos, setProdutos] = useState<Produto[]>([])
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
-  const [showPizzaModal, setShowPizzaModal] = useState(false)
-  const [showInfoModal, setShowInfoModal] = useState(false)
-  const { dispatch } = useCart()
+  const [config, setConfig] = useState<PizzariaConfig>(mockConfig)
+  const [produtos, setProdutos] = useState<Produto[]>(mockProdutos)
+  const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({})
+  const [selectedPizza, setSelectedPizza] = useState<Produto | null>(null)
+  const [showStoreInfo, setShowStoreInfo] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     loadData()
@@ -57,353 +194,232 @@ export default function HomePage() {
 
   const loadData = async () => {
     try {
-      // Carregar configurações da pizzaria
-      const { data: configData, error: configError } = await supabase.from("pizzaria_config").select("*").single()
-
-      if (configError) {
-        console.error("Erro ao carregar configurações:", configError)
-        // Set default config if database is empty
-        setConfig({
-          id: "default",
-          nome: "Pizzaria Bella Vista",
-          foto_capa: null,
-          foto_perfil: null,
-          taxa_entrega: 5.0,
-          tempo_entrega_min: 60,
-          tempo_entrega_max: 90,
-          valor_minimo: 20.0,
-          aceita_dinheiro: true,
-          aceita_cartao: true,
-          endereco: "Rua das Flores, 123 - Centro",
-          telefone: "(11) 3333-4444",
-          whatsapp: "5511999887766",
-        })
-      } else if (configData) {
-        setConfig(configData)
-      }
-
-      // Carregar categorias
-      const { data: categoriasData, error: categoriasError } = await supabase
-        .from("categorias")
-        .select("*")
-        .eq("ativo", true)
-        .order("ordem")
-
-      if (categoriasError) {
-        console.error("Erro ao carregar categorias:", categoriasError)
-        // Set default categories
-        setCategorias([
-          {
-            id: "pizzas",
-            nome: "Pizzas",
-            descricao: "Pizzas doces e salgadas (Tradicional 8 fatias / Broto 4 fatias)",
-          },
-          { id: "bebidas", nome: "Bebidas", descricao: "Refrigerantes, sucos e águas" },
+      if (isSupabaseConfigured()) {
+        // Try to load from Supabase
+        const [configResult, produtosResult] = await Promise.all([
+          supabase.from("pizzaria_config").select("*").single(),
+          supabase.from("produtos").select("*").eq("ativo", true).order("ordem"),
         ])
-      } else if (categoriasData) {
-        setCategorias(categoriasData)
-      }
 
-      // Carregar produtos
-      const { data: produtosData, error: produtosError } = await supabase
-        .from("produtos")
-        .select("*")
-        .eq("ativo", true)
-        .order("ordem")
+        if (configResult.data) {
+          setConfig(configResult.data)
+        }
 
-      if (produtosError) {
-        console.error("Erro ao carregar produtos:", produtosError)
-        // Set default products
-        setProdutos([
-          {
-            id: "1",
-            categoria_id: "pizzas",
-            nome: "Margherita",
-            descricao: "Molho de tomate, mussarela e manjericão",
-            preco_tradicional: 35.0,
-            preco_broto: 25.0,
-            tipo: "salgada",
-          },
-          {
-            id: "2",
-            categoria_id: "pizzas",
-            nome: "Pepperoni",
-            descricao: "Molho de tomate, mussarela e pepperoni",
-            preco_tradicional: 42.0,
-            preco_broto: 32.0,
-            tipo: "salgada",
-          },
-          {
-            id: "3",
-            categoria_id: "pizzas",
-            nome: "Portuguesa",
-            descricao: "Molho de tomate, mussarela, presunto, ovos, cebola e azeitona",
-            preco_tradicional: 45.0,
-            preco_broto: 35.0,
-            tipo: "salgada",
-          },
-          {
-            id: "4",
-            categoria_id: "pizzas",
-            nome: "Chocolate",
-            descricao: "Chocolate ao leite derretido",
-            preco_tradicional: 38.0,
-            preco_broto: 28.0,
-            tipo: "doce",
-          },
-          {
-            id: "5",
-            categoria_id: "pizzas",
-            nome: "Brigadeiro",
-            descricao: "Chocolate, granulado e leite condensado",
-            preco_tradicional: 40.0,
-            preco_broto: 30.0,
-            tipo: "doce",
-          },
-          {
-            id: "6",
-            categoria_id: "bebidas",
-            nome: "Coca-Cola 2L",
-            descricao: "Refrigerante Coca-Cola 2 litros",
-            preco_tradicional: 8.0,
-            preco_broto: null,
-            tipo: "bebida",
-          },
-          {
-            id: "7",
-            categoria_id: "bebidas",
-            nome: "Guaraná Antarctica 2L",
-            descricao: "Refrigerante Guaraná Antarctica 2 litros",
-            preco_tradicional: 7.5,
-            preco_broto: null,
-            tipo: "bebida",
-          },
-          {
-            id: "8",
-            categoria_id: "bebidas",
-            nome: "Água Mineral 500ml",
-            descricao: "Água mineral sem gás",
-            preco_tradicional: 3.0,
-            preco_broto: null,
-            tipo: "bebida",
-          },
-        ])
-      } else if (produtosData) {
-        setProdutos(produtosData)
+        if (produtosResult.data && produtosResult.data.length > 0) {
+          setProdutos(produtosResult.data)
+        }
       }
     } catch (error) {
-      console.error("Erro geral ao carregar dados:", error)
-      // Set all default data in case of connection issues
-      setConfig({
-        id: "default",
-        nome: "Pizzaria Bella Vista",
-        foto_capa: null,
-        foto_perfil: null,
-        taxa_entrega: 5.0,
-        tempo_entrega_min: 60,
-        tempo_entrega_max: 90,
-        valor_minimo: 20.0,
-        aceita_dinheiro: true,
-        aceita_cartao: true,
-        endereco: "Rua das Flores, 123 - Centro",
-        telefone: "(11) 3333-4444",
-        whatsapp: "5511999887766",
-      })
-
-      setCategorias([
-        { id: "pizzas", nome: "Pizzas", descricao: "Pizzas doces e salgadas (Tradicional 8 fatias / Broto 4 fatias)" },
-        { id: "bebidas", nome: "Bebidas", descricao: "Refrigerantes, sucos e águas" },
-      ])
-
-      setProdutos([
-        {
-          id: "1",
-          categoria_id: "pizzas",
-          nome: "Margherita",
-          descricao: "Molho de tomate, mussarela e manjericão",
-          preco_tradicional: 35.0,
-          preco_broto: 25.0,
-          tipo: "salgada",
-        },
-        {
-          id: "2",
-          categoria_id: "pizzas",
-          nome: "Pepperoni",
-          descricao: "Molho de tomate, mussarela e pepperoni",
-          preco_tradicional: 42.0,
-          preco_broto: 32.0,
-          tipo: "salgada",
-        },
-        {
-          id: "6",
-          categoria_id: "bebidas",
-          nome: "Coca-Cola 2L",
-          descricao: "Refrigerante Coca-Cola 2 litros",
-          preco_tradicional: 8.0,
-          preco_broto: null,
-          tipo: "bebida",
-        },
-      ])
+      console.error("Error loading data:", error)
+      // Keep using mock data on error
+    } finally {
+      setLoading(false)
     }
   }
 
-  const toggleCategory = (categoryId: string) => {
-    const newExpanded = new Set(expandedCategories)
-    if (newExpanded.has(categoryId)) {
-      newExpanded.delete(categoryId)
-    } else {
-      newExpanded.add(categoryId)
-    }
-    setExpandedCategories(newExpanded)
+  const toggleSection = (section: string) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }))
   }
 
-  const addBebidaToCart = (produto: Produto) => {
-    const cartItem = {
-      id: `bebida-${Date.now()}`,
-      produtoId: produto.id,
-      nome: produto.nome,
-      tamanho: "tradicional" as const,
-      sabores: [produto.nome],
-      quantidade: 1,
-      precoUnitario: produto.preco_tradicional || 0,
-      precoTotal: produto.preco_tradicional || 0,
-      tipo: "bebida" as const,
-    }
+  const pizzasSalgadas = produtos.filter((p) => p.tipo === "salgada")
+  const pizzasDoces = produtos.filter((p) => p.tipo === "doce")
+  const bebidas = produtos.filter((p) => p.tipo === "bebida")
 
-    dispatch({ type: "ADD_ITEM", payload: cartItem })
-  }
-
-  const pizzas = produtos.filter((p) => p.categoria_id === categorias.find((c) => c.nome === "Pizzas")?.id)
-  const bebidas = produtos.filter((p) => p.categoria_id === categorias.find((c) => c.nome === "Bebidas")?.id)
-
-  if (!config) {
-    return <div className="flex items-center justify-center min-h-screen">Carregando...</div>
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Carregando cardápio...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      {/* Header com foto de capa e perfil */}
-      <div className="relative">
-        <div
-          className="h-48 bg-gradient-to-r from-red-500 to-orange-500 bg-cover bg-center"
-          style={{
-            backgroundImage: config.foto_capa ? `url(${config.foto_capa})` : undefined,
-          }}
-        />
-        <div className="absolute -bottom-8 right-4">
+    <CartProvider>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header com foto de capa e perfil */}
+        <div className="relative">
           <div
-            className="w-16 h-16 bg-white rounded-lg shadow-lg bg-cover bg-center border-2 border-white"
-            style={{
-              backgroundImage: config.foto_perfil ? `url(${config.foto_perfil})` : undefined,
-            }}
+            className="h-48 bg-cover bg-center"
+            style={{ backgroundImage: `url(${config.foto_capa || "/placeholder.jpg"})` }}
           />
-        </div>
-      </div>
-
-      {/* Nome da pizzaria */}
-      <div className="px-4 pt-12 pb-4">
-        <h1 className="text-2xl font-bold text-gray-900">{config.nome}</h1>
-      </div>
-
-      {/* Menu horizontal com informações */}
-      <div className="px-4 mb-6">
-        <div className="flex items-center justify-between bg-white rounded-lg p-4 shadow-sm">
-          <div className="flex items-center space-x-6">
-            <div className="text-center">
-              <div className="text-sm font-medium text-blue-600">Ver taxas</div>
-              <div className="text-xs text-gray-500">entregas</div>
-            </div>
-
-            <div className="text-center">
-              <div className="text-sm font-medium">
-                {config.tempo_entrega_min}-{config.tempo_entrega_max}
-              </div>
-              <div className="text-xs text-gray-500">minutos</div>
-            </div>
-
-            <div className="text-center">
-              <div className="text-sm font-medium">R$ {config.valor_minimo.toFixed(2)}</div>
-              <div className="text-xs text-gray-500">mínimo</div>
-            </div>
-
-            <div className="text-center">
-              <div className="flex space-x-1 justify-center">
-                {config.aceita_dinheiro && <Banknote className="h-4 w-4" />}
-                {config.aceita_cartao && <CreditCard className="h-4 w-4" />}
-              </div>
-              <div className="text-xs text-gray-500">pagamento</div>
-            </div>
+          <div className="absolute -bottom-8 right-4">
+            <img
+              src={config.foto_perfil || "/placeholder-logo.png"}
+              alt="Logo da pizzaria"
+              className="w-16 h-16 rounded-lg border-4 border-white shadow-lg object-cover"
+            />
           </div>
-
-          <Button variant="outline" size="sm" onClick={() => setShowInfoModal(true)}>
-            <Plus className="h-4 w-4" />
-          </Button>
         </div>
-      </div>
 
-      {/* Cardápio */}
-      <div className="px-4 space-y-4">
-        {categorias.map((categoria) => {
-          const isExpanded = expandedCategories.has(categoria.id)
-          const produtosCategoria = produtos.filter((p) => p.categoria_id === categoria.id)
+        <div className="px-4 pt-12 pb-4">
+          <h1 className="text-2xl font-bold text-gray-900">{config.nome}</h1>
+        </div>
 
-          return (
-            <Card key={categoria.id} className="overflow-hidden">
-              <div
-                className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50"
-                onClick={() => {
-                  if (categoria.nome === "Pizzas") {
-                    setShowPizzaModal(true)
-                  } else {
-                    toggleCategory(categoria.id)
-                  }
-                }}
-              >
-                <div>
-                  <h2 className="text-lg font-semibold">{categoria.nome}</h2>
-                  {categoria.descricao && <p className="text-sm text-gray-600 mt-1">{categoria.descricao}</p>}
-                </div>
-                {categoria.nome === "Pizzas" ? (
-                  <Plus className="h-5 w-5 text-gray-400" />
-                ) : isExpanded ? (
-                  <ChevronUp className="h-5 w-5 text-gray-400" />
-                ) : (
-                  <ChevronDown className="h-5 w-5 text-gray-400" />
-                )}
+        {/* Menu horizontal com informações */}
+        <div className="px-4 py-4 bg-white border-b">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-6">
+              <div className="text-center">
+                <div className="text-sm font-medium text-gray-900">ver taxas</div>
+                <div className="text-xs text-gray-500">entregas</div>
               </div>
 
-              {isExpanded && categoria.nome !== "Pizzas" && (
-                <div className="border-t bg-gray-50">
-                  <div className="p-4 space-y-3">
-                    {produtosCategoria.map((produto) => (
-                      <div key={produto.id} className="flex items-center justify-between bg-white p-3 rounded-lg">
+              <div className="text-center">
+                <div className="text-sm font-medium text-gray-900">
+                  {config.tempo_entrega_min}-{config.tempo_entrega_max}
+                </div>
+                <div className="text-xs text-gray-500">minutos</div>
+              </div>
+
+              <div className="text-center">
+                <div className="text-sm font-medium text-gray-900">R${config.valor_minimo.toFixed(2)}</div>
+                <div className="text-xs text-gray-500">mínimo</div>
+              </div>
+
+              <div className="text-center flex space-x-1">
+                {config.aceita_dinheiro && <Banknote className="w-4 h-4" />}
+                {config.aceita_cartao && <CreditCard className="w-4 h-4" />}
+                <div className="text-xs text-gray-500 ml-1">pagamento</div>
+              </div>
+            </div>
+
+            <Button variant="outline" size="sm" onClick={() => setShowStoreInfo(true)}>
+              <Plus className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Cardápio */}
+        <div className="px-4 py-4 space-y-4">
+          {/* Seção Pizzas */}
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between cursor-pointer" onClick={() => toggleSection("pizzas")}>
+                <h2 className="text-lg font-semibold">Pizzas</h2>
+                {expandedSections.pizzas ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+              </div>
+
+              {expandedSections.pizzas && (
+                <div className="mt-4 space-y-4">
+                  <div className="text-sm text-gray-600">
+                    Pizzas doces e salgadas (Tradicional 8 fatias / Broto 4 fatias)
+                  </div>
+                  <div className="text-sm text-gray-600">Você pode escolher até 2 sabores</div>
+
+                  {/* Botões de seleção de sabores */}
+                  <div className="flex space-x-4">
+                    <Button
+                      variant="outline"
+                      className="flex-1 h-16 flex flex-col items-center justify-center bg-transparent"
+                      onClick={() => {
+                        /* Implementar seleção 1 sabor */
+                      }}
+                    >
+                      <div className="w-8 h-8 rounded-full border-2 border-gray-400 mb-1"></div>
+                      <span className="text-xs">1</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="flex-1 h-16 flex flex-col items-center justify-center bg-transparent"
+                      onClick={() => {
+                        /* Implementar seleção 2 sabores */
+                      }}
+                    >
+                      <div className="w-8 h-8 rounded-full border-2 border-gray-400 relative mb-1">
+                        <div className="absolute inset-0 border-r-2 border-gray-400"></div>
+                      </div>
+                      <span className="text-xs">2</span>
+                    </Button>
+                  </div>
+
+                  {/* Lista de pizzas */}
+                  <div className="space-y-3">
+                    {[...pizzasSalgadas, ...pizzasDoces].map((pizza) => (
+                      <div
+                        key={pizza.id}
+                        className="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
+                        onClick={() => setSelectedPizza(pizza)}
+                      >
                         <div className="flex-1">
-                          <h3 className="font-medium">{produto.nome}</h3>
-                          {produto.descricao && <p className="text-sm text-gray-600 mt-1">{produto.descricao}</p>}
-                          <p className="text-lg font-semibold text-green-600 mt-2">
-                            R$ {produto.preco_tradicional?.toFixed(2)}
-                          </p>
+                          <div className="flex items-center space-x-2">
+                            <h3 className="font-medium">{pizza.nome}</h3>
+                            {pizza.tipo === "doce" && (
+                              <Badge variant="secondary" className="text-xs">
+                                Doce
+                              </Badge>
+                            )}
+                          </div>
+                          {pizza.descricao && <p className="text-sm text-gray-600 mt-1">{pizza.descricao}</p>}
+                          <div className="flex items-center space-x-4 mt-2">
+                            {pizza.preco_broto && (
+                              <span className="text-sm">Broto: R${pizza.preco_broto.toFixed(2)}</span>
+                            )}
+                            {pizza.preco_tradicional && (
+                              <span className="text-sm font-medium">
+                                Tradicional: R${pizza.preco_tradicional.toFixed(2)}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <Button onClick={() => addBebidaToCart(produto)} size="sm">
-                          <Plus className="h-4 w-4" />
-                        </Button>
+                        <Plus className="w-5 h-5 text-red-600" />
                       </div>
                     ))}
                   </div>
                 </div>
               )}
-            </Card>
-          )
-        })}
+            </CardContent>
+          </Card>
+
+          {/* Seção Bebidas */}
+          <Card>
+            <CardContent className="p-4">
+              <div
+                className="flex items-center justify-between cursor-pointer"
+                onClick={() => toggleSection("bebidas")}
+              >
+                <h2 className="text-lg font-semibold">Bebidas</h2>
+                {expandedSections.bebidas ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+              </div>
+
+              {expandedSections.bebidas && (
+                <div className="mt-4 space-y-3">
+                  {bebidas.map((bebida) => (
+                    <div
+                      key={bebida.id}
+                      className="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
+                    >
+                      <div className="flex-1">
+                        <h3 className="font-medium">{bebida.nome}</h3>
+                        {bebida.descricao && <p className="text-sm text-gray-600 mt-1">{bebida.descricao}</p>}
+                        <span className="text-sm font-medium text-red-600">
+                          R${bebida.preco_tradicional?.toFixed(2)}
+                        </span>
+                      </div>
+                      <Plus className="w-5 h-5 text-red-600" />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Modals */}
+        {selectedPizza && (
+          <PizzaSelectionModal pizza={selectedPizza} isOpen={!!selectedPizza} onClose={() => setSelectedPizza(null)} />
+        )}
+
+        <StoreInfoModal isOpen={showStoreInfo} onClose={() => setShowStoreInfo(false)} config={config} />
+
+        {/* Carrinho fixo no rodapé */}
+        <CartFooter />
       </div>
-
-      {/* Modals */}
-      <PizzaSelectionModal isOpen={showPizzaModal} onClose={() => setShowPizzaModal(false)} pizzas={pizzas} />
-
-      <StoreInfoModal isOpen={showInfoModal} onClose={() => setShowInfoModal(false)} config={config} />
-
-      {/* Cart Footer */}
-      <CartFooter />
-    </div>
+    </CartProvider>
   )
 }

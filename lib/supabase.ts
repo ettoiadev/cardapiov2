@@ -1,10 +1,23 @@
 import { createClient } from "@supabase/supabase-js"
 
-// Remove the fallback values and warnings since Supabase is now configured
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+// Check if environment variables exist, otherwise use fallback values
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co"
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-key"
+
+// Only show warning if we're using fallback values
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  console.warn("⚠️ Supabase environment variables not found. Using mock data mode.")
+  console.warn("Please create .env.local file with:")
+  console.warn("NEXT_PUBLIC_SUPABASE_URL=your-supabase-url")
+  console.warn("NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key")
+}
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+// Helper function to check if Supabase is properly configured
+export const isSupabaseConfigured = () => {
+  return !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+}
 
 export type Database = {
   public: {
