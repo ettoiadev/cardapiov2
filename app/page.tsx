@@ -312,7 +312,7 @@ export default function HomePage() {
                   <div className="text-sm text-gray-600">
                     Pizzas doces e salgadas (Tradicional 8 fatias / Broto 4 fatias)
                   </div>
-                  <div className="text-sm text-gray-600">Você pode escolher até 2 sabores</div>
+                  <div className="text-sm text-red-600">Você pode escolher até 2 sabores</div>
 
                   {/* Botões de seleção de sabores */}
                   <div className="flex space-x-4">
@@ -323,7 +323,7 @@ export default function HomePage() {
                         /* Implementar seleção 1 sabor */
                       }}
                     >
-                      <div className="w-8 h-8 rounded-full bg-gray-200 border-2 border-gray-300 mb-1"></div>
+                      <div className="w-8 h-8 aspect-square rounded-full bg-gray-200 border-2 border-gray-300 mb-1 flex-shrink-0"></div>
                       <span className="text-xs">1</span>
                     </Button>
                     <Button
@@ -333,7 +333,7 @@ export default function HomePage() {
                         /* Implementar seleção 2 sabores */
                       }}
                     >
-                      <div className="w-8 h-8 rounded-full border-2 border-gray-300 relative mb-1 overflow-hidden">
+                      <div className="w-8 h-8 aspect-square rounded-full border-2 border-gray-300 relative mb-1 overflow-hidden flex-shrink-0">
                         <div className="absolute left-0 top-0 w-1/2 h-full bg-gray-200"></div>
                         <div className="absolute left-1/2 top-0 w-px h-full bg-gray-300"></div>
                       </div>
