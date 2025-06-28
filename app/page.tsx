@@ -382,7 +382,7 @@ function HomePageContent() {
                   <div className="flex space-x-4">
                     <Button
                       variant="outline"
-                      className={`flex-1 h-16 flex flex-col items-center justify-center bg-transparent ${
+                      className={`flex-1 h-20 flex flex-col items-center justify-center bg-transparent ${
                         !multiFlavorMode ? "border-red-500 bg-red-50" : ""
                       }`}
                       onClick={() => {
@@ -390,12 +390,12 @@ function HomePageContent() {
                         setSelectedFlavorsForMulti([])
                       }}
                     >
-                      <div className="w-8 h-8 aspect-square rounded-full bg-gray-200 border-2 border-gray-300 mb-1 flex-shrink-0"></div>
+                      <div className="w-8 h-8 aspect-square rounded-full bg-gray-200 border-2 border-gray-300 mb-2 flex-shrink-0"></div>
                       <span className="text-xs">1</span>
                     </Button>
                     <Button
                       variant="outline"
-                      className={`flex-1 h-16 flex flex-col items-center justify-center bg-transparent ${
+                      className={`flex-1 h-20 flex flex-col items-center justify-center bg-transparent ${
                         multiFlavorMode ? "border-red-500 bg-red-50" : ""
                       }`}
                       onClick={() => {
@@ -403,7 +403,7 @@ function HomePageContent() {
                         setSelectedFlavorsForMulti([])
                       }}
                     >
-                      <div className="w-8 h-8 aspect-square rounded-full border-2 border-gray-300 relative mb-1 overflow-hidden flex-shrink-0">
+                      <div className="w-8 h-8 aspect-square rounded-full border-2 border-gray-300 relative mb-2 overflow-hidden flex-shrink-0">
                         <div className="absolute left-0 top-0 w-1/2 h-full bg-gray-200"></div>
                         <div className="absolute left-1/2 top-0 w-px h-full bg-gray-300"></div>
                       </div>
