@@ -257,8 +257,8 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="px-4 pt-16 pb-4 ml-24">
-          <h1 className="text-2xl font-bold text-gray-900">{config.nome}</h1>
+        <div className="relative px-4 pt-6 pb-4">
+          <h1 className="text-2xl font-bold text-gray-900 ml-32">{config.nome}</h1>
         </div>
 
         {/* Menu horizontal com informações */}
