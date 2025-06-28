@@ -24,6 +24,7 @@ interface PizzariaConfig {
   endereco: string
   telefone: string
   whatsapp: string
+  horario_funcionamento: any
 }
 
 export default function AdminConfigPage() {
@@ -40,6 +41,15 @@ export default function AdminConfigPage() {
     endereco: "",
     telefone: "",
     whatsapp: "",
+    horario_funcionamento: {
+      segunda: "18:00-23:00",
+      terca: "18:00-23:00",
+      quarta: "18:00-23:00",
+      quinta: "18:00-23:00",
+      sexta: "18:00-00:00",
+      sabado: "18:00-00:00",
+      domingo: "18:00-23:00",
+    },
   })
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
@@ -66,11 +76,30 @@ export default function AdminConfigPage() {
           endereco: data.endereco || "",
           telefone: data.telefone || "",
           whatsapp: data.whatsapp || "",
+          horario_funcionamento: data.horario_funcionamento || {
+            segunda: "18:00-23:00",
+            terca: "18:00-23:00",
+            quarta: "18:00-23:00",
+            quinta: "18:00-23:00",
+            sexta: "18:00-00:00",
+            sabado: "18:00-00:00",
+            domingo: "18:00-23:00",
+          },
         })
       }
     } catch (error) {
       console.error("Erro ao conectar com Supabase:", error)
     }
+  }
+
+  const updateHorario = (dia: string, horario: string) => {
+    setConfig({
+      ...config,
+      horario_funcionamento: {
+        ...config.horario_funcionamento,
+        [dia]: horario,
+      },
+    })
   }
 
   const handleSave = async () => {
@@ -232,6 +261,35 @@ export default function AdminConfigPage() {
                     <span>Cartão</span>
                   </label>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Horários de Funcionamento */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Horários de Funcionamento</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {Object.entries(config.horario_funcionamento || {}).map(([dia, horario]) => (
+                  <div key={dia}>
+                    <Label htmlFor={dia} className="capitalize">
+                      {dia === 'terca' ? 'Terça' : 
+                       dia === 'sabado' ? 'Sábado' : 
+                       dia.charAt(0).toUpperCase() + dia.slice(1)}
+                    </Label>
+                    <Input
+                      id={dia}
+                      value={horario as string}
+                      onChange={(e) => updateHorario(dia, e.target.value)}
+                      placeholder="18:00-23:00 ou Fechado"
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="text-sm text-gray-600">
+                Use o formato "HH:MM-HH:MM" (ex: 18:00-23:00) ou digite "Fechado" para dias sem funcionamento.
               </div>
             </CardContent>
           </Card>
