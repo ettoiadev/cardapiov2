@@ -323,7 +323,7 @@ export default function HomePage() {
                         /* Implementar seleção 1 sabor */
                       }}
                     >
-                      <div className="w-8 h-8 rounded-full border-2 border-gray-400 mb-1"></div>
+                      <div className="w-8 h-8 rounded-full bg-gray-200 border-2 border-gray-300 mb-1"></div>
                       <span className="text-xs">1</span>
                     </Button>
                     <Button
@@ -333,8 +333,9 @@ export default function HomePage() {
                         /* Implementar seleção 2 sabores */
                       }}
                     >
-                      <div className="w-8 h-8 rounded-full border-2 border-gray-400 relative mb-1">
-                        <div className="absolute inset-0 border-r-2 border-gray-400"></div>
+                      <div className="w-8 h-8 rounded-full border-2 border-gray-300 relative mb-1 overflow-hidden">
+                        <div className="absolute left-0 top-0 w-1/2 h-full bg-gray-200"></div>
+                        <div className="absolute left-1/2 top-0 w-px h-full bg-gray-300"></div>
                       </div>
                       <span className="text-xs">2</span>
                     </Button>
