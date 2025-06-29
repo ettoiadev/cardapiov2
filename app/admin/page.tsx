@@ -4,7 +4,17 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AdminLayout } from "@/components/admin-layout"
 import { supabase } from "@/lib/supabase"
-import { Package, Users, FileText, DollarSign } from "lucide-react"
+import { formatCurrency } from "@/lib/currency-utils"
+import { 
+  Package, 
+  Users, 
+  FileText, 
+  DollarSign, 
+  BarChart3, 
+  TrendingUp,
+  Activity,
+  ChefHat
+} from "lucide-react"
 
 interface DashboardStats {
   totalProdutos: number
@@ -52,88 +62,201 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header Section */}
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100 shadow-sm">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="space-y-2">
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <BarChart3 className="h-8 w-8 text-blue-600" />
+                Dashboard
+              </h1>
+              <p className="text-gray-600 max-w-2xl">
+                Visão geral do seu negócio com estatísticas e métricas importantes para acompanhar o desempenho.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-blue-600 bg-blue-100 px-4 py-2 rounded-lg">
+              <Activity className="h-4 w-4" />
+              Sistema Operacional
+            </div>
+          </div>
+        </div>
 
-        {/* Cards de estatísticas */}
+        {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Produtos</CardTitle>
-              <Package className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalProdutos}</div>
+          <Card className="shadow-lg border-0 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl overflow-hidden hover:shadow-xl transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-orange-600">Total de Produtos</p>
+                  <p className="text-3xl font-bold text-gray-900">{stats.totalProdutos}</p>
+                  <p className="text-xs text-orange-500">produtos ativos</p>
+                </div>
+                <div className="p-3 bg-orange-200 rounded-xl">
+                  <Package className="h-8 w-8 text-orange-600" />
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Clientes</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalClientes}</div>
+          <Card className="shadow-lg border-0 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl overflow-hidden hover:shadow-xl transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-blue-600">Total de Clientes</p>
+                  <p className="text-3xl font-bold text-gray-900">{stats.totalClientes}</p>
+                  <p className="text-xs text-blue-500">clientes cadastrados</p>
+                </div>
+                <div className="p-3 bg-blue-200 rounded-xl">
+                  <Users className="h-8 w-8 text-blue-600" />
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Pedidos</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalPedidos}</div>
+          <Card className="shadow-lg border-0 bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl overflow-hidden hover:shadow-xl transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-purple-600">Total de Pedidos</p>
+                  <p className="text-3xl font-bold text-gray-900">{stats.totalPedidos}</p>
+                  <p className="text-xs text-purple-500">pedidos realizados</p>
+                </div>
+                <div className="p-3 bg-purple-200 rounded-xl">
+                  <FileText className="h-8 w-8 text-purple-600" />
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Faturamento</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">R$ {stats.faturamentoMes.toFixed(2)}</div>
+          <Card className="shadow-lg border-0 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl overflow-hidden hover:shadow-xl transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-green-600">Faturamento</p>
+                  <p className="text-3xl font-bold text-gray-900">{formatCurrency(stats.faturamentoMes)}</p>
+                  <p className="text-xs text-green-500">receita total</p>
+                </div>
+                <div className="p-3 bg-green-200 rounded-xl">
+                  <TrendingUp className="h-8 w-8 text-green-600" />
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Resumo rápido */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Resumo do Sistema</CardTitle>
+        {/* Detailed Information Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-100 p-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gray-200 rounded-lg">
+                  <BarChart3 className="h-6 w-6 text-gray-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl font-semibold text-gray-900">
+                    Resumo do Sistema
+                  </CardTitle>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Principais métricas do seu negócio
+                  </p>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between">
-                <span>Produtos ativos:</span>
-                <span className="font-medium">{stats.totalProdutos}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Clientes cadastrados:</span>
-                <span className="font-medium">{stats.totalClientes}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Pedidos realizados:</span>
-                <span className="font-medium">{stats.totalPedidos}</span>
-              </div>
-              <div className="flex justify-between border-t pt-4">
-                <span className="font-medium">Faturamento total:</span>
-                <span className="font-bold text-green-600">R$ {stats.faturamentoMes.toFixed(2)}</span>
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100">
+                  <div className="flex items-center gap-3">
+                    <Package className="h-5 w-5 text-orange-600" />
+                    <span className="font-medium text-gray-900">Produtos ativos</span>
+                  </div>
+                  <span className="text-xl font-bold text-orange-600">{stats.totalProdutos}</span>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-100">
+                  <div className="flex items-center gap-3">
+                    <Users className="h-5 w-5 text-blue-600" />
+                    <span className="font-medium text-gray-900">Clientes cadastrados</span>
+                  </div>
+                  <span className="text-xl font-bold text-blue-600">{stats.totalClientes}</span>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-100">
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-5 w-5 text-purple-600" />
+                    <span className="font-medium text-gray-900">Pedidos realizados</span>
+                  </div>
+                  <span className="text-xl font-bold text-purple-600">{stats.totalPedidos}</span>
+                </div>
+                
+                <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200 border-t-4 border-t-green-500">
+                  <div className="flex items-center gap-3">
+                    <TrendingUp className="h-5 w-5 text-green-600" />
+                    <span className="font-semibold text-gray-900">Faturamento total</span>
+                  </div>
+                  <span className="text-2xl font-bold text-green-600">{formatCurrency(stats.faturamentoMes)}</span>
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Ações Rápidas</CardTitle>
+          <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-indigo-100 p-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-indigo-100 rounded-lg">
+                  <ChefHat className="h-6 w-6 text-indigo-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl font-semibold text-gray-900">
+                    Gestão Rápida
+                  </CardTitle>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Principais funcionalidades do sistema
+                  </p>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="text-sm text-gray-600">
-                <p>• Gerencie produtos e categorias</p>
-                <p>• Visualize clientes cadastrados</p>
-                <p>• Acompanhe pedidos realizados</p>
-                <p>• Configure informações da pizzaria</p>
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg border border-orange-200 hover:shadow-md transition-shadow">
+                  <div className="p-2 bg-orange-200 rounded-lg">
+                    <Package className="h-5 w-5 text-orange-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Gerenciar Produtos</h3>
+                    <p className="text-sm text-gray-600">Organize produtos e categorias do cardápio</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200 hover:shadow-md transition-shadow">
+                  <div className="p-2 bg-blue-200 rounded-lg">
+                    <Users className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Visualizar Clientes</h3>
+                    <p className="text-sm text-gray-600">Acompanhe clientes cadastrados</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg border border-purple-200 hover:shadow-md transition-shadow">
+                  <div className="p-2 bg-purple-200 rounded-lg">
+                    <FileText className="h-5 w-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Acompanhar Pedidos</h3>
+                    <p className="text-sm text-gray-600">Monitore pedidos em tempo real</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+                  <div className="p-2 bg-gray-200 rounded-lg">
+                    <Activity className="h-5 w-5 text-gray-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Configurar Sistema</h3>
+                    <p className="text-sm text-gray-600">Ajuste informações da pizzaria</p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>

@@ -8,9 +8,22 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
 import { AdminLayout } from "@/components/admin-layout"
 import { supabase } from "@/lib/supabase"
-import { Plus, Edit, Trash2, Settings } from "lucide-react"
+import { 
+  Plus, 
+  Edit, 
+  Trash2, 
+  Settings, 
+  Tag, 
+  Pizza, 
+  Layers,
+  CheckCircle2,
+  XCircle,
+  ArrowUpDown,
+  ChefHat
+} from "lucide-react"
 
 interface Categoria {
   id: string
@@ -176,27 +189,71 @@ export default function AdminCardapioPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Gerenciar Itens de Cardapio</h1>
-          <div className="flex items-center space-x-2">
-            <Settings className="h-5 w-5 text-gray-500" />
-            <span className="text-sm text-gray-600">Configuracoes avancadas</span>
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header Section */}
+        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-8 border border-indigo-100 shadow-sm">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="space-y-2">
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <ChefHat className="h-8 w-8 text-indigo-600" />
+                Gerenciar Itens de Cardápio
+              </h1>
+              <p className="text-gray-600 max-w-2xl">
+                Configure categorias, tamanhos de pizza e opções de sabores para personalizar completamente seu cardápio.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-indigo-600 bg-indigo-100 px-4 py-2 rounded-lg">
+              <Settings className="h-4 w-4" />
+              Configurações Avançadas
+            </div>
           </div>
         </div>
 
+        {/* Tab Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="categorias">Categorias</TabsTrigger>
-            <TabsTrigger value="tamanhos">Tamanhos de Pizza</TabsTrigger>
-            <TabsTrigger value="sabores">Opcoes de Sabores</TabsTrigger>
-          </TabsList>
+          <div className="mb-8">
+            <TabsList className="grid w-full grid-cols-3 bg-gray-100 p-1 rounded-xl h-14">
+              <TabsTrigger 
+                value="categorias" 
+                className="flex items-center gap-2 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm h-12"
+              >
+                <Tag className="h-4 w-4" />
+                Categorias
+              </TabsTrigger>
+              <TabsTrigger 
+                value="tamanhos" 
+                className="flex items-center gap-2 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm h-12"
+              >
+                <Pizza className="h-4 w-4" />
+                Tamanhos de Pizza
+              </TabsTrigger>
+              <TabsTrigger 
+                value="sabores" 
+                className="flex items-center gap-2 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm h-12"
+              >
+                <Layers className="h-4 w-4" />
+                Opções de Sabores
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="categorias">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Gerenciar Categorias</CardTitle>
+            <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 p-6">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-green-100 rounded-lg">
+                      <Tag className="h-6 w-6 text-green-600" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl font-semibold text-gray-900">
+                        Gerenciar Categorias
+                      </CardTitle>
+                      <p className="text-sm text-gray-600 mt-1">
+                        Organize produtos por categorias para facilitar a navegação
+                      </p>
+                    </div>
+                  </div>
                   <Dialog open={isDialogOpen && activeTab === "categorias"} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                       <Button
@@ -204,6 +261,7 @@ export default function AdminCardapioPage() {
                           setEditingCategoria(null)
                           setIsDialogOpen(true)
                         }}
+                        className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl"
                       >
                         <Plus className="h-4 w-4 mr-2" />
                         Nova Categoria
@@ -222,17 +280,23 @@ export default function AdminCardapioPage() {
                   </Dialog>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {categorias.map((categoria) => (
-                    <Card key={categoria.id}>
-                      <CardHeader>
+                    <Card key={categoria.id} className="shadow-md border-0 bg-gradient-to-br from-white to-gray-50 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
+                      <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-100 p-4">
                         <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg">{categoria.nome}</CardTitle>
-                          <div className="flex space-x-2">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-green-100 rounded-lg">
+                              <Tag className="h-4 w-4 text-green-600" />
+                            </div>
+                            <CardTitle className="text-lg font-semibold text-gray-900">{categoria.nome}</CardTitle>
+                          </div>
+                          <div className="flex gap-1">
                             <Button
-                              variant="outline"
+                              variant="ghost"
                               size="sm"
+                              className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600"
                               onClick={() => {
                                 setEditingCategoria(categoria)
                                 setIsDialogOpen(true)
@@ -241,8 +305,9 @@ export default function AdminCardapioPage() {
                               <Edit className="h-4 w-4" />
                             </Button>
                             <Button
-                              variant="outline"
+                              variant="ghost"
                               size="sm"
+                              className="h-8 w-8 p-0 hover:bg-red-50 text-red-600"
                               onClick={() => handleDeleteCategoria(categoria.id)}
                             >
                               <Trash2 className="h-4 w-4" />
@@ -250,18 +315,33 @@ export default function AdminCardapioPage() {
                           </div>
                         </div>
                       </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-gray-600 mb-3">{categoria.descricao}</p>
-                        <div className="space-y-2">
-                          <div className="flex justify-between">
-                            <span>Ordem:</span>
-                            <span className="font-medium">{categoria.ordem}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Status:</span>
-                            <span className={categoria.ativo ? "text-green-600" : "text-red-600"}>
-                              {categoria.ativo ? "Ativo" : "Inativo"}
+                      <CardContent className="p-4">
+                        {categoria.descricao && (
+                          <p className="text-sm text-gray-600 mb-4 leading-relaxed">{categoria.descricao}</p>
+                        )}
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                            <span className="text-sm text-gray-600 flex items-center gap-2">
+                              <ArrowUpDown className="h-3 w-3" />
+                              Ordem
                             </span>
+                            <Badge variant="secondary" className="text-xs">
+                              {categoria.ordem}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                            <span className="text-sm text-gray-600">Status</span>
+                            {categoria.ativo ? (
+                              <Badge className="bg-green-100 text-green-800 text-xs">
+                                <CheckCircle2 className="h-3 w-3 mr-1" />
+                                Ativo
+                              </Badge>
+                            ) : (
+                              <Badge variant="secondary" className="bg-red-100 text-red-800 text-xs">
+                                <XCircle className="h-3 w-3 mr-1" />
+                                Inativo
+                              </Badge>
+                            )}
                           </div>
                         </div>
                       </CardContent>
@@ -273,10 +353,22 @@ export default function AdminCardapioPage() {
           </TabsContent>
 
           <TabsContent value="tamanhos">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Gerenciar Tamanhos de Pizza</CardTitle>
+            <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 border-b border-orange-100 p-6">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-orange-100 rounded-lg">
+                      <Pizza className="h-6 w-6 text-orange-600" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl font-semibold text-gray-900">
+                        Gerenciar Tamanhos de Pizza
+                      </CardTitle>
+                      <p className="text-sm text-gray-600 mt-1">
+                        Configure os diferentes tamanhos disponíveis para as pizzas
+                      </p>
+                    </div>
+                  </div>
                   <Dialog open={isDialogOpen && activeTab === "tamanhos"} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                       <Button
@@ -284,6 +376,7 @@ export default function AdminCardapioPage() {
                           setEditingTamanho(null)
                           setIsDialogOpen(true)
                         }}
+                        className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-xl"
                       >
                         <Plus className="h-4 w-4 mr-2" />
                         Novo Tamanho
@@ -302,17 +395,23 @@ export default function AdminCardapioPage() {
                   </Dialog>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {tamanhosPizza.map((tamanho) => (
-                    <Card key={tamanho.id}>
-                      <CardHeader>
+                    <Card key={tamanho.id} className="shadow-md border-0 bg-gradient-to-br from-white to-gray-50 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
+                      <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-100 p-4">
                         <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg">{tamanho.nome}</CardTitle>
-                          <div className="flex space-x-2">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-orange-100 rounded-lg">
+                              <Pizza className="h-4 w-4 text-orange-600" />
+                            </div>
+                            <CardTitle className="text-lg font-semibold text-gray-900">{tamanho.nome}</CardTitle>
+                          </div>
+                          <div className="flex gap-1">
                             <Button
-                              variant="outline"
+                              variant="ghost"
                               size="sm"
+                              className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600"
                               onClick={() => {
                                 setEditingTamanho(tamanho)
                                 setIsDialogOpen(true)
@@ -321,8 +420,9 @@ export default function AdminCardapioPage() {
                               <Edit className="h-4 w-4" />
                             </Button>
                             <Button
-                              variant="outline"
+                              variant="ghost"
                               size="sm"
+                              className="h-8 w-8 p-0 hover:bg-red-50 text-red-600"
                               onClick={() => handleDeleteTamanho(tamanho.id)}
                             >
                               <Trash2 className="h-4 w-4" />
@@ -330,22 +430,41 @@ export default function AdminCardapioPage() {
                           </div>
                         </div>
                       </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-gray-600 mb-3">{tamanho.descricao}</p>
-                        <div className="space-y-2">
-                          <div className="flex justify-between">
-                            <span>Fatias:</span>
-                            <span className="font-medium">{tamanho.fatias}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Ordem:</span>
-                            <span className="font-medium">{tamanho.ordem}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Status:</span>
-                            <span className={tamanho.ativo ? "text-green-600" : "text-red-600"}>
-                              {tamanho.ativo ? "Ativo" : "Inativo"}
+                      <CardContent className="p-4">
+                        {tamanho.descricao && (
+                          <p className="text-sm text-gray-600 mb-4 leading-relaxed">{tamanho.descricao}</p>
+                        )}
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between p-2 bg-orange-50 rounded-lg">
+                            <span className="text-sm text-orange-600 flex items-center gap-2">
+                              🍕 Fatias
                             </span>
+                            <Badge className="bg-orange-100 text-orange-800 text-xs">
+                              {tamanho.fatias}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                            <span className="text-sm text-gray-600 flex items-center gap-2">
+                              <ArrowUpDown className="h-3 w-3" />
+                              Ordem
+                            </span>
+                            <Badge variant="secondary" className="text-xs">
+                              {tamanho.ordem}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                            <span className="text-sm text-gray-600">Status</span>
+                            {tamanho.ativo ? (
+                              <Badge className="bg-green-100 text-green-800 text-xs">
+                                <CheckCircle2 className="h-3 w-3 mr-1" />
+                                Ativo
+                              </Badge>
+                            ) : (
+                              <Badge variant="secondary" className="bg-red-100 text-red-800 text-xs">
+                                <XCircle className="h-3 w-3 mr-1" />
+                                Inativo
+                              </Badge>
+                            )}
                           </div>
                         </div>
                       </CardContent>
@@ -357,10 +476,22 @@ export default function AdminCardapioPage() {
           </TabsContent>
 
           <TabsContent value="sabores">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Gerenciar Opcoes de Sabores</CardTitle>
+            <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-violet-50 border-b border-purple-100 p-6">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-purple-100 rounded-lg">
+                      <Layers className="h-6 w-6 text-purple-600" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl font-semibold text-gray-900">
+                        Gerenciar Opções de Sabores
+                      </CardTitle>
+                      <p className="text-sm text-gray-600 mt-1">
+                        Configure quantos sabores podem ser escolhidos por pizza
+                      </p>
+                    </div>
+                  </div>
                   <Dialog open={isDialogOpen && activeTab === "sabores"} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                       <Button
@@ -368,14 +499,15 @@ export default function AdminCardapioPage() {
                           setEditingOpcao(null)
                           setIsDialogOpen(true)
                         }}
+                        className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl"
                       >
                         <Plus className="h-4 w-4 mr-2" />
-                        Nova Opcao
+                        Nova Opção
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>{editingOpcao ? "Editar Opcao" : "Nova Opcao"}</DialogTitle>
+                        <DialogTitle>{editingOpcao ? "Editar Opção" : "Nova Opção"}</DialogTitle>
                       </DialogHeader>
                       <OpcaoSaborForm
                         opcao={editingOpcao}
@@ -386,17 +518,23 @@ export default function AdminCardapioPage() {
                   </Dialog>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {opcoesSabores.map((opcao) => (
-                    <Card key={opcao.id}>
-                      <CardHeader>
+                    <Card key={opcao.id} className="shadow-md border-0 bg-gradient-to-br from-white to-gray-50 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
+                      <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-100 p-4">
                         <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg">{opcao.nome}</CardTitle>
-                          <div className="flex space-x-2">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-purple-100 rounded-lg">
+                              <Layers className="h-4 w-4 text-purple-600" />
+                            </div>
+                            <CardTitle className="text-lg font-semibold text-gray-900">{opcao.nome}</CardTitle>
+                          </div>
+                          <div className="flex gap-1">
                             <Button
-                              variant="outline"
+                              variant="ghost"
                               size="sm"
+                              className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600"
                               onClick={() => {
                                 setEditingOpcao(opcao)
                                 setIsDialogOpen(true)
@@ -405,8 +543,9 @@ export default function AdminCardapioPage() {
                               <Edit className="h-4 w-4" />
                             </Button>
                             <Button
-                              variant="outline"
+                              variant="ghost"
                               size="sm"
+                              className="h-8 w-8 p-0 hover:bg-red-50 text-red-600"
                               onClick={() => handleDeleteOpcao(opcao.id)}
                             >
                               <Trash2 className="h-4 w-4" />
@@ -414,22 +553,41 @@ export default function AdminCardapioPage() {
                           </div>
                         </div>
                       </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-gray-600 mb-3">{opcao.descricao}</p>
-                        <div className="space-y-2">
-                          <div className="flex justify-between">
-                            <span>Maximo de sabores:</span>
-                            <span className="font-medium">{opcao.maximo_sabores}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Ordem:</span>
-                            <span className="font-medium">{opcao.ordem}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Status:</span>
-                            <span className={opcao.ativo ? "text-green-600" : "text-red-600"}>
-                              {opcao.ativo ? "Ativo" : "Inativo"}
+                      <CardContent className="p-4">
+                        {opcao.descricao && (
+                          <p className="text-sm text-gray-600 mb-4 leading-relaxed">{opcao.descricao}</p>
+                        )}
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between p-2 bg-purple-50 rounded-lg">
+                            <span className="text-sm text-purple-600 flex items-center gap-2">
+                              🍕 Máximo de sabores
                             </span>
+                            <Badge className="bg-purple-100 text-purple-800 text-xs">
+                              {opcao.maximo_sabores}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                            <span className="text-sm text-gray-600 flex items-center gap-2">
+                              <ArrowUpDown className="h-3 w-3" />
+                              Ordem
+                            </span>
+                            <Badge variant="secondary" className="text-xs">
+                              {opcao.ordem}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                            <span className="text-sm text-gray-600">Status</span>
+                            {opcao.ativo ? (
+                              <Badge className="bg-green-100 text-green-800 text-xs">
+                                <CheckCircle2 className="h-3 w-3 mr-1" />
+                                Ativo
+                              </Badge>
+                            ) : (
+                              <Badge variant="secondary" className="bg-red-100 text-red-800 text-xs">
+                                <XCircle className="h-3 w-3 mr-1" />
+                                Inativo
+                              </Badge>
+                            )}
                           </div>
                         </div>
                       </CardContent>
