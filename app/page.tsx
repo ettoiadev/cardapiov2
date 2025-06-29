@@ -187,14 +187,13 @@ function HomePageContent() {
   const [config, setConfig] = useState<PizzariaConfig>(mockConfig)
   const [produtos, setProdutos] = useState<Produto[]>(mockProdutos)
   const [opcoesSabores, setOpcoesSabores] = useState<any[]>([])
-  const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({
-    pizzas: true, // Seção de pizzas aberta por padrão para melhor UX
-  })
+  const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({})
 
   const [showStoreInfo, setShowStoreInfo] = useState(false)
   const [loading, setLoading] = useState(true)
   const [flavorMode, setFlavorMode] = useState<1 | 2 | 3>(1)
   const [selectedFlavorsForMulti, setSelectedFlavorsForMulti] = useState<Produto[]>([])
+  const [selectedSingleFlavor, setSelectedSingleFlavor] = useState<string | null>(null)
 
   const { dispatch } = useCart()
   const router = useRouter()
@@ -286,17 +285,36 @@ function HomePageContent() {
   const scrollToBebidas = () => {
     const bebidasSection = document.querySelector('[data-section="bebidas"]')
     if (bebidasSection) {
-      bebidasSection.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      })
-      // Expandir automaticamente a seção de bebidas
+      // Expandir automaticamente a seção de bebidas primeiro
       setExpandedSections(prev => ({ ...prev, bebidas: true }))
+      
+      // Aguardar a expansão e depois fazer scroll até o final da seção
+      setTimeout(() => {
+        const bebidasContent = bebidasSection.querySelector('.mt-4')
+        if (bebidasContent) {
+          // Scroll até o final da seção, considerando o botão fixo (120px de margem)
+          const elementRect = bebidasContent.getBoundingClientRect()
+          const absoluteElementTop = elementRect.top + window.pageYOffset
+          const scrollToPosition = absoluteElementTop + bebidasContent.scrollHeight - 120
+          
+          window.scrollTo({ 
+            top: scrollToPosition,
+            behavior: 'smooth'
+          })
+        } else {
+          // Fallback para scroll padrão
+          bebidasSection.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'end'
+          })
+        }
+      }, 150) // Aguardar a animação de expansão
     }
   }
 
   const handleSingleFlavorSelection = (pizza: Produto) => {
-    // Para 1 sabor: seleção imediata, adicionar ao carrinho e scroll para bebidas
+    // Para 1 sabor: destaque visual, adicionar ao carrinho e scroll para bebidas
+    setSelectedSingleFlavor(pizza.id)
     setSelectedFlavorsForMulti([pizza])
     
     // Adicionar diretamente ao carrinho
@@ -318,7 +336,7 @@ function HomePageContent() {
       scrollToBebidas()
       // Reset da seleção após adicionar ao carrinho
       setSelectedFlavorsForMulti([])
-    }, 300)
+    }, 500)
   }
 
   const handleMultiFlavorSelection = (pizza: Produto) => {
@@ -462,7 +480,7 @@ function HomePageContent() {
         </div>
 
         {/* Cardápio */}
-        <div className="px-4 py-4 space-y-4">
+        <div className="px-4 py-4 space-y-4 pb-24">
           {/* Seção Pizzas */}
           <Card>
             <CardContent className="p-4">
@@ -509,6 +527,7 @@ function HomePageContent() {
                           onClick={() => {
                             setFlavorMode(opcao.maximo_sabores as 1 | 2 | 3)
                             setSelectedFlavorsForMulti([])
+                            setSelectedSingleFlavor(null)
                           }}
                         >
                           <div className="w-8 h-8 mb-2 flex-shrink-0 flex items-center justify-center relative">
@@ -542,13 +561,16 @@ function HomePageContent() {
                     {[...pizzasSalgadas, ...pizzasDoces].map((pizza) => {
                       const isSelected = selectedFlavorsForMulti.find(p => p.id === pizza.id)
                       const isDisabled = selectedFlavorsForMulti.length >= flavorMode && !isSelected
+                      const isSingleFlavorSelected = flavorMode === 1 && selectedSingleFlavor === pizza.id
                       
                       return (
                         <div
                           key={pizza.id}
                           className={`flex items-center justify-between p-3 border rounded-lg transition-colors ${
                             flavorMode === 1
-                              ? "cursor-pointer hover:bg-gray-50 border-gray-200 hover:border-gray-300"
+                              ? isSingleFlavorSelected
+                                ? "cursor-pointer bg-red-50 border-red-300 hover:border-red-400"
+                                : "cursor-pointer hover:bg-gray-50 border-gray-200 hover:border-gray-300"
                               : flavorMode > 1 
                                 ? (isSelected 
                                     ? "border-red-500 bg-red-50" 
