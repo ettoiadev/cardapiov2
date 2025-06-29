@@ -244,29 +244,10 @@ export default function CheckoutPage() {
     )
   }
   
-  // Carrinho vazio
+  // Se carrinho estiver vazio, redirecionar para página inicial
   if (state.items.length === 0) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="bg-white border-b px-4 py-3 flex items-center">
-          <Button variant="ghost" size="sm" onClick={() => router.push("/")}>
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <h1 className="text-lg font-semibold ml-2">Finalizar Pedido</h1>
-        </div>
-        
-        <div className="flex-1 flex items-center justify-center p-8">
-          <div className="text-center">
-            <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-            <h2 className="text-2xl font-bold mb-2">Carrinho Vazio</h2>
-            <p className="text-gray-600 mb-6">Adicione itens ao seu pedido para continuar</p>
-            <Button onClick={() => router.push("/")} className="bg-red-600 hover:bg-red-700">
-              Voltar ao Cardápio
-            </Button>
-          </div>
-        </div>
-      </div>
-    )
+    router.push("/")
+    return null
   }
   
   const subtotal = state.total

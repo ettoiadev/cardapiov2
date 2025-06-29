@@ -202,30 +202,24 @@ function HomePageContent() {
     loadData()
   }, [])
 
-  // Redirecionamento automático APENAS para múltiplos sabores (2 ou 3)
+  // Processamento automático APENAS para múltiplos sabores (2 ou 3)
   useEffect(() => {
     if (flavorMode > 1 && selectedFlavorsForMulti.length === flavorMode) {
-      // Para múltiplos sabores, mostrar apenas o resumo visual
-      // O processamento será feito quando o usuário clicar para continuar
-      // ou após um delay maior para permitir que veja a seleção
+      // Para múltiplos sabores, adicionar ao carrinho e rolar para próxima categoria
+      // SEM redirecionamento automático para checkout
       const timer = setTimeout(() => {
         // Adicionar ao carrinho primeiro
         handleAddToCart()
         
-        // Primeiro rolar para a próxima categoria
+        // Rolar para a próxima categoria
         setTimeout(() => {
           scrollToNextCategory()
         }, 500)
-        
-        // Depois redirecionar para checkout
-        setTimeout(() => {
-          router.push('/checkout')
-        }, 1500)
-      }, 2000) // Aguardar 2 segundos para o usuário ver a seleção completa
+      }, 1000) // Aguardar 1 segundo para o usuário ver a seleção completa
       
       return () => clearTimeout(timer)
     }
-  }, [flavorMode, selectedFlavorsForMulti.length, router])
+  }, [flavorMode, selectedFlavorsForMulti.length])
 
   const loadData = async () => {
     try {
@@ -384,12 +378,12 @@ function HomePageContent() {
       },
     })
 
-    // Reset das seleções apenas para múltiplos sabores após um delay maior
-    // Para permitir que o usuário veja a seleção visual durante todo o processo
+    // Reset das seleções para múltiplos sabores após rolagem
+    // Para permitir que o usuário veja a seleção visual durante o processo
     if (flavorMode > 1) {
       setTimeout(() => {
         setSelectedFlavorsForMulti([])
-      }, 2500) // Reset após 2.5s para manter visual durante todo o processo
+      }, 1500) // Reset após 1.5s para manter visual durante rolagem
     } else {
       // Para 1 sabor, reset imediato como antes
       setSelectedFlavorsForMulti([])
@@ -409,10 +403,7 @@ function HomePageContent() {
       },
     })
 
-    // Redirecionar para o checkout após adicionar ao carrinho
-    setTimeout(() => {
-      router.push('/checkout')
-    }, 500)
+    // Bebida adicionada ao carrinho - usuário deve usar botão "Fechar pedido" para finalizar
   }
 
   const pizzasSalgadas = produtos.filter((p) => p.tipo === "salgada")
@@ -643,7 +634,7 @@ function HomePageContent() {
                           Sabores selecionados: {selectedFlavorsForMulti.map(p => p.nome).join(" + ")}
                         </div>
                         <div className="text-sm text-green-600 font-bold">
-                          ✓ Seleção completa! Processando pedido...
+                          ✓ Pizza adicionada ao carrinho!
                         </div>
                       </div>
                     </div>
