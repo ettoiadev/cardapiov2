@@ -53,11 +53,18 @@ export default function CheckoutPage() {
   const [orderNotes, setOrderNotes] = useState("")
   const [paymentMethod, setPaymentMethod] = useState<"pix" | "dinheiro" | "debito" | "credito">("pix")
   
-  // Carregar configurações da loja
+    // Carregar configurações da loja
   useEffect(() => {
     loadStoreConfig()
   }, [])
   
+  // Verificar carrinho vazio e redirecionar se necessário
+  useEffect(() => {
+    if (!loading && state.items.length === 0) {
+      router.push("/")
+    }
+  }, [state.items.length, router, loading])
+
   const loadStoreConfig = async () => {
     try {
       const { data } = await supabase
@@ -244,10 +251,13 @@ export default function CheckoutPage() {
     )
   }
   
-  // Se carrinho estiver vazio, redirecionar para página inicial
+  // Se carrinho estiver vazio, mostrar loading (redirecionamento será feito no useEffect)
   if (state.items.length === 0) {
-    router.push("/")
-    return null
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-red-600" />
+      </div>
+    )
   }
   
   const subtotal = state.total

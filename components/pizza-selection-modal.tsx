@@ -90,10 +90,7 @@ export function PizzaSelectionModal({ pizza, isOpen, onClose, multiFlavorMode = 
     setSelectedFlavors([])
     onClose()
     
-    // Redirecionar para o checkout após adicionar ao carrinho
-    setTimeout(() => {
-      router.push('/checkout')
-    }, 500) // Delay maior para garantir que o estado seja atualizado antes do redirecionamento
+    // Item adicionado ao carrinho - usuário deve usar botão "Fechar pedido" para finalizar
   }
 
   return (
