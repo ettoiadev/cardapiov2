@@ -187,7 +187,9 @@ function HomePageContent() {
   const [config, setConfig] = useState<PizzariaConfig>(mockConfig)
   const [produtos, setProdutos] = useState<Produto[]>(mockProdutos)
   const [opcoesSabores, setOpcoesSabores] = useState<any[]>([])
-  const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({})
+  const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({
+    pizzas: true, // Seção de pizzas aberta por padrão para melhor UX
+  })
 
   const [showStoreInfo, setShowStoreInfo] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -203,16 +205,16 @@ function HomePageContent() {
 
 
 
-  // Redirecionamento automático para checkout após adicionar ao carrinho
+  // Redirecionamento automático APENAS para múltiplos sabores (2 ou 3)
   useEffect(() => {
-    if (selectedFlavorsForMulti.length === flavorMode) {
+    if (flavorMode > 1 && selectedFlavorsForMulti.length === flavorMode) {
       // Adicionar ao carrinho primeiro - usar o tamanho tradicional como padrão
       // Usuário poderá editar o tamanho na página de checkout se necessário
       handleAddToCart()
       
       const timer = setTimeout(() => {
         router.push('/checkout')
-      }, 300) // Redirecionamento mais rápido para experiência fluida
+      }, 300) // Redirecionamento automático para múltiplos sabores
       return () => clearTimeout(timer)
     }
   }, [flavorMode, selectedFlavorsForMulti.length, router])
@@ -294,12 +296,28 @@ function HomePageContent() {
   }
 
   const handleSingleFlavorSelection = (pizza: Produto) => {
-    // Para 1 sabor: seleção imediata e scroll para bebidas
+    // Para 1 sabor: seleção imediata, adicionar ao carrinho e scroll para bebidas
     setSelectedFlavorsForMulti([pizza])
+    
+    // Adicionar diretamente ao carrinho
+    const tamanho = "tradicional"
+    dispatch({
+      type: "ADD_ITEM",
+      payload: {
+        id: `${pizza.id}-${tamanho}`,
+        nome: pizza.nome,
+        tamanho: tamanho,
+        sabores: [pizza.nome],
+        preco: pizza.preco_tradicional || 0,
+        tipo: pizza.tipo,
+      },
+    })
     
     // Scroll automático para a seção bebidas após um pequeno delay
     setTimeout(() => {
       scrollToBebidas()
+      // Reset da seleção após adicionar ao carrinho
+      setSelectedFlavorsForMulti([])
     }, 300)
   }
 
@@ -587,12 +605,12 @@ function HomePageContent() {
                     })}
                   </div>
 
-                  {/* Resumo dos sabores selecionados */}
-                  {selectedFlavorsForMulti.length === flavorMode && (
+                  {/* Resumo dos sabores selecionados - APENAS para múltiplos sabores */}
+                  {flavorMode > 1 && selectedFlavorsForMulti.length === flavorMode && (
                     <div className="space-y-3 pt-4 border-t bg-green-50 rounded-lg p-4 mx-2">
                       <div className="text-center">
                         <div className="text-sm text-gray-700 mb-2 font-medium">
-                          {flavorMode === 1 ? 'Sabor selecionado:' : 'Sabores selecionados:'} {selectedFlavorsForMulti.map(p => p.nome).join(" + ")}
+                          Sabores selecionados: {selectedFlavorsForMulti.map(p => p.nome).join(" + ")}
                         </div>
                         <div className="text-sm text-green-600 font-bold animate-pulse">
                           ✓ Redirecionando para finalizar pedido...
