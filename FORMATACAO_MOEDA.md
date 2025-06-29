@@ -67,9 +67,7 @@ onChange={(e) => {
 - ✅ Mensagem de valor mínimo com formatação
 - ✅ Preços individuais dos itens
 
-#### **Admin - Pedidos** (`app/admin/pedidos/page.tsx`)
-- ✅ Valores dos itens formatados
-- ✅ Totais dos pedidos
+
 
 ## 🎯 **Exemplos de Uso**
 

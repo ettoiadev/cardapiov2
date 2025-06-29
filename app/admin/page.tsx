@@ -4,14 +4,10 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AdminLayout } from "@/components/admin-layout"
 import { supabase } from "@/lib/supabase"
-import { formatCurrency } from "@/lib/currency-utils"
 import { 
   Package, 
   Users, 
-  FileText, 
-  DollarSign, 
   BarChart3, 
-  TrendingUp,
   Activity,
   ChefHat
 } from "lucide-react"
@@ -19,16 +15,12 @@ import {
 interface DashboardStats {
   totalProdutos: number
   totalClientes: number
-  totalPedidos: number
-  faturamentoMes: number
 }
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats>({
     totalProdutos: 0,
     totalClientes: 0,
-    totalPedidos: 0,
-    faturamentoMes: 0,
   })
 
   useEffect(() => {
@@ -38,22 +30,17 @@ export default function AdminDashboard() {
   const loadStats = async () => {
     try {
       // Carregar estatísticas
-      const [produtosRes, clientesRes, pedidosRes] = await Promise.all([
+      const [produtosRes, clientesRes] = await Promise.all([
         supabase.from("produtos").select("id", { count: "exact" }).eq("ativo", true),
         supabase.from("clientes").select("id", { count: "exact" }),
-        supabase.from("pedidos").select("total"),
       ])
 
       const totalProdutos = produtosRes.count || 0
       const totalClientes = clientesRes.count || 0
-      const totalPedidos = pedidosRes.data?.length || 0
-      const faturamentoMes = pedidosRes.data?.reduce((sum, pedido) => sum + pedido.total, 0) || 0
 
       setStats({
         totalProdutos,
         totalClientes,
-        totalPedidos,
-        faturamentoMes,
       })
     } catch (error) {
       console.error("Erro ao carregar estatísticas:", error)
@@ -83,7 +70,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card className="shadow-lg border-0 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl overflow-hidden hover:shadow-xl transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -109,36 +96,6 @@ export default function AdminDashboard() {
                 </div>
                 <div className="p-3 bg-blue-200 rounded-xl">
                   <Users className="h-8 w-8 text-blue-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-lg border-0 bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl overflow-hidden hover:shadow-xl transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-purple-600">Total de Pedidos</p>
-                  <p className="text-3xl font-bold text-gray-900">{stats.totalPedidos}</p>
-                  <p className="text-xs text-purple-500">pedidos realizados</p>
-                </div>
-                <div className="p-3 bg-purple-200 rounded-xl">
-                  <FileText className="h-8 w-8 text-purple-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-lg border-0 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl overflow-hidden hover:shadow-xl transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-green-600">Faturamento</p>
-                  <p className="text-3xl font-bold text-gray-900">{formatCurrency(stats.faturamentoMes)}</p>
-                  <p className="text-xs text-green-500">receita total</p>
-                </div>
-                <div className="p-3 bg-green-200 rounded-xl">
-                  <TrendingUp className="h-8 w-8 text-green-600" />
                 </div>
               </div>
             </CardContent>
@@ -180,22 +137,6 @@ export default function AdminDashboard() {
                   </div>
                   <span className="text-xl font-bold text-blue-600">{stats.totalClientes}</span>
                 </div>
-                
-                <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-100">
-                  <div className="flex items-center gap-3">
-                    <FileText className="h-5 w-5 text-purple-600" />
-                    <span className="font-medium text-gray-900">Pedidos realizados</span>
-                  </div>
-                  <span className="text-xl font-bold text-purple-600">{stats.totalPedidos}</span>
-                </div>
-                
-                <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200 border-t-4 border-t-green-500">
-                  <div className="flex items-center gap-3">
-                    <TrendingUp className="h-5 w-5 text-green-600" />
-                    <span className="font-semibold text-gray-900">Faturamento total</span>
-                  </div>
-                  <span className="text-2xl font-bold text-green-600">{formatCurrency(stats.faturamentoMes)}</span>
-                </div>
               </div>
             </CardContent>
           </Card>
@@ -235,16 +176,6 @@ export default function AdminDashboard() {
                   <div>
                     <h3 className="font-semibold text-gray-900">Visualizar Clientes</h3>
                     <p className="text-sm text-gray-600">Acompanhe clientes cadastrados</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg border border-purple-200 hover:shadow-md transition-shadow">
-                  <div className="p-2 bg-purple-200 rounded-lg">
-                    <FileText className="h-5 w-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Acompanhar Pedidos</h3>
-                    <p className="text-sm text-gray-600">Monitore pedidos em tempo real</p>
                   </div>
                 </div>
                 
