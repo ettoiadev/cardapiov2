@@ -379,8 +379,16 @@ function HomePageContent() {
       },
     })
 
-    // Reset das seleções
-    setSelectedFlavorsForMulti([])
+    // Reset das seleções apenas para múltiplos sabores após um delay
+    // Para permitir que o usuário veja a seleção visual por mais tempo
+    if (flavorMode > 1) {
+      setTimeout(() => {
+        setSelectedFlavorsForMulti([])
+      }, 1200) // Reset após 1.2s para manter visual durante rolagem
+    } else {
+      // Para 1 sabor, reset imediato como antes
+      setSelectedFlavorsForMulti([])
+    }
   }
 
   const handleAddBebidaToCart = (bebida: Produto) => {
