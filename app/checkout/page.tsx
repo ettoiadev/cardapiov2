@@ -182,6 +182,16 @@ export default function CheckoutPage() {
     state.items.forEach((item, index) => {
       message += `${index + 1}. ${item.nome}\n`
       message += `   • Tamanho: ${item.tamanho}\n`
+      
+      // Mostrar sabores se for pizza com múltiplos sabores
+      if (item.sabores && item.sabores.length > 0) {
+        if (item.sabores.length === 1) {
+          message += `   • Sabor: ${item.sabores[0]}\n`
+        } else {
+          message += `   • Sabores: ${item.sabores.join(', ')}\n`
+        }
+      }
+      
       message += `   • Quantidade: ${item.quantidade}\n`
       message += `   • Valor: ${formatCurrency(item.preco * item.quantidade)}\n\n`
     })
