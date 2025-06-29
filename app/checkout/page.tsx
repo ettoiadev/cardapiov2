@@ -2,26 +2,25 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Bike, Package, Plus, Minus, MapPin, Trash2 } from "lucide-react"
+import { ArrowLeft, ShoppingBag, MapPin, Phone, User, CreditCard, DollarSign, Smartphone, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
+import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useCart } from "@/lib/cart-context"
-import { supabase } from "@/lib/supabase"
 import { formatCurrency } from "@/lib/currency-utils"
+import { supabase } from "@/lib/supabase"
 
-interface PizzariaConfig {
+interface StoreConfig {
+  nome: string
+  whatsapp: string | null
   taxa_entrega: number
   valor_minimo: number
-  telefone: string | null
-  whatsapp: string | null
 }
 
-interface EnderecoData {
-  cep: string
+interface AddressData {
   logradouro: string
   bairro: string
   localidade: string
@@ -30,616 +29,511 @@ interface EnderecoData {
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { state, dispatch } = useCart()
+  const { state } = useCart()
   
-  const [config, setConfig] = useState<PizzariaConfig | null>(null)
-  const [isLoaded, setIsLoaded] = useState(false)
-  const [isCartLoaded, setIsCartLoaded] = useState(false)
-  const [tipoEntrega, setTipoEntrega] = useState<"delivery" | "balcao">("delivery")
+  // Estados principais
+  const [loading, setLoading] = useState(true)
+  const [storeConfig, setStoreConfig] = useState<StoreConfig | null>(null)
   
-  const [nomeCompleto, setNomeCompleto] = useState("")
-  const [telefone, setTelefone] = useState("")
-  const [cep, setCep] = useState("")
-  const [enderecoData, setEnderecoData] = useState<EnderecoData | null>(null)
-  const [numero, setNumero] = useState("")
-  const [complemento, setComplemento] = useState("")
-  const [observacoesEntrega, setObservacoesEntrega] = useState("")
-  const [buscandoCep, setBuscandoCep] = useState(false)
-  const [erroCep, setErroCep] = useState("")
+  // Tipo de entrega
+  const [deliveryType, setDeliveryType] = useState<"balcao" | "delivery">("balcao")
   
-  const [observacoesPedido, setObservacoesPedido] = useState("")
-  const [formaPagamento, setFormaPagamento] = useState<"pix" | "dinheiro" | "debito" | "credito">("pix")
-
-  const totalItens = state.items.reduce((sum, item) => sum + item.quantidade, 0)
-
-  const buscarCep = async (cepValue: string) => {
-    const cepLimpo = cepValue.replace(/\D/g, "")
-    if (cepLimpo.length !== 8) {
-      setErroCep("CEP deve ter 8 dígitos")
-      return
-    }
-
-    setBuscandoCep(true)
-    setErroCep("")
-
+  // Dados do cliente
+  const [customerName, setCustomerName] = useState("")
+  const [customerPhone, setCustomerPhone] = useState("")
+  const [customerCep, setCep] = useState("")
+  const [addressData, setAddressData] = useState<AddressData | null>(null)
+  const [addressNumber, setAddressNumber] = useState("")
+  const [addressComplement, setAddressComplement] = useState("")
+  const [deliveryNotes, setDeliveryNotes] = useState("")
+  const [searchingCep, setSearchingCep] = useState(false)
+  const [cepError, setCepError] = useState("")
+  
+  // Observações e pagamento
+  const [orderNotes, setOrderNotes] = useState("")
+  const [paymentMethod, setPaymentMethod] = useState<"pix" | "dinheiro" | "debito" | "credito">("pix")
+  
+  // Carregar configurações da loja
+  useEffect(() => {
+    loadStoreConfig()
+  }, [])
+  
+  const loadStoreConfig = async () => {
     try {
-      const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`)
-      const data = await response.json()
-      if (data.erro) {
-        setErroCep("CEP não encontrado")
-        setEnderecoData(null)
+      const { data } = await supabase
+        .from("pizzaria_config")
+        .select("nome, whatsapp, taxa_entrega, valor_minimo")
+        .single()
+      
+      if (data) {
+        setStoreConfig(data)
       } else {
-        setEnderecoData(data)
-        setErroCep("")
+        // Valores padrão se não conseguir carregar
+        setStoreConfig({
+          nome: "Pizzaria",
+          whatsapp: "5511999999999",
+          taxa_entrega: 5,
+          valor_minimo: 20
+        })
       }
     } catch (error) {
-      setErroCep("Erro ao buscar CEP")
-      setEnderecoData(null)
+      // Valores padrão em caso de erro
+      setStoreConfig({
+        nome: "Pizzaria",
+        whatsapp: "5511999999999",
+        taxa_entrega: 5,
+        valor_minimo: 20
+      })
     } finally {
-      setBuscandoCep(false)
+      setLoading(false)
     }
   }
-
+  
+  // Buscar CEP
+  const searchCep = async (cep: string) => {
+    const cleanCep = cep.replace(/\D/g, "")
+    
+    if (cleanCep.length !== 8) {
+      setCepError("CEP deve ter 8 dígitos")
+      return
+    }
+    
+    setSearchingCep(true)
+    setCepError("")
+    
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`)
+      const data = await response.json()
+      
+      if (data.erro) {
+        setCepError("CEP não encontrado")
+        setAddressData(null)
+      } else {
+        setAddressData(data)
+        setCepError("")
+      }
+    } catch (error) {
+      setCepError("Erro ao buscar CEP")
+      setAddressData(null)
+    } finally {
+      setSearchingCep(false)
+    }
+  }
+  
+  // Máscara de CEP
   const handleCepChange = (value: string) => {
-    const maskedValue = value
+    const masked = value
       .replace(/\D/g, "")
       .replace(/(\d{5})(\d)/, "$1-$2")
       .slice(0, 9)
-    setCep(maskedValue)
     
-    if (maskedValue.replace(/\D/g, "").length === 8) {
-      buscarCep(maskedValue)
+    setCep(masked)
+    
+    if (masked.replace(/\D/g, "").length === 8) {
+      searchCep(masked)
     } else {
-      setEnderecoData(null)
-      setErroCep("")
+      setAddressData(null)
+      setCepError("")
     }
   }
-
-  const handleTelefoneChange = (value: string) => {
-    const maskedValue = value
+  
+  // Máscara de telefone
+  const handlePhoneChange = (value: string) => {
+    const masked = value
       .replace(/\D/g, "")
       .replace(/(\d{2})(\d)/, "($1) $2")
       .replace(/(\d{5})(\d)/, "$1-$2")
       .slice(0, 15)
-    setTelefone(maskedValue)
+    
+    setCustomerPhone(masked)
   }
-
-  const validarFormulario = () => {
-    if (tipoEntrega === "delivery") {
-      return nomeCompleto.trim() !== "" && 
-             telefone.trim() !== "" && 
-             cep.replace(/\D/g, "").length === 8 && 
-             enderecoData !== null && 
-             numero.trim() !== ""
+  
+  // Validar formulário
+  const isFormValid = () => {
+    if (deliveryType === "delivery") {
+      return (
+        customerName.trim() !== "" &&
+        customerPhone.replace(/\D/g, "").length >= 10 &&
+        customerCep.replace(/\D/g, "").length === 8 &&
+        addressData !== null &&
+        addressNumber.trim() !== ""
+      )
     }
     return true
   }
-
-  useEffect(() => {
-    setIsLoaded(true)
-    loadConfig()
-  }, [])
-
-  // Aguardar um pouco para o carrinho carregar do localStorage
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsCartLoaded(true)
-    }, 100) // Pequeno delay para garantir que o localStorage foi carregado
-    return () => clearTimeout(timer)
-  }, [])
-
-  const loadConfig = async () => {
-    try {
-      const { data, error } = await supabase.from("pizzaria_config").select("taxa_entrega, valor_minimo, telefone, whatsapp").single()
-      if (error) {
-        setConfig({
-          taxa_entrega: 5.0,
-          valor_minimo: 20.0,
-          telefone: "(11) 99999-9999",
-          whatsapp: "5511999999999"
-        })
-      } else if (data) {
-        setConfig(data)
-      }
-    } catch (error) {
-      setConfig({
-        taxa_entrega: 5.0,
-        valor_minimo: 20.0,
-        telefone: "(11) 99999-9999",
-        whatsapp: "5511999999999"
-      })
-    }
-  }
-
-  const gerarTextoWhatsApp = () => {
-    let texto = "🍕 *NOVO PEDIDO*\n\n"
+  
+  // Gerar mensagem para WhatsApp
+  const generateWhatsAppMessage = () => {
+    const deliveryFee = deliveryType === "delivery" ? (storeConfig?.taxa_entrega || 0) : 0
+    const subtotal = state.total
+    const total = subtotal + deliveryFee
     
-    texto += "*📋 PEDIDO:*\n"
+    let message = `🍕 *NOVO PEDIDO - ${storeConfig?.nome}*\n\n`
+    
+    // Resumo dos itens
+    message += `📋 *ITENS DO PEDIDO:*\n`
     state.items.forEach((item, index) => {
-      texto += `${index + 1}. ${item.nome}\n`
-      texto += `   • Tamanho: ${item.tamanho}\n`
-      if (item.sabores.length > 0) {
-        texto += `   • Sabor(es): ${item.sabores.join(", ")}\n`
-      }
-      texto += `   • Quantidade: ${item.quantidade}\n`
-      texto += `   • Valor: ${formatCurrency(item.preco * item.quantidade)}\n\n`
+      message += `${index + 1}. ${item.nome}\n`
+      message += `   • Tamanho: ${item.tamanho}\n`
+      message += `   • Quantidade: ${item.quantidade}\n`
+      message += `   • Valor: ${formatCurrency(item.preco * item.quantidade)}\n\n`
     })
-
-    texto += `*🚚 ENTREGA:* ${tipoEntrega === "delivery" ? "Delivery" : "Balcão"}\n\n`
-
-    if (tipoEntrega === "delivery") {
-      texto += "*👤 DADOS DO CLIENTE:*\n"
-      texto += `Nome: ${nomeCompleto}\n`
-      texto += `Telefone: ${telefone}\n\n`
+    
+    // Tipo de entrega
+    message += `🚚 *ENTREGA:* ${deliveryType === "delivery" ? "Delivery" : "Retirada no Balcão"}\n\n`
+    
+    // Dados do cliente (se delivery)
+    if (deliveryType === "delivery") {
+      message += `👤 *DADOS DO CLIENTE:*\n`
+      message += `Nome: ${customerName}\n`
+      message += `Telefone: ${customerPhone}\n\n`
       
-      if (enderecoData) {
-        texto += "*📍 ENDEREÇO:*\n"
-        texto += `${enderecoData.logradouro}, ${numero}\n`
-        if (complemento) texto += `${complemento}\n`
-        texto += `${enderecoData.bairro} - ${enderecoData.localidade}/${enderecoData.uf}\n`
-        texto += `CEP: ${cep}\n`
-        if (observacoesEntrega) texto += `Obs. Entrega: ${observacoesEntrega}\n`
-        texto += "\n"
+      message += `📍 *ENDEREÇO DE ENTREGA:*\n`
+      if (addressData) {
+        message += `${addressData.logradouro}, ${addressNumber}\n`
+        if (addressComplement) message += `${addressComplement}\n`
+        message += `${addressData.bairro} - ${addressData.localidade}/${addressData.uf}\n`
+        message += `CEP: ${customerCep}\n`
+        if (deliveryNotes) message += `Observações: ${deliveryNotes}\n`
       }
+      message += `\n`
     }
-
-    if (observacoesPedido) {
-      texto += `*📝 OBSERVAÇÕES:*\n${observacoesPedido}\n\n`
+    
+    // Observações do pedido
+    if (orderNotes) {
+      message += `📝 *OBSERVAÇÕES DO PEDIDO:*\n${orderNotes}\n\n`
     }
-
-    const formasPagamento = {
+    
+    // Forma de pagamento
+    const paymentLabels = {
       pix: "PIX",
       dinheiro: "Dinheiro",
-      debito: "Cartão de Débito", 
+      debito: "Cartão de Débito",
       credito: "Cartão de Crédito"
     }
-    texto += `*💳 FORMA DE PAGAMENTO:* ${formasPagamento[formaPagamento]}\n\n`
-
-    const subtotal = state.total
-    const taxaEntrega = tipoEntrega === "delivery" ? (config?.taxa_entrega || 0) : 0
-    const total = subtotal + taxaEntrega
-
-    texto += "*💰 RESUMO:*\n"
-    texto += `Subtotal: ${formatCurrency(subtotal)}\n`
-    if (tipoEntrega === "delivery") {
-      texto += `Taxa de entrega: ${formatCurrency(taxaEntrega)}\n`
+    message += `💳 *FORMA DE PAGAMENTO:* ${paymentLabels[paymentMethod]}\n\n`
+    
+    // Resumo financeiro
+    message += `💰 *VALORES:*\n`
+    message += `Subtotal: ${formatCurrency(subtotal)}\n`
+    if (deliveryType === "delivery") {
+      message += `Taxa de entrega: ${formatCurrency(deliveryFee)}\n`
     }
-    texto += `*Total: ${formatCurrency(total)}*\n\n`
-    texto += "Aguardo confirmação! 😊"
-
-    return texto
+    message += `*TOTAL: ${formatCurrency(total)}*\n\n`
+    
+    message += `✅ Aguardo confirmação!`
+    
+    return message
   }
-
-  const handleFinalizarPedido = () => {
-    const textoWhatsApp = gerarTextoWhatsApp()
-    const whatsappNumber = config?.whatsapp || "5511999999999"
-    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(textoWhatsApp)}`
-    window.open(url, "_blank")
+  
+  // Finalizar pedido
+  const handleFinishOrder = () => {
+    const message = generateWhatsAppMessage()
+    const whatsappNumber = storeConfig?.whatsapp || "5511999999999"
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+    
+    window.open(whatsappUrl, "_blank")
   }
-
-  if (!config || !isLoaded || !isCartLoaded) {
-    return <div className="flex items-center justify-center min-h-screen">Carregando...</div>
-  }
-
-  // Interface para carrinho vazio - só mostrar após aguardar carregamento
-  if (totalItens === 0) {
+  
+  // Loading
+  if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        <div className="bg-white border-b px-4 py-3 flex items-center sticky top-0 z-10 shadow-sm">
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-red-600" />
+      </div>
+    )
+  }
+  
+  // Carrinho vazio
+  if (state.items.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="bg-white border-b px-4 py-3 flex items-center">
           <Button variant="ghost" size="sm" onClick={() => router.push("/")}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-lg font-semibold ml-2">Checkout</h1>
+          <h1 className="text-lg font-semibold ml-2">Finalizar Pedido</h1>
         </div>
-
-        <div className="flex-1 flex items-center justify-center p-4">
-          <div className="text-center max-w-md">
-            <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-              <Package className="w-12 h-12 text-gray-400" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Carrinho Vazio</h2>
-            <p className="text-gray-600 mb-6">
-              Você ainda não adicionou nenhum item ao seu carrinho. 
-              Escolha suas pizzas favoritas para continuar!
-            </p>
-            <Button 
-              onClick={() => router.push("/")}
-              className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-xl"
-            >
-              Ver Cardápio
+        
+        <div className="flex-1 flex items-center justify-center p-8">
+          <div className="text-center">
+            <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+            <h2 className="text-2xl font-bold mb-2">Carrinho Vazio</h2>
+            <p className="text-gray-600 mb-6">Adicione itens ao seu pedido para continuar</p>
+            <Button onClick={() => router.push("/")} className="bg-red-600 hover:bg-red-700">
+              Voltar ao Cardápio
             </Button>
           </div>
         </div>
       </div>
     )
   }
-
+  
   const subtotal = state.total
-  const taxaEntrega = tipoEntrega === "delivery" ? config.taxa_entrega : 0
-  const total = subtotal + taxaEntrega
-
+  const deliveryFee = deliveryType === "delivery" ? (storeConfig?.taxa_entrega || 0) : 0
+  const total = subtotal + deliveryFee
+  const minimumValue = storeConfig?.valor_minimo || 0
+  const isMinimumMet = subtotal >= minimumValue
+  
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <div className="bg-white border-b px-4 py-3 flex items-center sticky top-0 z-10 shadow-sm">
-        <Button variant="ghost" size="sm" onClick={() => router.back()}>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b px-4 py-3 flex items-center sticky top-0 z-10">
+        <Button variant="ghost" size="sm" onClick={() => router.push("/")}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <h1 className="text-lg font-semibold ml-2">Finalizar Pedido</h1>
       </div>
-
-      <div className="flex-1 overflow-y-auto pb-32">
-        <div className="p-4 space-y-6">
-          <Card className="shadow-lg rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 pb-4">
-              <CardTitle className="text-xl font-semibold text-gray-900">Tipo de entrega</CardTitle>
-            </CardHeader>
-            <CardContent className="p-4">
-              <RadioGroup value={tipoEntrega} onValueChange={(value: "delivery" | "balcao") => setTipoEntrega(value)}>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3 p-4 border-2 border-transparent rounded-xl bg-white shadow-sm hover:border-green-200 transition-colors">
-                    <RadioGroupItem value="delivery" id="delivery" className="text-green-600" />
-                    <Label htmlFor="delivery" className="flex items-center space-x-3 cursor-pointer flex-1">
-                      <div className="p-2 bg-green-100 rounded-lg">
-                        <Bike className="h-5 w-5 text-green-600" />
-                      </div>
-                      <div>
-                        <span className="font-medium text-gray-900">🚲 Delivery</span>
-                        <p className="text-sm text-gray-500">Entrega em domicílio</p>
-                      </div>
-                    </Label>
+      
+      <div className="max-w-2xl mx-auto p-4 pb-24">
+        {/* Resumo do Pedido */}
+        <Card className="mb-4">
+          <div className="p-4">
+            <h2 className="text-lg font-semibold mb-4">Resumo do Pedido</h2>
+            <div className="space-y-3">
+              {state.items.map((item, index) => (
+                <div key={index} className="flex justify-between items-start pb-3 border-b last:border-0">
+                  <div className="flex-1">
+                    <h3 className="font-medium">{item.nome}</h3>
+                    <p className="text-sm text-gray-600">
+                      {item.quantidade}x {item.tamanho} • {formatCurrency(item.preco)}
+                    </p>
                   </div>
-                  <div className="flex items-center space-x-3 p-4 border-2 border-transparent rounded-xl bg-white shadow-sm hover:border-blue-200 transition-colors">
-                    <RadioGroupItem value="balcao" id="balcao" className="text-blue-600" />
-                    <Label htmlFor="balcao" className="flex items-center space-x-3 cursor-pointer flex-1">
-                      <div className="p-2 bg-blue-100 rounded-lg">
-                        <Package className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <span className="font-medium text-gray-900">🏬 Balcão</span>
-                        <p className="text-sm text-gray-500">Retirada no local</p>
-                      </div>
-                    </Label>
-                  </div>
+                  <span className="font-semibold">{formatCurrency(item.preco * item.quantidade)}</span>
                 </div>
-              </RadioGroup>
-            </CardContent>
-          </Card>
-
-          {/* FORMULÁRIO PARA DELIVERY */}
-          {tipoEntrega === "delivery" && (
-            <Card className="shadow-lg rounded-2xl overflow-hidden">
-              <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100 pb-4">
-                <CardTitle className="text-xl font-semibold text-gray-900">Dados para entrega</CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 space-y-4">
-                <div>
-                  <Label htmlFor="nome" className="text-sm font-medium text-gray-700 mb-2 block">
-                    Nome completo *
+              ))}
+            </div>
+          </div>
+        </Card>
+        
+        {/* Tipo de Entrega */}
+        <Card className="mb-4">
+          <div className="p-4">
+            <h2 className="text-lg font-semibold mb-4">Tipo de Entrega</h2>
+            <RadioGroup value={deliveryType} onValueChange={(value: "balcao" | "delivery") => setDeliveryType(value)}>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
+                  <RadioGroupItem value="balcao" id="balcao" />
+                  <Label htmlFor="balcao" className="flex-1 cursor-pointer">
+                    <span className="font-medium">🏬 Retirada no Balcão</span>
+                    <p className="text-sm text-gray-600">Retire seu pedido na loja</p>
                   </Label>
-                  <Input
-                    id="nome"
-                    type="text"
-                    placeholder="Seu nome completo"
-                    value={nomeCompleto}
-                    onChange={(e) => setNomeCompleto(e.target.value)}
-                    className="w-full"
-                    required
-                  />
                 </div>
-
-                <div>
-                  <Label htmlFor="telefone" className="text-sm font-medium text-gray-700 mb-2 block">
-                    Telefone *
+                <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
+                  <RadioGroupItem value="delivery" id="delivery" />
+                  <Label htmlFor="delivery" className="flex-1 cursor-pointer">
+                    <span className="font-medium">🚲 Delivery</span>
+                    <p className="text-sm text-gray-600">Receba em casa (+{formatCurrency(storeConfig?.taxa_entrega || 0)})</p>
                   </Label>
-                  <Input
-                    id="telefone"
-                    type="text"
-                    placeholder="(11) 99999-9999"
-                    value={telefone}
-                    onChange={(e) => handleTelefoneChange(e.target.value)}
-                    className="w-full"
-                    required
-                  />
                 </div>
-
+              </div>
+            </RadioGroup>
+          </div>
+        </Card>
+        
+        {/* Dados para Delivery */}
+        {deliveryType === "delivery" && (
+          <Card className="mb-4">
+            <div className="p-4">
+              <h2 className="text-lg font-semibold mb-4">Dados para Entrega</h2>
+              <div className="space-y-4">
+                {/* Nome */}
                 <div>
-                  <Label htmlFor="cep" className="text-sm font-medium text-gray-700 mb-2 block">
-                    CEP *
-                  </Label>
-                  <div className="relative">
+                  <Label htmlFor="name">Nome Completo *</Label>
+                  <div className="relative mt-1">
+                    <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input
-                      id="cep"
-                      type="text"
-                      placeholder="00000-000"
-                      value={cep}
-                      onChange={(e) => handleCepChange(e.target.value)}
-                      className="w-full pr-10"
+                      id="name"
+                      placeholder="Seu nome completo"
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
+                      className="pl-10"
                       required
                     />
-                    {buscandoCep && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                      </div>
+                  </div>
+                </div>
+                
+                {/* Telefone */}
+                <div>
+                  <Label htmlFor="phone">Telefone *</Label>
+                  <div className="relative mt-1">
+                    <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="phone"
+                      placeholder="(11) 99999-9999"
+                      value={customerPhone}
+                      onChange={(e) => handlePhoneChange(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+                
+                {/* CEP */}
+                <div>
+                  <Label htmlFor="cep">CEP *</Label>
+                  <div className="relative mt-1">
+                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="cep"
+                      placeholder="00000-000"
+                      value={customerCep}
+                      onChange={(e) => handleCepChange(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                    {searchingCep && (
+                      <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-gray-400" />
                     )}
                   </div>
-                  {erroCep && (
-                    <p className="text-red-600 text-sm mt-1">{erroCep}</p>
-                  )}
-                  {enderecoData && (
-                    <div className="mt-2 p-3 bg-green-50 rounded-lg border border-green-200">
-                      <div className="flex items-center gap-2 text-green-800 text-sm">
-                        <MapPin className="h-4 w-4" />
-                        <span className="font-medium">Endereço encontrado:</span>
-                      </div>
-                      <p className="text-green-700 text-sm mt-1">
-                        {enderecoData.logradouro}, {enderecoData.bairro} - {enderecoData.localidade}/{enderecoData.uf}
+                  {cepError && <p className="text-red-600 text-sm mt-1">{cepError}</p>}
+                  {addressData && (
+                    <div className="mt-2 p-3 bg-green-50 rounded-lg text-sm">
+                      <p className="font-medium text-green-800">Endereço encontrado:</p>
+                      <p className="text-green-700">
+                        {addressData.logradouro}, {addressData.bairro} - {addressData.localidade}/{addressData.uf}
                       </p>
                     </div>
                   )}
                 </div>
-
-                {enderecoData && (
+                
+                {/* Campos adicionais após CEP */}
+                {addressData && (
                   <>
                     <div>
-                      <Label htmlFor="numero" className="text-sm font-medium text-gray-700 mb-2 block">
-                        Número *
-                      </Label>
+                      <Label htmlFor="number">Número *</Label>
                       <Input
-                        id="numero"
-                        type="text"
+                        id="number"
                         placeholder="123"
-                        value={numero}
-                        onChange={(e) => setNumero(e.target.value)}
-                        className="w-full"
+                        value={addressNumber}
+                        onChange={(e) => setAddressNumber(e.target.value)}
+                        className="mt-1"
                         required
                       />
                     </div>
-
+                    
                     <div>
-                      <Label htmlFor="complemento" className="text-sm font-medium text-gray-700 mb-2 block">
-                        Complemento
-                      </Label>
+                      <Label htmlFor="complement">Complemento</Label>
                       <Input
-                        id="complemento"
-                        type="text"
-                        placeholder="Apto 123, Bloco A..."
-                        value={complemento}
-                        onChange={(e) => setComplemento(e.target.value)}
-                        className="w-full"
+                        id="complement"
+                        placeholder="Apto 101, Bloco A..."
+                        value={addressComplement}
+                        onChange={(e) => setAddressComplement(e.target.value)}
+                        className="mt-1"
                       />
                     </div>
-
+                    
                     <div>
-                      <Label htmlFor="obs-entrega" className="text-sm font-medium text-gray-700 mb-2 block">
-                        Observações para entrega
-                      </Label>
+                      <Label htmlFor="delivery-notes">Observações de Entrega</Label>
                       <Textarea
-                        id="obs-entrega"
-                        placeholder="Ponto de referência, instruções especiais..."
-                        value={observacoesEntrega}
-                        onChange={(e) => setObservacoesEntrega(e.target.value)}
-                        className="w-full"
+                        id="delivery-notes"
+                        placeholder="Ponto de referência, instruções..."
+                        value={deliveryNotes}
+                        onChange={(e) => setDeliveryNotes(e.target.value)}
+                        className="mt-1"
                         rows={2}
                       />
                     </div>
                   </>
                 )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* TEXTO PARA BALCÃO */}
-          {tipoEntrega === "balcao" && (
-            <Card className="shadow-lg rounded-2xl overflow-hidden">
-              <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Package className="w-8 h-8 text-blue-600" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Retirada no balcão</h3>
-                <p className="text-gray-600">
-                  Seu pedido estará pronto para retirada em nossa loja após a confirmação.
-                </p>
-              </CardContent>
-            </Card>
-          )}
-
-          <Card className="shadow-lg rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b border-purple-100 pb-4">
-              <CardTitle className="text-xl font-semibold text-gray-900">Resumo do pedido</CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="space-y-4 p-4">
-                {state.items.map((item, index) => (
-                  <div key={`${item.id}-${index}`} className="bg-gray-50 rounded-xl p-4">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg text-gray-900">{item.nome}</h3>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            {item.tamanho}
-                          </span>
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                            Qtd: {item.quantidade}
-                          </span>
-                        </div>
-                        {item.sabores.length > 0 && (
-                          <div className="mt-2">
-                            <p className="text-sm text-gray-600 font-medium">
-                              {item.sabores.length === 1 ? 'Sabor:' : 'Sabores:'}
-                            </p>
-                            <p className="text-sm text-gray-700">{item.sabores.join(", ")}</p>
-                          </div>
-                        )}
-                      </div>
-                      <div className="text-right ml-4">
-                        <p className="text-lg font-bold text-gray-900">{formatCurrency(item.preco * item.quantidade)}</p>
-                        <p className="text-sm text-gray-500">{formatCurrency(item.preco)} cada</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-3 border-t border-gray-200">
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center bg-white rounded-lg border border-gray-300">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 rounded-l-lg hover:bg-gray-100"
-                            onClick={() => {
-                              if (item.quantidade > 1) {
-                                dispatch({
-                                  type: "UPDATE_QUANTITY",
-                                  payload: { id: item.id, quantidade: item.quantidade - 1 }
-                                })
-                              }
-                            }}
-                            disabled={item.quantidade <= 1}
-                          >
-                            <Minus className="h-4 w-4" />
-                          </Button>
-                          <span className="px-3 py-1 text-sm font-medium bg-white min-w-[40px] text-center">
-                            {item.quantidade}
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 rounded-r-lg hover:bg-gray-100"
-                            onClick={() => {
-                              dispatch({
-                                type: "UPDATE_QUANTITY",
-                                payload: { id: item.id, quantidade: item.quantidade + 1 }
-                              })
-                            }}
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-red-600 hover:bg-red-50"
-                        onClick={() => {
-                          dispatch({ type: "REMOVE_ITEM", payload: item.id })
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* OBSERVAÇÕES */}
-          <Card className="shadow-lg rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-yellow-50 to-orange-50 border-b border-yellow-100 pb-4">
-              <CardTitle className="text-xl font-semibold text-gray-900">Observações</CardTitle>
-            </CardHeader>
-            <CardContent className="p-4">
-              <Textarea
-                placeholder="Ex: Sem cebola, bem passado, embalagem separada..."
-                value={observacoesPedido}
-                onChange={(e) => setObservacoesPedido(e.target.value)}
-                className="w-full"
-                rows={3}
-              />
-            </CardContent>
-          </Card>
-
-          {/* FORMA DE PAGAMENTO */}
-          <Card className="shadow-lg rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-green-50 to-teal-50 border-b border-green-100 pb-4">
-              <CardTitle className="text-xl font-semibold text-gray-900">Forma de pagamento</CardTitle>
-            </CardHeader>
-            <CardContent className="p-4">
-              <RadioGroup value={formaPagamento} onValueChange={(value: "pix" | "dinheiro" | "debito" | "credito") => setFormaPagamento(value)}>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
-                    <RadioGroupItem value="pix" id="pix" />
-                    <Label htmlFor="pix" className="flex-1 cursor-pointer">PIX</Label>
-                  </div>
-                  <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
-                    <RadioGroupItem value="dinheiro" id="dinheiro" />
-                    <Label htmlFor="dinheiro" className="flex-1 cursor-pointer">Dinheiro</Label>
-                  </div>
-                  <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
-                    <RadioGroupItem value="debito" id="debito" />
-                    <Label htmlFor="debito" className="flex-1 cursor-pointer">Cartão de Débito</Label>
-                  </div>
-                  <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
-                    <RadioGroupItem value="credito" id="credito" />
-                    <Label htmlFor="credito" className="flex-1 cursor-pointer">Cartão de Crédito</Label>
-                  </div>
-                </div>
-              </RadioGroup>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-lg rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-gray-50 to-slate-50 border-b border-gray-100 pb-4">
-              <CardTitle className="text-xl font-semibold text-gray-900">Resumo</CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 space-y-4">
-              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <span className="text-gray-700">Subtotal</span>
-                <span className="font-semibold text-gray-900">{formatCurrency(subtotal)}</span>
-              </div>
-              {tipoEntrega === "delivery" && (
-                <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
-                  <span className="text-blue-700">Taxa de entrega</span>
-                  <span className="font-semibold text-blue-900">{formatCurrency(taxaEntrega)}</span>
-                </div>
-              )}
-              <div className="border-t pt-4">
-                <div className="flex justify-between items-center p-4 bg-green-50 rounded-lg border border-green-200">
-                  <span className="text-xl font-bold text-green-800">Total</span>
-                  <span className="text-2xl font-bold text-green-900">{formatCurrency(total)}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Verificação de valor mínimo */}
-          {subtotal < config.valor_minimo && (
-            <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 shadow-lg">
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-6 h-6 bg-yellow-200 rounded-full flex items-center justify-center">
-                  <span className="text-yellow-800 text-sm font-bold">!</span>
-                </div>
-                <div>
-                  <p className="text-yellow-800 text-sm font-medium">
-                    Valor mínimo para pedido: {formatCurrency(config.valor_minimo)}
-                  </p>
-                  <p className="text-yellow-700 text-sm mt-1">
-                    Adicione mais {formatCurrency(config.valor_minimo - subtotal)} ao seu pedido.
-                  </p>
-                </div>
               </div>
             </div>
-          )}
-        </div>
-      </div>
-
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg z-20">
-        <div className="space-y-2">
-          <Button 
-            onClick={handleFinalizarPedido} 
-            disabled={subtotal < config.valor_minimo || !validarFormulario()} 
-            className="w-full h-14 text-lg font-semibold bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-xl shadow-lg" 
-            size="lg"
-          >
-            {subtotal < config.valor_minimo ? (
-              `Faltam ${formatCurrency(config.valor_minimo - subtotal)}`
-            ) : (
-              "Finalize seu Pedido"
+          </Card>
+        )}
+        
+        {/* Observações do Pedido */}
+        <Card className="mb-4">
+          <div className="p-4">
+            <h2 className="text-lg font-semibold mb-4">Observações do Pedido</h2>
+            <Textarea
+              placeholder="Ex: Sem cebola, bem passado..."
+              value={orderNotes}
+              onChange={(e) => setOrderNotes(e.target.value)}
+              rows={3}
+            />
+          </div>
+        </Card>
+        
+        {/* Forma de Pagamento */}
+        <Card className="mb-4">
+          <div className="p-4">
+            <h2 className="text-lg font-semibold mb-4">Forma de Pagamento</h2>
+            <RadioGroup value={paymentMethod} onValueChange={(value: any) => setPaymentMethod(value)}>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
+                  <RadioGroupItem value="pix" id="pix" />
+                  <Label htmlFor="pix" className="cursor-pointer">
+                    <Smartphone className="inline w-4 h-4 mr-1" /> PIX
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
+                  <RadioGroupItem value="dinheiro" id="dinheiro" />
+                  <Label htmlFor="dinheiro" className="cursor-pointer">
+                    <DollarSign className="inline w-4 h-4 mr-1" /> Dinheiro
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
+                  <RadioGroupItem value="debito" id="debito" />
+                  <Label htmlFor="debito" className="cursor-pointer">
+                    <CreditCard className="inline w-4 h-4 mr-1" /> Débito
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
+                  <RadioGroupItem value="credito" id="credito" />
+                  <Label htmlFor="credito" className="cursor-pointer">
+                    <CreditCard className="inline w-4 h-4 mr-1" /> Crédito
+                  </Label>
+                </div>
+              </div>
+            </RadioGroup>
+          </div>
+        </Card>
+        
+        {/* Resumo de Valores */}
+        <Card className="mb-4">
+          <div className="p-4">
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span className="font-medium">{formatCurrency(subtotal)}</span>
+              </div>
+              {deliveryType === "delivery" && (
+                <div className="flex justify-between">
+                  <span>Taxa de entrega</span>
+                  <span className="font-medium">{formatCurrency(deliveryFee)}</span>
+                </div>
+              )}
+              <div className="flex justify-between pt-2 border-t font-semibold text-lg">
+                <span>Total</span>
+                <span className="text-green-600">{formatCurrency(total)}</span>
+              </div>
+            </div>
+            
+            {!isMinimumMet && (
+              <div className="mt-4 p-3 bg-yellow-50 rounded-lg">
+                <p className="text-yellow-800 text-sm">
+                  Valor mínimo: {formatCurrency(minimumValue)}
+                  <br />
+                  Faltam {formatCurrency(minimumValue - subtotal)} para atingir o mínimo
+                </p>
+              </div>
             )}
-          </Button>
-          <p className="text-xs text-gray-500 text-center">
-            Você será redirecionado ao WhatsApp da pizzaria para enviar seu pedido.
-          </p>
-        </div>
+          </div>
+        </Card>
+      </div>
+      
+      {/* Botão Fixo */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4">
+        <Button
+          onClick={handleFinishOrder}
+          disabled={!isMinimumMet || !isFormValid()}
+          className="w-full h-12 text-lg bg-green-600 hover:bg-green-700 disabled:bg-gray-300"
+        >
+          Finalize seu Pedido
+        </Button>
+        <p className="text-xs text-gray-500 text-center mt-2">
+          Você será redirecionado ao WhatsApp da pizzaria
+        </p>
       </div>
     </div>
   )

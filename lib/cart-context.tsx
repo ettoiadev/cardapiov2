@@ -100,14 +100,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         const savedCart = localStorage.getItem("pizzaria-cart")
         if (savedCart) {
           const parsedCart = JSON.parse(savedCart)
-          console.log("🛒 Carrinho carregado do localStorage:", parsedCart)
           return parsedCart
         }
       } catch (error) {
         console.error("Erro ao carregar carrinho do localStorage:", error)
       }
     }
-    console.log("🛒 Inicializando carrinho vazio")
     return { items: [], total: 0 }
   }
 
@@ -129,7 +127,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     if (typeof window !== "undefined") {
       try {
         localStorage.setItem("pizzaria-cart", JSON.stringify(state))
-        console.log("💾 Carrinho salvo no localStorage:", state)
       } catch (error) {
         console.error("Erro ao salvar carrinho no localStorage:", error)
       }
