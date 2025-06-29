@@ -30,6 +30,9 @@ interface Produto {
 interface Categoria {
   id: string
   nome: string
+  descricao?: string | null
+  ordem?: number
+  ativo?: boolean
 }
 
 interface OpcaoSabor {
@@ -45,6 +48,8 @@ export default function AdminProdutosPage() {
   const [opcoesSabores, setOpcoesSabores] = useState<OpcaoSabor[]>([])
   const [editingProduto, setEditingProduto] = useState<Produto | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [editingCategoria, setEditingCategoria] = useState<Categoria | null>(null)
+  const [isCategoriaDialogOpen, setIsCategoriaDialogOpen] = useState(false)
 
   useEffect(() => {
     loadData()
@@ -124,6 +129,70 @@ export default function AdminProdutosPage() {
     }
   }
 
+  const handleSaveCategoria = async (categoria: Partial<Categoria>) => {
+    try {
+      if (editingCategoria?.id) {
+        // Atualizar categoria existente
+        const { error } = await supabase.from("categorias").update(categoria).eq("id", editingCategoria.id)
+        if (error) throw error
+      } else {
+        // Criar nova categoria
+        const { error } = await supabase.from("categorias").insert(categoria)
+        if (error) throw error
+      }
+
+      await loadData()
+      setIsCategoriaDialogOpen(false)
+      setEditingCategoria(null)
+    } catch (error) {
+      console.error("Erro ao salvar categoria:", error)
+      alert("Erro ao salvar categoria. Tente novamente.")
+    }
+  }
+
+  const handleDeleteCategoria = async (id: string) => {
+    try {
+      // Verificar se existem produtos usando esta categoria
+      const { data: produtosComCategoria, error: checkError } = await supabase
+        .from("produtos")
+        .select("id, nome")
+        .eq("categoria_id", id)
+      
+      if (checkError) throw checkError
+
+      if (produtosComCategoria && produtosComCategoria.length > 0) {
+        const nomesProdutos = produtosComCategoria.map(p => p.nome).join(", ")
+        const confirmacao = confirm(
+          `Esta categoria possui ${produtosComCategoria.length} produto(s) associado(s): ${nomesProdutos}.\n\n` +
+          `Ao excluir a categoria, estes produtos ficarão sem categoria.\n\n` +
+          `Deseja continuar?`
+        )
+        
+        if (!confirmacao) return
+
+        // Remover a categoria dos produtos antes de excluir
+        const { error: updateError } = await supabase
+          .from("produtos")
+          .update({ categoria_id: null })
+          .eq("categoria_id", id)
+        
+        if (updateError) throw updateError
+      } else {
+        const confirmacao = confirm("Tem certeza que deseja excluir esta categoria?")
+        if (!confirmacao) return
+      }
+
+      // Excluir a categoria
+      const { error } = await supabase.from("categorias").delete().eq("id", id)
+      if (error) throw error
+
+      await loadData()
+    } catch (error) {
+      console.error("Erro ao excluir categoria:", error)
+      alert("Erro ao excluir categoria. Tente novamente.")
+    }
+  }
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -154,6 +223,100 @@ export default function AdminProdutosPage() {
             </DialogContent>
           </Dialog>
         </div>
+
+        {/* Gerenciar Categorias */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Gerenciar Categorias</CardTitle>
+              <Dialog open={isCategoriaDialogOpen} onOpenChange={setIsCategoriaDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button
+                    onClick={() => {
+                      setEditingCategoria(null)
+                      setIsCategoriaDialogOpen(true)
+                    }}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nova Categoria
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>{editingCategoria ? "Editar Categoria" : "Nova Categoria"}</DialogTitle>
+                  </DialogHeader>
+                  <CategoriaForm
+                    categoria={editingCategoria}
+                    onSave={handleSaveCategoria}
+                    onCancel={() => setIsCategoriaDialogOpen(false)}
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Gerencie as categorias dos produtos. Categorias ajudam a organizar o cardápio.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {categorias.map((categoria) => (
+                  <div key={categoria.id} className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-medium text-lg">{categoria.nome}</h3>
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setEditingCategoria(categoria)
+                            setIsCategoriaDialogOpen(true)
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleDeleteCategoria(categoria.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    {categoria.descricao && (
+                      <p className="text-sm text-gray-600 mb-3">{categoria.descricao}</p>
+                    )}
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>Ordem:</span>
+                        <span className="font-medium">{categoria.ordem || 0}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Status:</span>
+                        <span className={(categoria.ativo ?? true) ? "text-green-600" : "text-red-600"}>
+                          {(categoria.ativo ?? true) ? "Ativo" : "Inativo"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Produtos:</span>
+                        <span className="font-medium">
+                          {produtos.filter(p => p.categoria_id === categoria.id).length}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {categorias.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <p>Nenhuma categoria cadastrada.</p>
+                  <p className="text-sm">Clique em "Nova Categoria" para começar.</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Controle de Opcoes de Sabores */}
         <Card>
@@ -399,6 +562,90 @@ function ProdutoForm({
           Cancelar
         </Button>
         <Button type="submit">Salvar</Button>
+      </div>
+    </form>
+  )
+}
+
+function CategoriaForm({
+  categoria,
+  onSave,
+  onCancel,
+}: {
+  categoria: Categoria | null
+  onSave: (categoria: Partial<Categoria>) => void
+  onCancel: () => void
+}) {
+  const [formData, setFormData] = useState({
+    nome: categoria?.nome || "",
+    descricao: categoria?.descricao || "",
+    ordem: categoria?.ordem || 0,
+    ativo: categoria?.ativo ?? true,
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!formData.nome.trim()) {
+      alert("Nome da categoria é obrigatório")
+      return
+    }
+    onSave(formData)
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label htmlFor="nome">Nome da Categoria *</Label>
+        <Input
+          id="nome"
+          value={formData.nome}
+          onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+          placeholder="Digite o nome da categoria"
+          required
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="descricao">Descrição</Label>
+        <Textarea
+          id="descricao"
+          value={formData.descricao}
+          onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
+          placeholder="Digite uma descrição opcional"
+          rows={3}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="ordem">Ordem</Label>
+          <Input
+            id="ordem"
+            type="number"
+            value={formData.ordem}
+            onChange={(e) => setFormData({ ...formData, ordem: Number.parseInt(e.target.value) || 0 })}
+            placeholder="0"
+          />
+        </div>
+        <div className="flex items-end">
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={formData.ativo}
+              onChange={(e) => setFormData({ ...formData, ativo: e.target.checked })}
+            />
+            <span className="text-sm">Categoria ativa</span>
+          </label>
+        </div>
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Cancelar
+        </Button>
+        <Button type="submit">
+          {categoria ? "Atualizar" : "Criar"} Categoria
+        </Button>
       </div>
     </form>
   )
