@@ -240,29 +240,37 @@ function HomePageContent() {
 
         if (opcoesResult.data && opcoesResult.data.length > 0) {
           setOpcoesSabores(opcoesResult.data)
+          
+          // Verificar se o modo atual ainda está ativo
+          const opcaoAtual = opcoesResult.data.find(o => o.maximo_sabores === flavorMode && o.ativo)
+          if (!opcaoAtual) {
+            // Se o modo atual não está ativo, voltar para 1 sabor
+            setFlavorMode(1)
+            setSelectedFlavorsForMulti([])
+          }
         } else {
           // Fallback para opções padrão
           setOpcoesSabores([
-            { id: "1", nome: "1 Sabor", maximo_sabores: 1, ordem: 1 },
-            { id: "2", nome: "2 Sabores", maximo_sabores: 2, ordem: 2 },
-            { id: "3", nome: "3 Sabores", maximo_sabores: 3, ordem: 3 }
+            { id: "1", nome: "1 Sabor", maximo_sabores: 1, ordem: 1, ativo: true },
+            { id: "2", nome: "2 Sabores", maximo_sabores: 2, ordem: 2, ativo: true },
+            { id: "3", nome: "3 Sabores", maximo_sabores: 3, ordem: 3, ativo: true }
           ])
         }
       } else {
         // Usar opções padrão quando Supabase não estiver configurado
         setOpcoesSabores([
-          { id: "1", nome: "1 Sabor", maximo_sabores: 1, ordem: 1 },
-          { id: "2", nome: "2 Sabores", maximo_sabores: 2, ordem: 2 },
-          { id: "3", nome: "3 Sabores", maximo_sabores: 3, ordem: 3 }
+          { id: "1", nome: "1 Sabor", maximo_sabores: 1, ordem: 1, ativo: true },
+          { id: "2", nome: "2 Sabores", maximo_sabores: 2, ordem: 2, ativo: true },
+          { id: "3", nome: "3 Sabores", maximo_sabores: 3, ordem: 3, ativo: true }
         ])
       }
     } catch (error) {
       console.error("Error loading data:", error)
       // Usar opções padrão em caso de erro
       setOpcoesSabores([
-        { id: "1", nome: "1 Sabor", maximo_sabores: 1, ordem: 1 },
-        { id: "2", nome: "2 Sabores", maximo_sabores: 2, ordem: 2 },
-        { id: "3", nome: "3 Sabores", maximo_sabores: 3, ordem: 3 }
+        { id: "1", nome: "1 Sabor", maximo_sabores: 1, ordem: 1, ativo: true },
+        { id: "2", nome: "2 Sabores", maximo_sabores: 2, ordem: 2, ativo: true },
+        { id: "3", nome: "3 Sabores", maximo_sabores: 3, ordem: 3, ativo: true }
       ])
     } finally {
       setLoading(false)
@@ -402,12 +410,12 @@ function HomePageContent() {
                     Pizzas doces e salgadas (Tradicional 8 fatias / Broto 4 fatias)
                   </div>
                   <div className="text-sm text-red-600">
-                    Você pode escolher até {Math.max(...opcoesSabores.map(o => o.maximo_sabores))} sabores
+                    Você pode escolher até {Math.max(...opcoesSabores.filter(o => o.ativo).map(o => o.maximo_sabores))} sabores
                   </div>
 
                   {/* Botões de seleção de sabores dinamicos */}
                   <div className="flex space-x-3">
-                    {opcoesSabores.map((opcao, index) => {
+                    {opcoesSabores.filter(opcao => opcao.ativo).map((opcao, index) => {
                       const IconComponent = () => {
                         if (opcao.maximo_sabores === 1) {
                           return (

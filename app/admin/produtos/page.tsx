@@ -31,9 +31,17 @@ interface Categoria {
   nome: string
 }
 
+interface OpcaoSabor {
+  id: string
+  nome: string
+  maximo_sabores: number
+  ativo: boolean
+}
+
 export default function AdminProdutosPage() {
   const [produtos, setProdutos] = useState<Produto[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
+  const [opcoesSabores, setOpcoesSabores] = useState<OpcaoSabor[]>([])
   const [editingProduto, setEditingProduto] = useState<Produto | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
@@ -43,15 +51,23 @@ export default function AdminProdutosPage() {
 
   const loadData = async () => {
     try {
-      const [produtosRes, categoriasRes] = await Promise.all([
+      const [produtosRes, categoriasRes, opcoesRes] = await Promise.all([
         supabase.from("produtos").select("*").order("ordem"),
         supabase.from("categorias").select("*").order("ordem"),
+        supabase.from("opcoes_sabores").select("*").order("ordem"),
       ])
 
       if (produtosRes.data) setProdutos(produtosRes.data)
       if (categoriasRes.data) setCategorias(categoriasRes.data)
+      if (opcoesRes.data) setOpcoesSabores(opcoesRes.data)
     } catch (error) {
       console.error("Erro ao carregar dados:", error)
+      // Fallback para opcoes mock
+      setOpcoesSabores([
+        { id: "1", nome: "1 Sabor", maximo_sabores: 1, ativo: true },
+        { id: "2", nome: "2 Sabores", maximo_sabores: 2, ativo: true },
+        { id: "3", nome: "3 Sabores", maximo_sabores: 3, ativo: true }
+      ])
     }
   }
 
@@ -87,6 +103,26 @@ export default function AdminProdutosPage() {
     }
   }
 
+  const handleToggleOpcaoSabor = async (opcaoId: string, novoStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from("opcoes_sabores")
+        .update({ ativo: novoStatus })
+        .eq("id", opcaoId)
+      
+      if (error) throw error
+      
+      // Atualizar estado local
+      setOpcoesSabores(prev => 
+        prev.map(opcao => 
+          opcao.id === opcaoId ? { ...opcao, ativo: novoStatus } : opcao
+        )
+      )
+    } catch (error) {
+      console.error("Erro ao atualizar opcao de sabor:", error)
+    }
+  }
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -117,6 +153,46 @@ export default function AdminProdutosPage() {
             </DialogContent>
           </Dialog>
         </div>
+
+        {/* Controle de Opcoes de Sabores */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Configuracoes de Sabores</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Configure quais opcoes de sabores estao disponiveis para os clientes.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {opcoesSabores.map((opcao) => (
+                  <div key={opcao.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="text-sm font-medium">{opcao.nome}</div>
+                      {opcao.maximo_sabores === 1 && (
+                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                          Obrigatorio
+                        </span>
+                      )}
+                    </div>
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={opcao.ativo}
+                        disabled={opcao.maximo_sabores === 1} // 1 sabor sempre habilitado
+                        onChange={(e) => handleToggleOpcaoSabor(opcao.id, e.target.checked)}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 disabled:opacity-50"
+                      />
+                      <span className="text-sm text-gray-600">
+                        {opcao.ativo ? "Habilitado" : "Desabilitado"}
+                      </span>
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {produtos.map((produto) => (
