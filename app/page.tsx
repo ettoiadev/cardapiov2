@@ -202,18 +202,22 @@ function HomePageContent() {
     loadData()
   }, [])
 
-
-
   // Redirecionamento automático APENAS para múltiplos sabores (2 ou 3)
   useEffect(() => {
     if (flavorMode > 1 && selectedFlavorsForMulti.length === flavorMode) {
-      // Adicionar ao carrinho primeiro - usar o tamanho tradicional como padrão
-      // Usuário poderá editar o tamanho na página de checkout se necessário
+      // Adicionar ao carrinho primeiro
       handleAddToCart()
       
+      // Primeiro rolar para a próxima categoria
+      setTimeout(() => {
+        scrollToNextCategory()
+      }, 500)
+      
+      // Depois redirecionar para checkout
       const timer = setTimeout(() => {
         router.push('/checkout')
-      }, 300) // Redirecionamento automático para múltiplos sabores
+      }, 1500) // Aguardar a rolagem completar antes de redirecionar
+      
       return () => clearTimeout(timer)
     }
   }, [flavorMode, selectedFlavorsForMulti.length, router])
@@ -626,7 +630,7 @@ function HomePageContent() {
                           Sabores selecionados: {selectedFlavorsForMulti.map(p => p.nome).join(" + ")}
                         </div>
                         <div className="text-sm text-green-600 font-bold animate-pulse">
-                          ✓ Redirecionando para finalizar pedido...
+                          ✓ Pizza adicionada ao carrinho!
                         </div>
                       </div>
                     </div>
@@ -674,8 +678,6 @@ function HomePageContent() {
         {/* Modals */}
 
         <StoreInfoModal isOpen={showStoreInfo} onClose={() => setShowStoreInfo(false)} config={config} />
-
-
 
         {/* Carrinho fixo no rodapé */}
         <CartFooter />
