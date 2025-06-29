@@ -212,9 +212,13 @@ function HomePageContent() {
     }
   }, [flavorMode, selectedFlavorsForMulti.length])
 
-  // Redirecionamento automático para checkout
+  // Redirecionamento automático para checkout após adicionar ao carrinho
   useEffect(() => {
     if (flavorMode > 1 && selectedFlavorsForMulti.length === flavorMode) {
+      // Adicionar ao carrinho primeiro - usar o tamanho tradicional como padrão
+      // Usuário poderá editar o tamanho na página de checkout se necessário
+      handleAddMultiFlavorToCart("tradicional")
+      
       const timer = setTimeout(() => {
         router.push('/checkout')
       }, 500) // Pequeno delay para o usuário ver a seleção
@@ -322,6 +326,25 @@ function HomePageContent() {
 
     // Reset das seleções
     setSelectedFlavorsForMulti([])
+  }
+
+  const handleAddBebidaToCart = (bebida: Produto) => {
+    dispatch({
+      type: "ADD_ITEM",
+      payload: {
+        id: bebida.id,
+        nome: bebida.nome,
+        tamanho: "tradicional", // Bebidas não têm variação de tamanho
+        sabores: [bebida.nome],
+        preco: bebida.preco_tradicional || 0,
+        tipo: bebida.tipo,
+      },
+    })
+
+    // Redirecionar para o checkout após adicionar ao carrinho
+    setTimeout(() => {
+      router.push('/checkout')
+    }, 500)
   }
 
   const pizzasSalgadas = produtos.filter((p) => p.tipo === "salgada")
@@ -573,6 +596,7 @@ function HomePageContent() {
                     <div
                       key={bebida.id}
                       className="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
+                      onClick={() => handleAddBebidaToCart(bebida)}
                     >
                       <div className="flex-1">
                         <h3 className="font-medium">{bebida.nome}</h3>

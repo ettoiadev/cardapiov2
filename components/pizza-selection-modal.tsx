@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
@@ -31,6 +32,7 @@ export function PizzaSelectionModal({ pizza, isOpen, onClose, multiFlavorMode = 
   const [selectedSize, setSelectedSize] = useState<"broto" | "tradicional">("tradicional")
   const [selectedFlavors, setSelectedFlavors] = useState<string[]>([])
   const { dispatch } = useCart()
+  const router = useRouter()
 
   const handleFlavorSelection = (flavorName: string) => {
     if (selectedFlavors.includes(flavorName)) {
@@ -87,6 +89,11 @@ export function PizzaSelectionModal({ pizza, isOpen, onClose, multiFlavorMode = 
     // Reset do estado
     setSelectedFlavors([])
     onClose()
+    
+    // Redirecionar para o checkout após adicionar ao carrinho
+    setTimeout(() => {
+      router.push('/checkout')
+    }, 500) // Delay maior para garantir que o estado seja atualizado antes do redirecionamento
   }
 
   return (
