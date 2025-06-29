@@ -36,10 +36,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
   const menuItems = [
     { href: "/admin", icon: Home, label: "Dashboard" },
-    { href: "/admin/config", icon: Settings, label: "Configurações" },
+    { href: "/admin/pedidos", icon: FileText, label: "Pedidos" },
     { href: "/admin/produtos", icon: Package, label: "Produtos" },
     { href: "/admin/clientes", icon: Users, label: "Clientes" },
-    { href: "/admin/pedidos", icon: FileText, label: "Pedidos" },
+    { href: "/admin/config", icon: Settings, label: "Configurações" },
   ]
 
   const toggleMobileMenu = () => {

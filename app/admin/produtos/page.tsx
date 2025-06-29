@@ -10,10 +10,29 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
 import { AdminLayout } from "@/components/admin-layout"
 import { supabase } from "@/lib/supabase"
 import { formatCurrency, formatCurrencyInput, parseCurrencyInput } from "@/lib/currency-utils"
-import { Plus, Edit, Trash2 } from "lucide-react"
+import { 
+  Plus, 
+  Edit, 
+  Trash2, 
+  Package, 
+  Tag, 
+  Settings2, 
+  Pizza, 
+  Coffee,
+  Utensils,
+  Eye,
+  EyeOff,
+  MoreVertical,
+  CheckCircle2,
+  XCircle,
+  ArrowUpDown,
+  Filter,
+  Search
+} from "lucide-react"
 
 interface Produto {
   id: string
@@ -50,6 +69,7 @@ export default function AdminProdutosPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingCategoria, setEditingCategoria] = useState<Categoria | null>(null)
   const [isCategoriaDialogOpen, setIsCategoriaDialogOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
 
   useEffect(() => {
     loadData()
@@ -193,222 +213,424 @@ export default function AdminProdutosPage() {
     }
   }
 
+  const filteredProdutos = produtos.filter(produto =>
+    produto.nome.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  const getProductIcon = (tipo: string) => {
+    switch (tipo) {
+      case 'pizza':
+      case 'salgada':
+        return <Pizza className="h-5 w-5 text-orange-500" />
+      case 'doce':
+        return <Utensils className="h-5 w-5 text-pink-500" />
+      case 'bebida':
+        return <Coffee className="h-5 w-5 text-blue-500" />
+      default:
+        return <Package className="h-5 w-5 text-gray-500" />
+    }
+  }
+
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Gerenciar Produtos</h1>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button
-                onClick={() => {
-                  setEditingProduto(null)
-                  setIsDialogOpen(true)
-                }}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Novo Produto
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>{editingProduto ? "Editar Produto" : "Novo Produto"}</DialogTitle>
-              </DialogHeader>
-              <ProdutoForm
-                produto={editingProduto}
-                categorias={categorias}
-                onSave={handleSave}
-                onCancel={() => setIsDialogOpen(false)}
-              />
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        {/* Gerenciar Categorias */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Gerenciar Categorias</CardTitle>
-              <Dialog open={isCategoriaDialogOpen} onOpenChange={setIsCategoriaDialogOpen}>
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header Section */}
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100 shadow-sm">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="space-y-2">
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <Package className="h-8 w-8 text-blue-600" />
+                Gerenciamento de Produtos
+              </h1>
+              <p className="text-gray-600 max-w-2xl">
+                Gerencie produtos, categorias e configurações de sabores do seu cardápio digital.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <Button
+                    size="lg"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all"
                     onClick={() => {
-                      setEditingCategoria(null)
-                      setIsCategoriaDialogOpen(true)
+                      setEditingProduto(null)
+                      setIsDialogOpen(true)
                     }}
                   >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Nova Categoria
+                    <Plus className="h-5 w-5 mr-2" />
+                    Novo Produto
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-md">
+                <DialogContent className="max-w-2xl">
                   <DialogHeader>
-                    <DialogTitle>{editingCategoria ? "Editar Categoria" : "Nova Categoria"}</DialogTitle>
+                    <DialogTitle className="text-xl font-semibold">
+                      {editingProduto ? "Editar Produto" : "Novo Produto"}
+                    </DialogTitle>
                   </DialogHeader>
-                  <CategoriaForm
-                    categoria={editingCategoria}
-                    onSave={handleSaveCategoria}
-                    onCancel={() => setIsCategoriaDialogOpen(false)}
+                  <ProdutoForm
+                    produto={editingProduto}
+                    categorias={categorias}
+                    onSave={handleSave}
+                    onCancel={() => setIsDialogOpen(false)}
                   />
                 </DialogContent>
               </Dialog>
             </div>
+          </div>
+        </div>
+
+        {/* Management Sections Grid */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          {/* Categories Management */}
+          <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <Tag className="h-6 w-6 text-green-600" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl font-semibold text-gray-900">
+                      Categorias
+                    </CardTitle>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Organize seus produtos por categorias
+                    </p>
+                  </div>
+                </div>
+                <Dialog open={isCategoriaDialogOpen} onOpenChange={setIsCategoriaDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="border-green-200 text-green-700 hover:bg-green-50 rounded-lg"
+                      onClick={() => {
+                        setEditingCategoria(null)
+                        setIsCategoriaDialogOpen(true)
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Nova Categoria
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="text-xl font-semibold">
+                        {editingCategoria ? "Editar Categoria" : "Nova Categoria"}
+                      </DialogTitle>
+                    </DialogHeader>
+                    <CategoriaForm
+                      categoria={editingCategoria}
+                      onSave={handleSaveCategoria}
+                      onCancel={() => setIsCategoriaDialogOpen(false)}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                {categorias.length > 0 ? (
+                  <div className="grid gap-4">
+                    {categorias.map((categoria) => (
+                      <div 
+                        key={categoria.id} 
+                        className="group bg-gradient-to-r from-gray-50 to-white border border-gray-100 rounded-xl p-4 hover:shadow-md transition-all duration-200"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 space-y-3">
+                            <div className="flex items-center gap-3">
+                              <h3 className="font-semibold text-gray-900">{categoria.nome}</h3>
+                              <Badge variant={categoria.ativo ? "default" : "secondary"} className="text-xs">
+                                {categoria.ativo ? "Ativo" : "Inativo"}
+                              </Badge>
+                            </div>
+                            {categoria.descricao && (
+                              <p className="text-sm text-gray-600 leading-relaxed">
+                                {categoria.descricao}
+                              </p>
+                            )}
+                            <div className="flex items-center gap-6 text-xs text-gray-500">
+                              <span className="flex items-center gap-1">
+                                <ArrowUpDown className="h-3 w-3" />
+                                Ordem: {categoria.ordem || 0}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Package className="h-3 w-3" />
+                                {produtos.filter(p => p.categoria_id === categoria.id).length} produtos
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600"
+                              onClick={() => {
+                                setEditingCategoria(categoria)
+                                setIsCategoriaDialogOpen(true)
+                              }}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 hover:bg-red-50 text-red-600"
+                              onClick={() => handleDeleteCategoria(categoria.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Tag className="h-8 w-8 text-gray-400" />
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhuma categoria</h3>
+                    <p className="text-gray-500 mb-4">Crie sua primeira categoria para organizar os produtos</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Flavor Options Management */}
+          <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-purple-50 to-violet-50 border-b border-purple-100 p-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <Settings2 className="h-6 w-6 text-purple-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl font-semibold text-gray-900">
+                    Configurações de Sabores
+                  </CardTitle>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Controle as opções de sabores disponíveis
+                  </p>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                {opcoesSabores.map((opcao) => (
+                  <div 
+                    key={opcao.id} 
+                    className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white border border-gray-100 rounded-xl hover:shadow-sm transition-all"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="p-2 bg-orange-100 rounded-lg">
+                        <Pizza className="h-5 w-5 text-orange-600" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-3">
+                          <span className="font-medium text-gray-900">{opcao.nome}</span>
+                          {opcao.maximo_sabores === 1 && (
+                            <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">
+                              Obrigatório
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Até {opcao.maximo_sabores} sabor{opcao.maximo_sabores > 1 ? 'es' : ''}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        {opcao.ativo ? (
+                          <CheckCircle2 className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-gray-400" />
+                        )}
+                        <span className="text-sm text-gray-600">
+                          {opcao.ativo ? "Habilitado" : "Desabilitado"}
+                        </span>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={opcao.ativo}
+                          disabled={opcao.maximo_sabores === 1} // 1 sabor sempre habilitado
+                          onChange={(e) => handleToggleOpcaoSabor(opcao.id, e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                      </label>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Products List Section */}
+        <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 border-b border-orange-100 p-6">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-orange-100 rounded-lg">
+                  <Package className="h-6 w-6 text-orange-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl font-semibold text-gray-900">
+                    Lista de Produtos
+                  </CardTitle>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {filteredProdutos.length} produto{filteredProdutos.length !== 1 ? 's' : ''} encontrado{filteredProdutos.length !== 1 ? 's' : ''}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <Input
+                    placeholder="Buscar produtos..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 w-64 rounded-lg border-gray-200 focus:border-orange-300 focus:ring-orange-200"
+                  />
+                </div>
+              </div>
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <p className="text-sm text-gray-600">
-                Gerencie as categorias dos produtos. Categorias ajudam a organizar o cardápio.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {categorias.map((categoria) => (
-                  <div key={categoria.id} className="border rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-medium text-lg">{categoria.nome}</h3>
-                      <div className="flex space-x-2">
+          <CardContent className="p-6">
+            {filteredProdutos.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {filteredProdutos.map((produto) => (
+                  <div
+                    key={produto.id}
+                    className="group bg-gradient-to-br from-white to-gray-50 border border-gray-100 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-gray-200"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        {getProductIcon(produto.tipo)}
+                        <div>
+                          <h3 className="font-semibold text-gray-900 text-lg leading-tight">
+                            {produto.nome}
+                          </h3>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge 
+                              variant={produto.ativo ? "default" : "secondary"}
+                              className="text-xs"
+                            >
+                              {produto.ativo ? "Ativo" : "Inativo"}
+                            </Badge>
+                            <span className="text-xs text-gray-500 capitalize">
+                              {produto.tipo}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="sm"
+                          className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600"
                           onClick={() => {
-                            setEditingCategoria(categoria)
-                            setIsCategoriaDialogOpen(true)
+                            setEditingProduto(produto)
+                            setIsDialogOpen(true)
                           }}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleDeleteCategoria(categoria.id)}
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 hover:bg-red-50 text-red-600"
+                          onClick={() => handleDelete(produto.id)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
-                    {categoria.descricao && (
-                      <p className="text-sm text-gray-600 mb-3">{categoria.descricao}</p>
+
+                    {produto.descricao && (
+                      <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                        {produto.descricao}
+                      </p>
                     )}
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>Ordem:</span>
-                        <span className="font-medium">{categoria.ordem || 0}</span>
+
+                    <div className="space-y-3">
+                      <div className="bg-white rounded-lg p-3 border border-gray-100">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600 flex items-center gap-2">
+                            <Pizza className="h-4 w-4" />
+                            Tradicional
+                          </span>
+                          <span className="font-semibold text-green-600">
+                            {formatCurrency(produto.preco_tradicional)}
+                          </span>
+                        </div>
+                        {produto.preco_broto && (
+                          <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100">
+                            <span className="text-sm text-gray-600 flex items-center gap-2">
+                              <Pizza className="h-3 w-3" />
+                              Broto
+                            </span>
+                            <span className="font-semibold text-green-600">
+                              {formatCurrency(produto.preco_broto)}
+                            </span>
+                          </div>
+                        )}
                       </div>
-                      <div className="flex justify-between">
-                        <span>Status:</span>
-                        <span className={(categoria.ativo ?? true) ? "text-green-600" : "text-red-600"}>
-                          {(categoria.ativo ?? true) ? "Ativo" : "Inativo"}
+
+                      <div className="flex items-center justify-between text-xs text-gray-500">
+                        <span className="flex items-center gap-1">
+                          <ArrowUpDown className="h-3 w-3" />
+                          Ordem: {produto.ordem}
                         </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Produtos:</span>
-                        <span className="font-medium">
-                          {produtos.filter(p => p.categoria_id === categoria.id).length}
-                        </span>
+                        {produto.categoria_id && (
+                          <span className="flex items-center gap-1">
+                            <Tag className="h-3 w-3" />
+                            {categorias.find(c => c.id === produto.categoria_id)?.nome || 'Sem categoria'}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
-              {categorias.length === 0 && (
-                <div className="text-center py-8 text-gray-500">
-                  <p>Nenhuma categoria cadastrada.</p>
-                  <p className="text-sm">Clique em "Nova Categoria" para começar.</p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Controle de Opcoes de Sabores */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Configuracoes de Sabores</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <p className="text-sm text-gray-600">
-                Configure quais opcoes de sabores estao disponiveis para os clientes.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {opcoesSabores.map((opcao) => (
-                  <div key={opcao.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <div className="text-sm font-medium">{opcao.nome}</div>
-                      {opcao.maximo_sabores === 1 && (
-                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                          Obrigatorio
-                        </span>
-                      )}
-                    </div>
-                    <label className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={opcao.ativo}
-                        disabled={opcao.maximo_sabores === 1} // 1 sabor sempre habilitado
-                        onChange={(e) => handleToggleOpcaoSabor(opcao.id, e.target.checked)}
-                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 disabled:opacity-50"
-                      />
-                      <span className="text-sm text-gray-600">
-                        {opcao.ativo ? "Habilitado" : "Desabilitado"}
-                      </span>
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {produtos.map((produto) => (
-            <Card key={produto.id}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">{produto.nome}</CardTitle>
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setEditingProduto(produto)
-                        setIsDialogOpen(true)
-                      }}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => handleDelete(produto.id)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-600 mb-3">{produto.descricao}</p>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Tradicional:</span>
-                    <span className="font-medium">{formatCurrency(produto.preco_tradicional)}</span>
-                  </div>
-                  {produto.preco_broto && (
-                    <div className="flex justify-between">
-                      <span>Broto:</span>
-                      <span className="font-medium">{formatCurrency(produto.preco_broto)}</span>
-                    </div>
+            ) : (
+              <div className="text-center py-16">
+                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  {searchTerm ? (
+                    <Search className="h-10 w-10 text-gray-400" />
+                  ) : (
+                    <Package className="h-10 w-10 text-gray-400" />
                   )}
-                  <div className="flex justify-between">
-                    <span>Tipo:</span>
-                    <span className="capitalize">{produto.tipo}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Status:</span>
-                    <span className={produto.ativo ? "text-green-600" : "text-red-600"}>
-                      {produto.ativo ? "Ativo" : "Inativo"}
-                    </span>
-                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                <h3 className="text-xl font-medium text-gray-900 mb-2">
+                  {searchTerm ? 'Nenhum produto encontrado' : 'Nenhum produto cadastrado'}
+                </h3>
+                <p className="text-gray-500 mb-6 max-w-md mx-auto">
+                  {searchTerm 
+                    ? `Não encontramos produtos com "${searchTerm}". Tente uma busca diferente.`
+                    : 'Comece criando seu primeiro produto para construir o cardápio.'
+                  }
+                </p>
+                {!searchTerm && (
+                  <Button
+                    size="lg"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl"
+                    onClick={() => {
+                      setEditingProduto(null)
+                      setIsDialogOpen(true)
+                    }}
+                  >
+                    <Plus className="h-5 w-5 mr-2" />
+                    Criar Primeiro Produto
+                  </Button>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </AdminLayout>
   )
@@ -450,24 +672,25 @@ function ProdutoForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="nome">Nome</Label>
+          <Label htmlFor="nome" className="text-sm font-medium text-gray-700">Nome</Label>
           <Input
             id="nome"
             value={formData.nome}
             onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
             required
+            className="mt-1 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200"
           />
         </div>
         <div>
-          <Label htmlFor="categoria">Categoria</Label>
+          <Label htmlFor="categoria" className="text-sm font-medium text-gray-700">Categoria</Label>
           <Select
             value={formData.categoria_id}
             onValueChange={(value) => setFormData({ ...formData, categoria_id: value })}
           >
-            <SelectTrigger>
+            <SelectTrigger className="mt-1 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200">
               <SelectValue placeholder="Selecione uma categoria" />
             </SelectTrigger>
             <SelectContent>
@@ -482,19 +705,21 @@ function ProdutoForm({
       </div>
 
       <div>
-        <Label htmlFor="descricao">Descrição</Label>
+        <Label htmlFor="descricao" className="text-sm font-medium text-gray-700">Descrição</Label>
         <Textarea
           id="descricao"
           value={formData.descricao}
           onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
+          className="mt-1 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200"
+          rows={3}
         />
       </div>
 
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <Label htmlFor="tipo">Tipo</Label>
+          <Label htmlFor="tipo" className="text-sm font-medium text-gray-700">Tipo</Label>
           <Select value={formData.tipo} onValueChange={(value) => setFormData({ ...formData, tipo: value })}>
-            <SelectTrigger>
+            <SelectTrigger className="mt-1 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -505,7 +730,7 @@ function ProdutoForm({
           </Select>
         </div>
         <div>
-          <Label htmlFor="preco_tradicional">Preço Tradicional</Label>
+          <Label htmlFor="preco_tradicional" className="text-sm font-medium text-gray-700">Preço Tradicional</Label>
           <Input
             id="preco_tradicional"
             type="text"
@@ -517,10 +742,11 @@ function ProdutoForm({
               setFormData({ ...formData, preco_tradicional: valorNumerico })
             }}
             placeholder="R$ 0,00"
+            className="mt-1 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200"
           />
         </div>
         <div>
-          <Label htmlFor="preco_broto">Preço Broto</Label>
+          <Label htmlFor="preco_broto" className="text-sm font-medium text-gray-700">Preço Broto</Label>
           <Input
             id="preco_broto"
             type="text"
@@ -532,36 +758,48 @@ function ProdutoForm({
               setFormData({ ...formData, preco_broto: valorNumerico })
             }}
             placeholder="R$ 0,00"
+            className="mt-1 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200"
           />
         </div>
       </div>
 
-      <div className="flex items-center space-x-4">
-        <label className="flex items-center space-x-2">
+      <div className="flex items-center justify-between">
+        <label className="flex items-center space-x-3">
           <input
             type="checkbox"
             checked={formData.ativo}
             onChange={(e) => setFormData({ ...formData, ativo: e.target.checked })}
+            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
           />
-          <span>Produto ativo</span>
+          <span className="text-sm font-medium text-gray-700">Produto ativo</span>
         </label>
-        <div>
-          <Label htmlFor="ordem">Ordem</Label>
+        <div className="flex items-center gap-2">
+          <Label htmlFor="ordem" className="text-sm font-medium text-gray-700">Ordem</Label>
           <Input
             id="ordem"
             type="number"
             value={formData.ordem}
             onChange={(e) => setFormData({ ...formData, ordem: Number.parseInt(e.target.value) || 0 })}
-            className="w-20"
+            className="w-20 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200"
           />
         </div>
       </div>
 
-      <div className="flex justify-end space-x-2">
-        <Button type="button" variant="outline" onClick={onCancel}>
+      <div className="flex justify-end space-x-3 pt-6 border-t border-gray-100">
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={onCancel}
+          className="px-6 py-2 rounded-lg border-gray-200 hover:bg-gray-50"
+        >
           Cancelar
         </Button>
-        <Button type="submit">Salvar</Button>
+        <Button 
+          type="submit"
+          className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+        >
+          Salvar
+        </Button>
       </div>
     </form>
   )
@@ -593,57 +831,69 @@ function CategoriaForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <Label htmlFor="nome">Nome da Categoria *</Label>
+        <Label htmlFor="nome" className="text-sm font-medium text-gray-700">Nome da Categoria *</Label>
         <Input
           id="nome"
           value={formData.nome}
           onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
           placeholder="Digite o nome da categoria"
           required
+          className="mt-1 rounded-lg border-gray-200 focus:border-green-300 focus:ring-green-200"
         />
       </div>
 
       <div>
-        <Label htmlFor="descricao">Descrição</Label>
+        <Label htmlFor="descricao" className="text-sm font-medium text-gray-700">Descrição</Label>
         <Textarea
           id="descricao"
           value={formData.descricao}
           onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
           placeholder="Digite uma descrição opcional"
           rows={3}
+          className="mt-1 rounded-lg border-gray-200 focus:border-green-300 focus:ring-green-200"
         />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="ordem">Ordem</Label>
+          <Label htmlFor="ordem" className="text-sm font-medium text-gray-700">Ordem</Label>
           <Input
             id="ordem"
             type="number"
             value={formData.ordem}
             onChange={(e) => setFormData({ ...formData, ordem: Number.parseInt(e.target.value) || 0 })}
             placeholder="0"
+            className="mt-1 rounded-lg border-gray-200 focus:border-green-300 focus:ring-green-200"
           />
         </div>
         <div className="flex items-end">
-          <label className="flex items-center space-x-2">
+          <label className="flex items-center space-x-3">
             <input
               type="checkbox"
               checked={formData.ativo}
               onChange={(e) => setFormData({ ...formData, ativo: e.target.checked })}
+              className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
             />
-            <span className="text-sm">Categoria ativa</span>
+            <span className="text-sm font-medium text-gray-700">Categoria ativa</span>
           </label>
         </div>
       </div>
 
-      <div className="flex justify-end space-x-2 pt-4">
-        <Button type="button" variant="outline" onClick={onCancel}>
+      <div className="flex justify-end space-x-3 pt-6 border-t border-gray-100">
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={onCancel}
+          className="px-6 py-2 rounded-lg border-gray-200 hover:bg-gray-50"
+        >
           Cancelar
         </Button>
-        <Button type="submit">
+        <Button 
+          type="submit"
+          className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg"
+        >
           {categoria ? "Atualizar" : "Criar"} Categoria
         </Button>
       </div>
