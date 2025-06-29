@@ -205,18 +205,23 @@ function HomePageContent() {
   // Redirecionamento automático APENAS para múltiplos sabores (2 ou 3)
   useEffect(() => {
     if (flavorMode > 1 && selectedFlavorsForMulti.length === flavorMode) {
-      // Adicionar ao carrinho primeiro
-      handleAddToCart()
-      
-      // Primeiro rolar para a próxima categoria
-      setTimeout(() => {
-        scrollToNextCategory()
-      }, 500)
-      
-      // Depois redirecionar para checkout
+      // Para múltiplos sabores, mostrar apenas o resumo visual
+      // O processamento será feito quando o usuário clicar para continuar
+      // ou após um delay maior para permitir que veja a seleção
       const timer = setTimeout(() => {
-        router.push('/checkout')
-      }, 1500) // Aguardar a rolagem completar antes de redirecionar
+        // Adicionar ao carrinho primeiro
+        handleAddToCart()
+        
+        // Primeiro rolar para a próxima categoria
+        setTimeout(() => {
+          scrollToNextCategory()
+        }, 500)
+        
+        // Depois redirecionar para checkout
+        setTimeout(() => {
+          router.push('/checkout')
+        }, 1500)
+      }, 2000) // Aguardar 2 segundos para o usuário ver a seleção completa
       
       return () => clearTimeout(timer)
     }
@@ -379,12 +384,12 @@ function HomePageContent() {
       },
     })
 
-    // Reset das seleções apenas para múltiplos sabores após um delay
-    // Para permitir que o usuário veja a seleção visual por mais tempo
+    // Reset das seleções apenas para múltiplos sabores após um delay maior
+    // Para permitir que o usuário veja a seleção visual durante todo o processo
     if (flavorMode > 1) {
       setTimeout(() => {
         setSelectedFlavorsForMulti([])
-      }, 1200) // Reset após 1.2s para manter visual durante rolagem
+      }, 2500) // Reset após 2.5s para manter visual durante todo o processo
     } else {
       // Para 1 sabor, reset imediato como antes
       setSelectedFlavorsForMulti([])
@@ -637,8 +642,8 @@ function HomePageContent() {
                         <div className="text-sm text-gray-700 mb-2 font-medium">
                           Sabores selecionados: {selectedFlavorsForMulti.map(p => p.nome).join(" + ")}
                         </div>
-                        <div className="text-sm text-green-600 font-bold animate-pulse">
-                          ✓ Pizza adicionada ao carrinho!
+                        <div className="text-sm text-green-600 font-bold">
+                          ✓ Seleção completa! Processando pedido...
                         </div>
                       </div>
                     </div>
