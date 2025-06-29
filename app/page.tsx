@@ -195,7 +195,7 @@ function HomePageContent() {
   const [selectedFlavorsForMulti, setSelectedFlavorsForMulti] = useState<Produto[]>([])
   const [selectedSingleFlavor, setSelectedSingleFlavor] = useState<string | null>(null)
 
-  const { dispatch } = useCart()
+  const { dispatch, state: cartState } = useCart()
   const router = useRouter()
 
   useEffect(() => {
@@ -402,25 +402,82 @@ function HomePageContent() {
     }
   }
 
-  const handleAddBebidaToCart = (bebida: Produto) => {
-    dispatch({
-      type: "ADD_ITEM",
-      payload: {
-        id: bebida.id,
-        nome: bebida.nome,
-        tamanho: "tradicional", // Bebidas não têm variação de tamanho
-        sabores: [bebida.nome],
-        preco: bebida.preco_tradicional || 0,
-        tipo: bebida.tipo,
-      },
-    })
+  // Função genérica para adicionar/remover produtos de outras categorias (não pizzas)
+  const handleToggleProductInCart = (produto: Produto) => {
+    // Verificar se o item já está no carrinho
+    const isInCart = cartState.items.some(item => item.id === produto.id)
+    
+    if (isInCart) {
+      // Se já está no carrinho, remover
+      dispatch({
+        type: "REMOVE_ITEM",
+        payload: produto.id,
+      })
+    } else {
+      // Se não está no carrinho, adicionar
+      dispatch({
+        type: "ADD_ITEM",
+        payload: {
+          id: produto.id,
+          nome: produto.nome,
+          tamanho: "tradicional", // Produtos não-pizza não têm variação de tamanho
+          sabores: [produto.nome],
+          preco: produto.preco_tradicional || 0,
+          tipo: produto.tipo,
+        },
+      })
+    }
+  }
 
-    // Bebida adicionada ao carrinho - usuário deve usar botão "Fechar pedido" para finalizar
+  // Função específica para bebidas (mantida para compatibilidade)
+  const handleAddBebidaToCart = (bebida: Produto) => {
+    handleToggleProductInCart(bebida)
+  }
+
+  // Função para renderizar produtos de outras categorias com estilo consistente
+  const renderCategoryProducts = (produtos: Produto[], categoryName: string) => {
+    return produtos.map((produto) => {
+      const isInCart = cartState.items.some(item => item.id === produto.id)
+      
+      return (
+        <div
+          key={produto.id}
+          className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
+            isInCart
+              ? "bg-red-50 border-red-300 hover:border-red-400"
+              : "border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+          }`}
+          onClick={() => handleToggleProductInCart(produto)}
+        >
+          <div className="flex-1">
+            <h3 className="font-medium">{produto.nome}</h3>
+            {produto.descricao && <p className="text-sm text-gray-600 mt-1">{produto.descricao}</p>}
+            <span className="text-sm font-medium text-red-600">
+              {formatCurrency(produto.preco_tradicional)}
+            </span>
+          </div>
+          {isInCart ? (
+            <div className="w-6 h-6 rounded border-2 flex items-center justify-center transition-all border-red-500 bg-red-500">
+              <Check className="w-4 h-4 text-white" />
+            </div>
+          ) : (
+            <Plus className="w-5 h-5 text-red-600" />
+          )}
+        </div>
+      )
+    })
   }
 
   const pizzasSalgadas = produtos.filter((p) => p.tipo === "salgada")
   const pizzasDoces = produtos.filter((p) => p.tipo === "doce")
   const bebidas = produtos.filter((p) => p.tipo === "bebida")
+  
+  // Obter outras categorias dinamicamente (que não sejam pizza)
+  const outrasCategoriasTypes = Array.from(new Set(produtos.map(p => p.tipo).filter(tipo => !["salgada", "doce", "bebida"].includes(tipo))))
+  const outrasCategoriasMap = outrasCategoriasTypes.reduce((acc, tipo) => {
+    acc[tipo] = produtos.filter(p => p.tipo === tipo)
+    return acc
+  }, {} as Record<string, Produto[]>)
 
   if (loading) {
     return (
@@ -669,26 +726,38 @@ function HomePageContent() {
 
               {expandedSections.bebidas && (
                 <div className="mt-4 space-y-3">
-                  {bebidas.map((bebida) => (
-                    <div
-                      key={bebida.id}
-                      className="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
-                      onClick={() => handleAddBebidaToCart(bebida)}
-                    >
-                      <div className="flex-1">
-                        <h3 className="font-medium">{bebida.nome}</h3>
-                        {bebida.descricao && <p className="text-sm text-gray-600 mt-1">{bebida.descricao}</p>}
-                        <span className="text-sm font-medium text-red-600">
-                          {formatCurrency(bebida.preco_tradicional)}
-                        </span>
-                      </div>
-                      <Plus className="w-5 h-5 text-red-600" />
-                    </div>
-                  ))}
+                  {renderCategoryProducts(bebidas, "Bebidas")}
                 </div>
               )}
             </CardContent>
           </Card>
+
+          {/* Seções Dinâmicas para Outras Categorias */}
+          {outrasCategoriasTypes.map((tipo) => {
+            const produtos = outrasCategoriasMap[tipo]
+            const sectionKey = tipo.toLowerCase()
+            const categoryName = tipo.charAt(0).toUpperCase() + tipo.slice(1)
+            
+            return (
+              <Card key={tipo} data-section={sectionKey}>
+                <CardContent className="p-4">
+                  <div
+                    className="flex items-center justify-between cursor-pointer"
+                    onClick={() => toggleSection(sectionKey)}
+                  >
+                    <h2 className="text-lg font-semibold">{categoryName}</h2>
+                    {expandedSections[sectionKey] ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+                  </div>
+
+                  {expandedSections[sectionKey] && (
+                    <div className="mt-4 space-y-3">
+                      {renderCategoryProducts(produtos, categoryName)}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )
+          })}
         </div>
 
         {/* Modals */}
