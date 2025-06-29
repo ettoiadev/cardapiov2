@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { AdminLayout } from "@/components/admin-layout"
 import { supabase } from "@/lib/supabase"
+import { formatCurrency } from "@/lib/currency-utils"
 import { CheckCircle, Clock, Package, Bike } from "lucide-react"
 
 interface Pedido {
@@ -175,7 +176,7 @@ export default function AdminPedidosPage() {
                           )}
                           <p className="text-sm text-gray-600">Quantidade: {item.quantidade}</p>
                         </div>
-                        <p className="font-medium">R$ {item.preco_total.toFixed(2)}</p>
+                        <p className="font-medium">{formatCurrency(item.preco_total)}</p>
                       </div>
                     ))}
                   </div>

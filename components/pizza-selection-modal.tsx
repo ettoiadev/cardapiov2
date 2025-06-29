@@ -7,6 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/lib/cart-context"
+import { formatCurrency } from "@/lib/currency-utils"
 
 interface Produto {
   id: string
@@ -170,9 +171,9 @@ export function PizzaSelectionModal({ pizza, isOpen, onClose, multiFlavorMode = 
                         <div className="text-sm text-gray-500">4 fatias</div>
                       </div>
                       <div className="font-medium text-red-600">
-                        R${multiFlavorMode && selectedFlavors.length > 0 
-                          ? calculatePrice()?.toFixed(2) 
-                          : pizza.preco_broto?.toFixed(2) || "0.00"}
+                        {multiFlavorMode && selectedFlavors.length > 0 
+                          ? formatCurrency(calculatePrice() || 0)
+                          : formatCurrency(pizza.preco_broto)}
                       </div>
                     </div>
                   </Label>
@@ -189,9 +190,9 @@ export function PizzaSelectionModal({ pizza, isOpen, onClose, multiFlavorMode = 
                         <div className="text-sm text-gray-500">8 fatias</div>
                       </div>
                       <div className="font-medium text-red-600">
-                        R${multiFlavorMode && selectedFlavors.length > 0 
-                          ? calculatePrice()?.toFixed(2) 
-                          : pizza.preco_tradicional?.toFixed(2) || "0.00"}
+                        {multiFlavorMode && selectedFlavors.length > 0 
+                          ? formatCurrency(calculatePrice() || 0)
+                          : formatCurrency(pizza.preco_tradicional)}
                       </div>
                     </div>
                   </Label>

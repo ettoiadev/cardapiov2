@@ -9,6 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { useCart } from "@/lib/cart-context"
 import { supabase } from "@/lib/supabase"
+import { formatCurrency } from "@/lib/currency-utils"
 
 interface PizzariaConfig {
   taxa_entrega: number
@@ -122,7 +123,7 @@ export default function CheckoutPage() {
                     <p className="text-sm text-gray-500">Sabores: {item.sabores.join(", ")}</p>
                   )}
                 </div>
-                <p className="font-medium">R$ {item.precoTotal.toFixed(2)}</p>
+                <p className="font-medium">{formatCurrency(item.precoTotal)}</p>
               </div>
             ))}
           </CardContent>
@@ -133,18 +134,18 @@ export default function CheckoutPage() {
           <CardContent className="pt-6 space-y-3">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>R$ {subtotal.toFixed(2)}</span>
+              <span>{formatCurrency(subtotal)}</span>
             </div>
             {tipoEntrega === "delivery" && (
               <div className="flex justify-between">
                 <span>Taxa de entrega</span>
-                <span>R$ {taxaEntrega.toFixed(2)}</span>
+                <span>{formatCurrency(taxaEntrega)}</span>
               </div>
             )}
             <div className="border-t pt-3">
               <div className="flex justify-between text-xl font-bold">
                 <span>Total</span>
-                <span>R$ {total.toFixed(2)}</span>
+                <span>{formatCurrency(total)}</span>
               </div>
             </div>
           </CardContent>
@@ -154,9 +155,9 @@ export default function CheckoutPage() {
         {subtotal < config.valor_minimo && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <p className="text-yellow-800 text-sm">
-              Valor mínimo para pedido: R$ {config.valor_minimo.toFixed(2)}
+              Valor mínimo para pedido: {formatCurrency(config.valor_minimo)}
               <br />
-              Adicione mais R$ {(config.valor_minimo - subtotal).toFixed(2)} ao seu pedido.
+              Adicione mais {formatCurrency(config.valor_minimo - subtotal)} ao seu pedido.
             </p>
           </div>
         )}

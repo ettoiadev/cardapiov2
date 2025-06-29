@@ -11,6 +11,7 @@ import { CartProvider, useCart } from "@/lib/cart-context"
 import { PizzaSelectionModal } from "@/components/pizza-selection-modal"
 import { StoreInfoModal } from "@/components/store-info-modal"
 import { CartFooter } from "@/components/cart-footer"
+import { formatCurrency } from "@/lib/currency-utils"
 
 interface PizzariaConfig {
   id: string
@@ -370,7 +371,7 @@ function HomePageContent() {
               </div>
 
               <div className="text-center">
-                <div className="text-sm font-medium text-gray-900">R${config.valor_minimo.toFixed(2)}</div>
+                <div className="text-sm font-medium text-gray-900">{formatCurrency(config.valor_minimo)}</div>
                 <div className="text-xs text-gray-500">mínimo</div>
               </div>
 
@@ -501,11 +502,11 @@ function HomePageContent() {
                           {pizza.descricao && <p className="text-sm text-gray-600 mt-1">{pizza.descricao}</p>}
                           <div className="flex items-center space-x-4 mt-2">
                             {pizza.preco_broto && (
-                              <span className="text-sm">Broto: R${pizza.preco_broto.toFixed(2)}</span>
+                              <span className="text-sm">Broto: {formatCurrency(pizza.preco_broto)}</span>
                             )}
                             {pizza.preco_tradicional && (
                               <span className="text-sm font-medium">
-                                Tradicional: R${pizza.preco_tradicional.toFixed(2)}
+                                Tradicional: {formatCurrency(pizza.preco_tradicional)}
                               </span>
                             )}
                           </div>
@@ -569,7 +570,7 @@ function HomePageContent() {
                         <h3 className="font-medium">{bebida.nome}</h3>
                         {bebida.descricao && <p className="text-sm text-gray-600 mt-1">{bebida.descricao}</p>}
                         <span className="text-sm font-medium text-red-600">
-                          R${bebida.preco_tradicional?.toFixed(2)}
+                          {formatCurrency(bebida.preco_tradicional)}
                         </span>
                       </div>
                       <Plus className="w-5 h-5 text-red-600" />

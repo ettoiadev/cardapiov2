@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { AdminLayout } from "@/components/admin-layout"
 import { supabase } from "@/lib/supabase"
+import { formatCurrency, formatCurrencyInput, parseCurrencyInput } from "@/lib/currency-utils"
 import { Plus, Edit, Trash2 } from "lucide-react"
 
 interface Produto {
@@ -222,12 +223,12 @@ export default function AdminProdutosPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>Tradicional:</span>
-                    <span className="font-medium">R$ {produto.preco_tradicional?.toFixed(2) || "N/A"}</span>
+                    <span className="font-medium">{formatCurrency(produto.preco_tradicional)}</span>
                   </div>
                   {produto.preco_broto && (
                     <div className="flex justify-between">
                       <span>Broto:</span>
-                      <span className="font-medium">R$ {produto.preco_broto.toFixed(2)}</span>
+                      <span className="font-medium">{formatCurrency(produto.preco_broto)}</span>
                     </div>
                   )}
                   <div className="flex justify-between">
@@ -271,6 +272,14 @@ function ProdutoForm({
     ativo: produto?.ativo ?? true,
     ordem: produto?.ordem || 0,
   })
+
+  // Estados para os valores formatados dos preços
+  const [precoTradicionalFormatado, setPrecoTradicionalFormatado] = useState(
+    produto?.preco_tradicional ? formatCurrencyInput((produto.preco_tradicional * 100).toString()) : ""
+  )
+  const [precoBrotoFormatado, setPrecoBrotoFormatado] = useState(
+    produto?.preco_broto ? formatCurrencyInput((produto.preco_broto * 100).toString()) : ""
+  )
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -336,20 +345,30 @@ function ProdutoForm({
           <Label htmlFor="preco_tradicional">Preço Tradicional</Label>
           <Input
             id="preco_tradicional"
-            type="number"
-            step="0.01"
-            value={formData.preco_tradicional}
-            onChange={(e) => setFormData({ ...formData, preco_tradicional: Number.parseFloat(e.target.value) || 0 })}
+            type="text"
+            value={precoTradicionalFormatado}
+            onChange={(e) => {
+              const valorFormatado = formatCurrencyInput(e.target.value)
+              setPrecoTradicionalFormatado(valorFormatado)
+              const valorNumerico = parseCurrencyInput(valorFormatado)
+              setFormData({ ...formData, preco_tradicional: valorNumerico })
+            }}
+            placeholder="R$ 0,00"
           />
         </div>
         <div>
           <Label htmlFor="preco_broto">Preço Broto</Label>
           <Input
             id="preco_broto"
-            type="number"
-            step="0.01"
-            value={formData.preco_broto}
-            onChange={(e) => setFormData({ ...formData, preco_broto: Number.parseFloat(e.target.value) || 0 })}
+            type="text"
+            value={precoBrotoFormatado}
+            onChange={(e) => {
+              const valorFormatado = formatCurrencyInput(e.target.value)
+              setPrecoBrotoFormatado(valorFormatado)
+              const valorNumerico = parseCurrencyInput(valorFormatado)
+              setFormData({ ...formData, preco_broto: valorNumerico })
+            }}
+            placeholder="R$ 0,00"
           />
         </div>
       </div>
