@@ -206,7 +206,7 @@ function HomePageContent() {
   useEffect(() => {
     if (flavorMode > 1 && selectedFlavorsForMulti.length === flavorMode) {
       // Para múltiplos sabores, adicionar ao carrinho e rolar para próxima categoria
-      // SEM redirecionamento automático para checkout
+      // SEM redirecionamento automático para checkout e SEM reset automático
       const timer = setTimeout(() => {
         // Adicionar ao carrinho primeiro
         const tamanho = "tradicional"
@@ -229,14 +229,9 @@ function HomePageContent() {
           },
         })
         
-        // Rolar para a próxima categoria
+        // Rolar para a próxima categoria SEM resetar as seleções
         setTimeout(() => {
           scrollToNextCategory()
-          
-          // Reset da seleção APENAS após o scroll, para manter a visualização
-          setTimeout(() => {
-            setSelectedFlavorsForMulti([])
-          }, 1000) // Aguardar 1 segundo após o scroll para resetar
         }, 500)
       }, 1000) // Aguardar 1 segundo para o usuário ver a seleção completa
       
@@ -401,7 +396,7 @@ function HomePageContent() {
       },
     })
 
-    // Reset das seleções apenas para 1 sabor (múltiplos sabores são resetados no useEffect)
+    // Reset das seleções apenas para 1 sabor (múltiplos sabores mantêm seleção)
     if (flavorMode === 1) {
       setSelectedFlavorsForMulti([])
     }
