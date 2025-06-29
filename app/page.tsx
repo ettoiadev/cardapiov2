@@ -282,34 +282,25 @@ function HomePageContent() {
     }))
   }
 
-  const scrollToBebidas = () => {
-    const bebidasSection = document.querySelector('[data-section="bebidas"]')
-    if (bebidasSection) {
-      // Expandir automaticamente a seção de bebidas primeiro
-      setExpandedSections(prev => ({ ...prev, bebidas: true }))
-      
-      // Aguardar a expansão e depois fazer scroll até o final da seção
-      setTimeout(() => {
-        const bebidasContent = bebidasSection.querySelector('.mt-4')
-        if (bebidasContent) {
-          // Scroll até o final da seção, considerando o botão fixo (120px de margem)
-          const elementRect = bebidasContent.getBoundingClientRect()
-          const absoluteElementTop = elementRect.top + window.pageYOffset
-          const scrollToPosition = absoluteElementTop + bebidasContent.scrollHeight - 120
-          
-          window.scrollTo({ 
-            top: scrollToPosition,
-            behavior: 'smooth'
-          })
-        } else {
-          // Fallback para scroll padrão
-          bebidasSection.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'end'
-          })
-        }
-      }, 150) // Aguardar a animação de expansão
-    }
+  const scrollToNextCategory = () => {
+    // Expandir automaticamente a seção de bebidas primeiro
+    setExpandedSections(prev => ({ ...prev, bebidas: true }))
+    
+    // Aguardar a expansão e depois fazer scroll suave
+    setTimeout(() => {
+      const bebidasSection = document.querySelector('[data-section="bebidas"]')
+      if (bebidasSection) {
+        // Calcular posição de scroll considerando o header fixo e botão do carrinho
+        const headerHeight = 60 // altura aproximada do header
+        const elementTop = bebidasSection.getBoundingClientRect().top + window.pageYOffset
+        const targetPosition = elementTop - headerHeight - 20 // 20px de margem adicional
+        
+        window.scrollTo({ 
+          top: targetPosition,
+          behavior: 'smooth'
+        })
+      }
+    }, 200) // Aguardar a animação de expansão
   }
 
   const handleSingleFlavorSelection = (pizza: Produto) => {
@@ -331,9 +322,9 @@ function HomePageContent() {
       },
     })
     
-    // Scroll automático para a seção bebidas após um pequeno delay
+    // Scroll automático para a próxima categoria após um pequeno delay
     setTimeout(() => {
-      scrollToBebidas()
+      scrollToNextCategory()
       // Reset da seleção após adicionar ao carrinho
       setSelectedFlavorsForMulti([])
     }, 500)
