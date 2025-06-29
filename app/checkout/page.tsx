@@ -23,16 +23,21 @@ export default function CheckoutPage() {
   const [tipoEntrega, setTipoEntrega] = useState<"delivery" | "balcao">("delivery")
   const [config, setConfig] = useState<PizzariaConfig | null>(null)
   const [observacoes, setObservacoes] = useState("")
+  const [isLoaded, setIsLoaded] = useState(false)
 
   const totalItens = state.items.reduce((sum, item) => sum + item.quantidade, 0)
 
+  // Aguardar hidratação para evitar problemas de SSR
   useEffect(() => {
-    if (totalItens === 0) {
-      router.push("/")
-      return
-    }
+    setIsLoaded(true)
+  }, [])
+
+  useEffect(() => {
     loadConfig()
-  }, [totalItens, router])
+  }, [])
+
+  // Não redirecionar imediatamente - permitir acesso direto à página
+  // Mostrar interface adequada para carrinho vazio
 
   const loadConfig = async () => {
     try {
@@ -58,8 +63,43 @@ export default function CheckoutPage() {
     }
   }
 
-  if (!config) {
+  if (!config || !isLoaded) {
     return <div className="flex items-center justify-center min-h-screen">Carregando...</div>
+  }
+
+  // Interface para carrinho vazio - permite acesso direto à URL
+  if (totalItens === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        {/* Header */}
+        <div className="bg-white border-b px-4 py-3 flex items-center sticky top-0 z-10 shadow-sm">
+          <Button variant="ghost" size="sm" onClick={() => router.push("/")}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-lg font-semibold ml-2">Checkout</h1>
+        </div>
+
+        {/* Carrinho vazio */}
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="text-center max-w-md">
+            <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+              <Package className="w-12 h-12 text-gray-400" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Carrinho Vazio</h2>
+            <p className="text-gray-600 mb-6">
+              Você ainda não adicionou nenhum item ao seu carrinho. 
+              Escolha suas pizzas favoritas para continuar!
+            </p>
+            <Button 
+              onClick={() => router.push("/")}
+              className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-xl"
+            >
+              Ver Cardápio
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   const subtotal = state.total
