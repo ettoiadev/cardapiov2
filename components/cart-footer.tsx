@@ -8,17 +8,26 @@ import { useRouter } from "next/navigation"
 import { formatCurrency } from "@/lib/currency-utils"
 
 export function CartFooter() {
-  const { state, dispatch } = useCart()
+  const { state, dispatch, clearLocalStorage } = useCart()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [showTooltip, setShowTooltip] = useState(false)
   const [itemsAnimation, setItemsAnimation] = useState(false)
+  const [isClearing, setIsClearing] = useState(false)
 
-  if (state.items.length === 0) {
+  // Verificação defensiva - só renderiza se há itens e não está limpando
+  if (state.items.length === 0 && !isClearing) {
     return null
   }
 
-  const totalItems = state.items.reduce((sum, item) => sum + item.quantidade, 0)
+  // Se está limpando, mostrar por um breve momento antes de sumir
+  if (isClearing && state.items.length === 0) {
+    return null
+  }
+
+  // Verificação defensiva para evitar erros durante limpeza
+  const totalItems = state.items?.length ? state.items.reduce((sum, item) => sum + (item.quantidade || 0), 0) : 0
+  const cartTotal = state.total || 0
 
   // Animação quando itens mudam
   useEffect(() => {
@@ -30,7 +39,30 @@ export function CartFooter() {
   }, [totalItems])
 
   const handleClearCart = () => {
-    dispatch({ type: "CLEAR_CART" })
+    // Prevenir múltiplos cliques
+    if (isClearing) return
+    
+    setIsClearing(true)
+    setShowTooltip(false)
+    
+    // Usar setTimeout para evitar setState conflitante
+    setTimeout(() => {
+      try {
+        // Limpar localStorage primeiro
+        clearLocalStorage()
+        
+        // Depois dispatch para limpar o estado
+        dispatch({ type: "CLEAR_CART" })
+        
+        // Reset do estado de limpeza após um breve delay
+        setTimeout(() => {
+          setIsClearing(false)
+        }, 100)
+      } catch (error) {
+        console.error("Erro ao limpar carrinho:", error)
+        setIsClearing(false)
+      }
+    }, 50)
   }
 
   const handleCheckout = async () => {
@@ -52,10 +84,11 @@ export function CartFooter() {
               <div className="relative">
                 <Button
                   onClick={handleClearCart}
+                  disabled={isClearing}
                   variant="ghost"
                   size="icon"
-                  className="h-11 w-11 rounded-lg text-neutral-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200 active:scale-95"
-                  onMouseEnter={() => setShowTooltip(true)}
+                  className="h-11 w-11 rounded-lg text-neutral-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onMouseEnter={() => !isClearing && setShowTooltip(true)}
                   onMouseLeave={() => setShowTooltip(false)}
                 >
                   <Trash2 className="w-5 h-5 stroke-2" />
@@ -95,7 +128,7 @@ export function CartFooter() {
                   <div className="flex items-center justify-between w-full">
                     <span>Fechar pedido</span>
                     <span className="font-bold text-green-100 ml-3">
-                      {formatCurrency(state.total)}
+                      {formatCurrency(cartTotal)}
                     </span>
                   </div>
                 )}
@@ -120,10 +153,11 @@ export function CartFooter() {
             <div className="relative">
               <Button
                 onClick={handleClearCart}
+                disabled={isClearing}
                 variant="ghost"
                 size="icon"
-                className="h-10 w-10 rounded-lg text-neutral-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200 active:scale-95"
-                onTouchStart={() => setShowTooltip(true)}
+                className="h-10 w-10 rounded-lg text-neutral-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                onTouchStart={() => !isClearing && setShowTooltip(true)}
                 onTouchEnd={() => setTimeout(() => setShowTooltip(false), 1500)}
               >
                 <Trash2 className="w-5 h-5 stroke-2" />
@@ -143,7 +177,7 @@ export function CartFooter() {
           <div className="space-y-2">
             <div className="text-center">
               <span className="text-lg font-bold text-neutral-800">
-                Total: {formatCurrency(state.total)}
+                Total: {formatCurrency(cartTotal)}
               </span>
             </div>
             

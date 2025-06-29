@@ -61,7 +61,12 @@ export default function CheckoutPage() {
   // Verificar carrinho vazio e redirecionar se necessário
   useEffect(() => {
     if (!loading && state.items.length === 0) {
-      router.push("/")
+      // Aguardar um momento antes de redirecionar para evitar conflitos
+      const timer = setTimeout(() => {
+        router.push("/")
+      }, 500)
+      
+      return () => clearTimeout(timer)
     }
   }, [state.items.length, router, loading])
 
@@ -179,7 +184,7 @@ export default function CheckoutPage() {
     
     // Resumo dos itens
     message += `📋 *ITENS DO PEDIDO:*\n`
-    state.items.forEach((item, index) => {
+    state.items?.forEach((item, index) => {
       message += `${index + 1}. ${item.nome}\n`
       message += `   • Tamanho: ${item.tamanho}\n`
       
@@ -262,7 +267,7 @@ export default function CheckoutPage() {
   }
   
   // Se carrinho estiver vazio, mostrar loading (redirecionamento será feito no useEffect)
-  if (state.items.length === 0) {
+  if (!state.items || state.items.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-red-600" />
@@ -270,7 +275,7 @@ export default function CheckoutPage() {
     )
   }
   
-  const subtotal = state.total
+  const subtotal = state.total || 0
   const deliveryFee = deliveryType === "delivery" ? (storeConfig?.taxa_entrega || 0) : 0
   const total = subtotal + deliveryFee
   const minimumValue = storeConfig?.valor_minimo || 0
@@ -292,7 +297,7 @@ export default function CheckoutPage() {
           <div className="p-4">
             <h2 className="text-lg font-semibold mb-4">Resumo do Pedido</h2>
             <div className="space-y-3">
-              {state.items.map((item, index) => (
+              {state.items?.map((item, index) => (
                 <div key={index} className="flex justify-between items-start pb-3 border-b last:border-0">
                   <div className="flex-1">
                     <h3 className="font-medium">{item.nome}</h3>
