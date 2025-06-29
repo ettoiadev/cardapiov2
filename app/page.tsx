@@ -281,13 +281,44 @@ function HomePageContent() {
     }))
   }
 
-  const handlePizzaSelection = (pizza: Produto) => {
+  const scrollToBebidas = () => {
+    const bebidasSection = document.querySelector('[data-section="bebidas"]')
+    if (bebidasSection) {
+      bebidasSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      })
+      // Expandir automaticamente a seção de bebidas
+      setExpandedSections(prev => ({ ...prev, bebidas: true }))
+    }
+  }
+
+  const handleSingleFlavorSelection = (pizza: Produto) => {
+    // Para 1 sabor: seleção imediata e scroll para bebidas
+    setSelectedFlavorsForMulti([pizza])
+    
+    // Scroll automático para a seção bebidas após um pequeno delay
+    setTimeout(() => {
+      scrollToBebidas()
+    }, 300)
+  }
+
+  const handleMultiFlavorSelection = (pizza: Produto) => {
+    // Para múltiplos sabores: comportamento de seleção toggle
     if (selectedFlavorsForMulti.find(p => p.id === pizza.id)) {
       // Remove se já estiver selecionado
       setSelectedFlavorsForMulti(prev => prev.filter(p => p.id !== pizza.id))
     } else if (selectedFlavorsForMulti.length < flavorMode) {
       // Adiciona se ainda não atingiu o limite
       setSelectedFlavorsForMulti(prev => [...prev, pizza])
+    }
+  }
+
+  const handlePizzaSelection = (pizza: Produto) => {
+    if (flavorMode === 1) {
+      handleSingleFlavorSelection(pizza)
+    } else {
+      handleMultiFlavorSelection(pizza)
     }
   }
 
@@ -498,13 +529,15 @@ function HomePageContent() {
                         <div
                           key={pizza.id}
                           className={`flex items-center justify-between p-3 border rounded-lg transition-colors ${
-                            flavorMode > 1 
-                              ? (isSelected 
-                                  ? "border-red-500 bg-red-50" 
-                                  : isDisabled 
-                                    ? "border-gray-200 opacity-50 cursor-not-allowed"
-                                    : "border-gray-200 hover:border-gray-300 cursor-pointer")
-                              : "cursor-pointer hover:bg-gray-50"
+                            flavorMode === 1
+                              ? "cursor-pointer hover:bg-gray-50 border-gray-200 hover:border-gray-300"
+                              : flavorMode > 1 
+                                ? (isSelected 
+                                    ? "border-red-500 bg-red-50" 
+                                    : isDisabled 
+                                      ? "border-gray-200 opacity-50 cursor-not-allowed"
+                                      : "border-gray-200 hover:border-gray-300 cursor-pointer")
+                                : "cursor-pointer hover:bg-gray-50"
                           }`}
                           onClick={() => {
                             if (!isDisabled) {
@@ -534,15 +567,21 @@ function HomePageContent() {
                           </div>
                         </div>
                         
-                        <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
-                          isSelected
-                            ? "border-red-500 bg-red-500"
-                            : "border-gray-300"
-                        }`}>
-                          {isSelected && (
-                            <Check className="w-4 h-4 text-white" />
-                          )}
-                        </div>
+                        {flavorMode > 1 && (
+                          <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
+                            isSelected
+                              ? "border-red-500 bg-red-500"
+                              : "border-gray-300"
+                          }`}>
+                            {isSelected && (
+                              <Check className="w-4 h-4 text-white" />
+                            )}
+                          </div>
+                        )}
+                        
+                        {flavorMode === 1 && (
+                          <Plus className="w-5 h-5 text-red-600" />
+                        )}
                         </div>
                       )
                     })}
@@ -567,7 +606,7 @@ function HomePageContent() {
           </Card>
 
           {/* Seção Bebidas */}
-          <Card>
+          <Card data-section="bebidas">
             <CardContent className="p-4">
               <div
                 className="flex items-center justify-between cursor-pointer"
