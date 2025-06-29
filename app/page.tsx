@@ -188,12 +188,12 @@ function HomePageContent() {
   const [produtos, setProdutos] = useState<Produto[]>(mockProdutos)
   const [opcoesSabores, setOpcoesSabores] = useState<any[]>([])
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({})
-  const [selectedPizza, setSelectedPizza] = useState<Produto | null>(null)
+
   const [showStoreInfo, setShowStoreInfo] = useState(false)
   const [loading, setLoading] = useState(true)
   const [flavorMode, setFlavorMode] = useState<1 | 2 | 3>(1)
   const [selectedFlavorsForMulti, setSelectedFlavorsForMulti] = useState<Produto[]>([])
-  const [showSecondFlavorPopup, setShowSecondFlavorPopup] = useState(false)
+
   const { dispatch } = useCart()
   const router = useRouter()
 
@@ -201,27 +201,18 @@ function HomePageContent() {
     loadData()
   }, [])
 
-  // Controlar popup "Escolha o segundo sabor"
-  useEffect(() => {
-    if (flavorMode > 1 && selectedFlavorsForMulti.length === 1) {
-      setShowSecondFlavorPopup(true)
-      const timer = setTimeout(() => {
-        setShowSecondFlavorPopup(false)
-      }, 2000)
-      return () => clearTimeout(timer)
-    }
-  }, [flavorMode, selectedFlavorsForMulti.length])
+
 
   // Redirecionamento automático para checkout após adicionar ao carrinho
   useEffect(() => {
-    if (flavorMode > 1 && selectedFlavorsForMulti.length === flavorMode) {
+    if (selectedFlavorsForMulti.length === flavorMode) {
       // Adicionar ao carrinho primeiro - usar o tamanho tradicional como padrão
       // Usuário poderá editar o tamanho na página de checkout se necessário
-      handleAddMultiFlavorToCart("tradicional")
+      handleAddToCart()
       
       const timer = setTimeout(() => {
         router.push('/checkout')
-      }, 500) // Pequeno delay para o usuário ver a seleção
+      }, 300) // Redirecionamento mais rápido para experiência fluida
       return () => clearTimeout(timer)
     }
   }, [flavorMode, selectedFlavorsForMulti.length, router])
@@ -290,7 +281,7 @@ function HomePageContent() {
     }))
   }
 
-  const handleMultiFlavorSelection = (pizza: Produto) => {
+  const handlePizzaSelection = (pizza: Produto) => {
     if (selectedFlavorsForMulti.find(p => p.id === pizza.id)) {
       // Remove se já estiver selecionado
       setSelectedFlavorsForMulti(prev => prev.filter(p => p.id !== pizza.id))
@@ -300,22 +291,24 @@ function HomePageContent() {
     }
   }
 
-  const handleAddMultiFlavorToCart = (tamanho: "broto" | "tradicional") => {
+  const handleAddToCart = () => {
     if (selectedFlavorsForMulti.length !== flavorMode) return
+
+    const tamanho = "tradicional" // Padrão tradicional, usuário pode editar no checkout
 
     // Calcula o maior preço entre os sabores selecionados
     const prices = selectedFlavorsForMulti.map(pizza => 
-      tamanho === "broto" ? pizza.preco_broto || 0 : pizza.preco_tradicional || 0
+      pizza.preco_tradicional || 0 // Sempre usar preço tradicional por padrão
     )
     const preco = Math.max(...prices)
 
     const sabores = selectedFlavorsForMulti.map(p => p.nome)
-    const nomeItem = `Pizza ${sabores.join(" + ")}`
+    const nomeItem = flavorMode === 1 ? sabores[0] : `Pizza ${sabores.join(" + ")}`
 
     dispatch({
       type: "ADD_ITEM",
       payload: {
-        id: `multi-${sabores.sort().join("-")}-${tamanho}`,
+        id: flavorMode === 1 ? `${selectedFlavorsForMulti[0].id}-${tamanho}` : `multi-${sabores.sort().join("-")}-${tamanho}`,
         nome: nomeItem,
         tamanho: tamanho,
         sabores: sabores,
@@ -499,7 +492,7 @@ function HomePageContent() {
                   <div className="space-y-3">
                     {[...pizzasSalgadas, ...pizzasDoces].map((pizza) => {
                       const isSelected = selectedFlavorsForMulti.find(p => p.id === pizza.id)
-                      const isDisabled = flavorMode > 1 && selectedFlavorsForMulti.length >= flavorMode && !isSelected
+                      const isDisabled = selectedFlavorsForMulti.length >= flavorMode && !isSelected
                       
                       return (
                         <div
@@ -514,10 +507,8 @@ function HomePageContent() {
                               : "cursor-pointer hover:bg-gray-50"
                           }`}
                           onClick={() => {
-                            if (flavorMode > 1 && !isDisabled) {
-                              handleMultiFlavorSelection(pizza)
-                            } else if (flavorMode === 1) {
-                              setSelectedPizza(pizza)
+                            if (!isDisabled) {
+                              handlePizzaSelection(pizza)
                             }
                           }}
                         >
@@ -543,33 +534,29 @@ function HomePageContent() {
                           </div>
                         </div>
                         
-                        {flavorMode > 1 ? (
-                          <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
-                            isSelected
-                              ? "border-red-500 bg-red-500"
-                              : "border-gray-300"
-                          }`}>
-                            {isSelected && (
-                              <Check className="w-4 h-4 text-white" />
-                            )}
-                          </div>
-                        ) : (
-                          <Plus className="w-5 h-5 text-red-600" />
-                        )}
+                        <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
+                          isSelected
+                            ? "border-red-500 bg-red-500"
+                            : "border-gray-300"
+                        }`}>
+                          {isSelected && (
+                            <Check className="w-4 h-4 text-white" />
+                          )}
+                        </div>
                         </div>
                       )
                     })}
                   </div>
 
                   {/* Resumo dos sabores selecionados */}
-                  {flavorMode > 1 && selectedFlavorsForMulti.length === flavorMode && (
-                    <div className="space-y-3 pt-4 border-t">
+                  {selectedFlavorsForMulti.length === flavorMode && (
+                    <div className="space-y-3 pt-4 border-t bg-green-50 rounded-lg p-4 mx-2">
                       <div className="text-center">
-                        <div className="text-sm text-gray-600 mb-2">
-                          Sabores selecionados: {selectedFlavorsForMulti.map(p => p.nome).join(" + ")}
+                        <div className="text-sm text-gray-700 mb-2 font-medium">
+                          {flavorMode === 1 ? 'Sabor selecionado:' : 'Sabores selecionados:'} {selectedFlavorsForMulti.map(p => p.nome).join(" + ")}
                         </div>
-                        <div className="text-sm text-green-600 font-medium">
-                          Redirecionando para finalizar pedido...
+                        <div className="text-sm text-green-600 font-bold animate-pulse">
+                          ✓ Redirecionando para finalizar pedido...
                         </div>
                       </div>
                     </div>
@@ -615,28 +602,10 @@ function HomePageContent() {
         </div>
 
         {/* Modals */}
-        {selectedPizza && flavorMode === 1 && (
-          <PizzaSelectionModal 
-            pizza={selectedPizza} 
-            isOpen={!!selectedPizza} 
-            onClose={() => setSelectedPizza(null)}
-            multiFlavorMode={false}
-            availablePizzas={[...pizzasSalgadas, ...pizzasDoces]}
-          />
-        )}
 
         <StoreInfoModal isOpen={showStoreInfo} onClose={() => setShowStoreInfo(false)} config={config} />
 
-        {/* Popup temporário "Escolha mais sabores" */}
-        {showSecondFlavorPopup && (
-          <div className="fixed bottom-20 left-4 right-4 z-50 animate-in slide-in-from-left duration-300">
-            <div className="bg-black/70 text-white text-center py-3 px-4 rounded-lg shadow-lg">
-              <span className="text-sm font-medium">
-                Escolha {flavorMode === 2 ? "mais 1 sabor" : `mais ${flavorMode - selectedFlavorsForMulti.length} sabores`}
-              </span>
-            </div>
-          </div>
-        )}
+
 
         {/* Carrinho fixo no rodapé */}
         <CartFooter />
