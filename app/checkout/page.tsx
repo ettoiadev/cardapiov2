@@ -60,7 +60,7 @@ export default function CheckoutPage() {
   
   // Verificar carrinho vazio e redirecionar se necessário
   useEffect(() => {
-    if (!loading && state.items.length === 0) {
+    if (!loading && (!state.items || state.items.length === 0)) {
       // Aguardar um momento antes de redirecionar para evitar conflitos
       const timer = setTimeout(() => {
         router.push("/")
@@ -68,7 +68,7 @@ export default function CheckoutPage() {
       
       return () => clearTimeout(timer)
     }
-  }, [state.items.length, router, loading])
+  }, [state.items?.length, router, loading])
 
   const loadStoreConfig = async () => {
     try {

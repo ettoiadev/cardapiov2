@@ -15,28 +15,29 @@ export function CartFooter() {
   const [itemsAnimation, setItemsAnimation] = useState(false)
   const [isClearing, setIsClearing] = useState(false)
 
-  // Verificação defensiva - só renderiza se há itens e não está limpando
-  if (state.items.length === 0 && !isClearing) {
-    return null
-  }
-
-  // Se está limpando, mostrar por um breve momento antes de sumir
-  if (isClearing && state.items.length === 0) {
-    return null
-  }
-
   // Verificação defensiva para evitar erros durante limpeza
   const totalItems = state.items?.length ? state.items.reduce((sum, item) => sum + (item.quantidade || 0), 0) : 0
   const cartTotal = state.total || 0
+  const hasItems = state.items?.length > 0
 
-  // Animação quando itens mudam
+  // Animação quando itens mudam - HOOK SEMPRE EXECUTADO
   useEffect(() => {
-    if (totalItems > 0) {
+    if (totalItems > 0 && hasItems) {
       setItemsAnimation(true)
       const timer = setTimeout(() => setItemsAnimation(false), 300)
       return () => clearTimeout(timer)
     }
-  }, [totalItems])
+  }, [totalItems, hasItems])
+
+  // useEffect para resetar estado de limpeza - HOOK SEMPRE EXECUTADO
+  useEffect(() => {
+    if (!hasItems && isClearing) {
+      const timer = setTimeout(() => {
+        setIsClearing(false)
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [hasItems, isClearing])
 
   const handleClearCart = () => {
     // Prevenir múltiplos cliques
@@ -53,11 +54,6 @@ export function CartFooter() {
         
         // Depois dispatch para limpar o estado
         dispatch({ type: "CLEAR_CART" })
-        
-        // Reset do estado de limpeza após um breve delay
-        setTimeout(() => {
-          setIsClearing(false)
-        }, 100)
       } catch (error) {
         console.error("Erro ao limpar carrinho:", error)
         setIsClearing(false)
@@ -71,6 +67,12 @@ export function CartFooter() {
     await new Promise(resolve => setTimeout(resolve, 500))
     router.push("/checkout")
     setIsLoading(false)
+  }
+
+  // RENDERIZAÇÃO CONDICIONAL APÓS TODOS OS HOOKS
+  // Só renderiza se há itens OU se está no processo de limpeza
+  if (!hasItems && !isClearing) {
+    return null
   }
 
   return (
@@ -116,7 +118,7 @@ export function CartFooter() {
             <div className="flex justify-end">
               <Button
                 onClick={handleCheckout}
-                disabled={isLoading}
+                disabled={isLoading || isClearing}
                 className="cart-button-gradient text-white font-semibold px-6 py-3 h-11 rounded-lg shadow-md disabled:opacity-70 disabled:cursor-not-allowed min-w-[180px]"
               >
                 {isLoading ? (
@@ -183,7 +185,7 @@ export function CartFooter() {
             
             <Button
               onClick={handleCheckout}
-              disabled={isLoading}
+              disabled={isLoading || isClearing}
               className="w-full cart-button-gradient text-white font-semibold py-3 h-12 rounded-lg shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {isLoading ? (

@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Minus, CreditCard, Banknote, Check } from "lucide-react"
 import { supabase, isSupabaseConfigured } from "@/lib/supabase"
-import { CartProvider, useCart } from "@/lib/cart-context"
+import { useCart } from "@/lib/cart-context"
 import { PizzaSelectionModal } from "@/components/pizza-selection-modal"
 import { StoreInfoModal } from "@/components/store-info-modal"
 import { CartFooter } from "@/components/cart-footer"
@@ -771,9 +771,5 @@ function HomePageContent() {
 }
 
 export default function HomePage() {
-  return (
-    <CartProvider>
-      <HomePageContent />
-    </CartProvider>
-  )
+  return <HomePageContent />
 }
