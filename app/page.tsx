@@ -209,17 +209,40 @@ function HomePageContent() {
       // SEM redirecionamento automático para checkout
       const timer = setTimeout(() => {
         // Adicionar ao carrinho primeiro
-        handleAddToCart()
+        const tamanho = "tradicional"
+        const prices = selectedFlavorsForMulti.map(pizza => 
+          pizza.preco_tradicional || 0
+        )
+        const preco = Math.max(...prices)
+        const sabores = selectedFlavorsForMulti.map(p => p.nome)
+        const nomeItem = `Pizza ${sabores.join(" + ")}`
+
+        dispatch({
+          type: "ADD_ITEM",
+          payload: {
+            id: `multi-${sabores.sort().join("-")}-${tamanho}`,
+            nome: nomeItem,
+            tamanho: tamanho,
+            sabores: sabores,
+            preco: preco,
+            tipo: selectedFlavorsForMulti[0].tipo,
+          },
+        })
         
         // Rolar para a próxima categoria
         setTimeout(() => {
           scrollToNextCategory()
+          
+          // Reset da seleção APENAS após o scroll, para manter a visualização
+          setTimeout(() => {
+            setSelectedFlavorsForMulti([])
+          }, 1000) // Aguardar 1 segundo após o scroll para resetar
         }, 500)
       }, 1000) // Aguardar 1 segundo para o usuário ver a seleção completa
       
       return () => clearTimeout(timer)
     }
-  }, [flavorMode, selectedFlavorsForMulti.length])
+  }, [flavorMode, selectedFlavorsForMulti, dispatch])
 
   const loadData = async () => {
     try {
@@ -378,14 +401,8 @@ function HomePageContent() {
       },
     })
 
-    // Reset das seleções para múltiplos sabores após rolagem
-    // Para permitir que o usuário veja a seleção visual durante o processo
-    if (flavorMode > 1) {
-      setTimeout(() => {
-        setSelectedFlavorsForMulti([])
-      }, 1500) // Reset após 1.5s para manter visual durante rolagem
-    } else {
-      // Para 1 sabor, reset imediato como antes
+    // Reset das seleções apenas para 1 sabor (múltiplos sabores são resetados no useEffect)
+    if (flavorMode === 1) {
       setSelectedFlavorsForMulti([])
     }
   }
