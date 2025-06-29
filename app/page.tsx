@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -417,29 +418,17 @@ function HomePageContent() {
                   {/* Botões de seleção de sabores dinamicos */}
                   <div className="flex space-x-3">
                     {opcoesSabores.filter(opcao => opcao.ativo).map((opcao, index) => {
-                      const IconComponent = () => {
-                        if (opcao.maximo_sabores === 1) {
-                          return (
-                            <svg width="32" height="32" viewBox="0 0 32 32" className="text-gray-700">
-                              <circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" strokeWidth="1.5"/>
-                            </svg>
-                          )
-                        } else if (opcao.maximo_sabores === 2) {
-                          return (
-                            <svg width="32" height="32" viewBox="0 0 32 32" className="text-gray-700">
-                              <circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" strokeWidth="1.5"/>
-                              <line x1="16" y1="4" x2="16" y2="28" stroke="currentColor" strokeWidth="1.5"/>
-                            </svg>
-                          )
-                        } else {
-                          return (
-                            <svg width="32" height="32" viewBox="0 0 32 32" className="text-gray-700">
-                              <circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" strokeWidth="1.5"/>
-                              <line x1="16" y1="4" x2="16" y2="28" stroke="currentColor" strokeWidth="1.5"/>
-                              <line x1="4" y1="16" x2="28" y2="16" stroke="currentColor" strokeWidth="1.5" transform="rotate(60 16 16)"/>
-                              <line x1="4" y1="16" x2="28" y2="16" stroke="currentColor" strokeWidth="1.5" transform="rotate(-60 16 16)"/>
-                            </svg>
-                          )
+                      // Função para obter o caminho da imagem baseado na quantidade de sabores
+                      const getImagePath = (maxSabores: number) => {
+                        switch (maxSabores) {
+                          case 1:
+                            return "/images/sabores/1sabor.svg"
+                          case 2:
+                            return "/images/sabores/2sabores.svg"
+                          case 3:
+                            return "/images/sabores/3sabores.svg"
+                          default:
+                            return "/images/sabores/1sabor.svg"
                         }
                       }
 
@@ -447,18 +436,37 @@ function HomePageContent() {
                         <Button
                           key={opcao.id}
                           variant="outline"
-                          className={`flex-1 h-20 flex flex-col items-center justify-center bg-transparent ${
-                            flavorMode === opcao.maximo_sabores ? "border-teal-500 bg-teal-50" : ""
+                          className={`flex-1 h-20 flex flex-col items-center justify-center bg-transparent transition-all duration-200 hover:shadow-md ${
+                            flavorMode === opcao.maximo_sabores 
+                              ? "border-teal-500 bg-teal-50 shadow-lg" 
+                              : "border-gray-300 hover:border-gray-400"
                           }`}
                           onClick={() => {
                             setFlavorMode(opcao.maximo_sabores as 1 | 2 | 3)
                             setSelectedFlavorsForMulti([])
                           }}
                         >
-                          <div className="w-8 h-8 mb-2 flex-shrink-0 flex items-center justify-center">
-                            <IconComponent />
+                          <div className="w-8 h-8 mb-2 flex-shrink-0 flex items-center justify-center relative">
+                            <Image
+                              src={getImagePath(opcao.maximo_sabores)}
+                              alt={`${opcao.maximo_sabores} sabor${opcao.maximo_sabores > 1 ? 'es' : ''}`}
+                              width={32}
+                              height={32}
+                              className={`object-contain transition-all duration-200 ${
+                                flavorMode === opcao.maximo_sabores 
+                                  ? "scale-110 brightness-110" 
+                                  : "opacity-80 hover:opacity-100"
+                              }`}
+                              priority={opcao.maximo_sabores <= 2} // Priorizar carregamento dos ícones mais comuns
+                            />
                           </div>
-                          <span className="text-xs">{opcao.maximo_sabores}</span>
+                          <span className={`text-xs font-medium transition-colors duration-200 ${
+                            flavorMode === opcao.maximo_sabores 
+                              ? "text-teal-700" 
+                              : "text-gray-600"
+                          }`}>
+                            {opcao.maximo_sabores}
+                          </span>
                         </Button>
                       )
                     })}
