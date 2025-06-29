@@ -34,6 +34,7 @@ export default function CheckoutPage() {
   
   const [config, setConfig] = useState<PizzariaConfig | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
+  const [isCartLoaded, setIsCartLoaded] = useState(false)
   const [tipoEntrega, setTipoEntrega] = useState<"delivery" | "balcao">("delivery")
   
   const [nomeCompleto, setNomeCompleto] = useState("")
@@ -117,6 +118,14 @@ export default function CheckoutPage() {
   useEffect(() => {
     setIsLoaded(true)
     loadConfig()
+  }, [])
+
+  // Aguardar um pouco para o carrinho carregar do localStorage
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsCartLoaded(true)
+    }, 100) // Pequeno delay para garantir que o localStorage foi carregado
+    return () => clearTimeout(timer)
   }, [])
 
   const loadConfig = async () => {
@@ -208,11 +217,11 @@ export default function CheckoutPage() {
     window.open(url, "_blank")
   }
 
-  if (!config || !isLoaded) {
+  if (!config || !isLoaded || !isCartLoaded) {
     return <div className="flex items-center justify-center min-h-screen">Carregando...</div>
   }
 
-  // Interface para carrinho vazio
+  // Interface para carrinho vazio - só mostrar após aguardar carregamento
   if (totalItens === 0) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">

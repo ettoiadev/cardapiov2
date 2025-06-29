@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { createContext, useContext, useReducer, type ReactNode } from "react"
+import { createContext, useContext, useReducer, useEffect, type ReactNode } from "react"
 
 export interface CartItem {
   id: string
@@ -27,6 +27,7 @@ type CartAction =
 const CartContext = createContext<{
   state: CartState
   dispatch: React.Dispatch<CartAction>
+  clearLocalStorage: () => void
 } | null>(null)
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
@@ -92,12 +93,50 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 }
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [state, dispatch] = useReducer(cartReducer, {
-    items: [],
-    total: 0,
-  })
+  // Função para carregar estado do localStorage
+  const loadInitialState = (): CartState => {
+    if (typeof window !== "undefined") {
+      try {
+        const savedCart = localStorage.getItem("pizzaria-cart")
+        if (savedCart) {
+          const parsedCart = JSON.parse(savedCart)
+          console.log("🛒 Carrinho carregado do localStorage:", parsedCart)
+          return parsedCart
+        }
+      } catch (error) {
+        console.error("Erro ao carregar carrinho do localStorage:", error)
+      }
+    }
+    console.log("🛒 Inicializando carrinho vazio")
+    return { items: [], total: 0 }
+  }
 
-  return <CartContext.Provider value={{ state, dispatch }}>{children}</CartContext.Provider>
+  const [state, dispatch] = useReducer(cartReducer, { items: [], total: 0 }, loadInitialState)
+
+  // Função para limpar localStorage
+  const clearLocalStorage = () => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("pizzaria-cart")
+      } catch (error) {
+        console.error("Erro ao limpar carrinho do localStorage:", error)
+      }
+    }
+  }
+
+  // Salvar no localStorage sempre que o estado mudar
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("pizzaria-cart", JSON.stringify(state))
+        console.log("💾 Carrinho salvo no localStorage:", state)
+      } catch (error) {
+        console.error("Erro ao salvar carrinho no localStorage:", error)
+      }
+    }
+  }, [state])
+
+  return <CartContext.Provider value={{ state, dispatch, clearLocalStorage }}>{children}</CartContext.Provider>
 }
 
 export const useCart = () => {
