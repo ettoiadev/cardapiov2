@@ -207,9 +207,111 @@ function HomePageContent() {
   const { config: pizzariaConfig } = useConfig()
   const router = useRouter()
 
+  // Função para calcular o status da pizzaria
+  const getStoreStatus = () => {
+    const now = new Date()
+    const currentDay = now.getDay() // 0 = domingo, 1 = segunda, etc.
+    const currentTime = now.getHours() * 60 + now.getMinutes() // minutos desde meia-noite
+    
+    // Mapear dia da semana para chave do horário
+    const dayMap = {
+      0: 'domingo',
+      1: 'segunda', 
+      2: 'terca',
+      3: 'quarta',
+      4: 'quinta',
+      5: 'sexta',
+      6: 'sabado'
+    }
+    
+    const dayKey = dayMap[currentDay as keyof typeof dayMap]
+    const todaySchedule = config.horario_funcionamento?.[dayKey]
+    
+    if (!todaySchedule || todaySchedule.toLowerCase() === 'fechado') {
+      return {
+        isOpen: false,
+        status: 'Fechado',
+        nextInfo: null
+      }
+    }
+    
+    // Parse do horário (formato: "18:00-23:00")
+    const scheduleMatch = todaySchedule.match(/(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})/)
+    if (!scheduleMatch) {
+      return {
+        isOpen: false,
+        status: 'Fechado',
+        nextInfo: null
+      }
+    }
+    
+    const [, openHour, openMin, closeHour, closeMin] = scheduleMatch
+    const openTime = parseInt(openHour) * 60 + parseInt(openMin)
+    let closeTime = parseInt(closeHour) * 60 + parseInt(closeMin)
+    
+    // Se fecha depois da meia-noite (ex: 00:00), ajustar para próximo dia
+    if (closeTime < openTime) {
+      closeTime += 24 * 60
+    }
+    
+    // Verificar se está aberto
+    const isOpen = currentTime >= openTime && currentTime < closeTime
+    
+    if (isOpen) {
+      // Está aberto - mostrar horário de fechamento
+      const closeHourFormatted = closeTime >= 24 * 60 
+        ? `${Math.floor((closeTime - 24 * 60) / 60).toString().padStart(2, '0')}:${(closeTime % 60).toString().padStart(2, '0')}`
+        : `${Math.floor(closeTime / 60).toString().padStart(2, '0')}:${(closeTime % 60).toString().padStart(2, '0')}`
+      
+      return {
+        isOpen: true,
+        status: 'Aberto',
+        nextInfo: `fecha às ${closeHourFormatted}`
+      }
+    } else {
+      // Está fechado - verificar se deve mostrar horário de abertura
+      const timeUntilOpen = openTime - currentTime
+      const twoHoursInMinutes = 2 * 60
+      
+      if (timeUntilOpen > 0 && timeUntilOpen <= twoHoursInMinutes) {
+        // Mostrar horário de abertura se faltar 2 horas ou menos
+        const openHourFormatted = `${openHour.padStart(2, '0')}:${openMin.padStart(2, '0')}`
+        return {
+          isOpen: false,
+          status: 'Fechado',
+          nextInfo: `abre às ${openHourFormatted}`
+        }
+      } else {
+        // Muito cedo ou muito tarde - só mostrar "Fechado"
+        return {
+          isOpen: false,
+          status: 'Fechado',
+          nextInfo: null
+        }
+      }
+    }
+  }
+
+  const [storeStatus, setStoreStatus] = useState(getStoreStatus())
+
   useEffect(() => {
     loadData()
   }, [])
+
+  // Atualizar status da pizzaria a cada minuto
+  useEffect(() => {
+    const updateStatus = () => {
+      setStoreStatus(getStoreStatus())
+    }
+    
+    // Atualizar imediatamente
+    updateStatus()
+    
+    // Configurar interval para atualizar a cada minuto
+    const interval = setInterval(updateStatus, 60000)
+    
+    return () => clearInterval(interval)
+  }, [config.horario_funcionamento])
 
   // Processamento automático APENAS para múltiplos sabores (2 ou 3)
   useEffect(() => {
@@ -524,6 +626,21 @@ function HomePageContent() {
         <div className="px-4 py-4 bg-white border-b">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-6">
+              {/* Status da Pizzaria (dinâmico) */}
+              <div className="text-center">
+                <div className={`text-sm font-medium ${
+                  storeStatus.isOpen 
+                    ? "text-green-600" 
+                    : "text-red-500"
+                }`}>
+                  {storeStatus.status}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {storeStatus.nextInfo || "status"}
+                </div>
+              </div>
+
+              {/* Tempo de Entrega */}
               <div className="text-center">
                 <div className="text-sm font-medium text-gray-900">
                   {config.tempo_entrega_min}–{config.tempo_entrega_max}
@@ -531,16 +648,13 @@ function HomePageContent() {
                 <div className="text-xs text-gray-500">minutos</div>
               </div>
 
+              {/* Valor Mínimo */}
               <div className="text-center">
                 <div className="text-sm font-medium text-gray-900">{formatCurrency(config.valor_minimo)}</div>
                 <div className="text-xs text-gray-500">mínimo</div>
               </div>
 
-              <div className="text-center">
-                <div className="text-sm font-medium text-gray-900">ver taxas</div>
-                <div className="text-xs text-gray-500">entregas</div>
-              </div>
-
+              {/* Formas de Pagamento */}
               <div className="text-center">
                 <div className="flex justify-center items-center space-x-1 mb-1">
                   {config.aceita_dinheiro && <Banknote className="w-4 h-4" />}
