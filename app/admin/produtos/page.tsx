@@ -217,6 +217,28 @@ export default function AdminProdutosPage() {
     produto.nome.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  // Função para organizar produtos por categoria com prioridade
+  const organizeProductsByCategory = () => {
+    const pizzasCategories = ['salgada', 'doce']
+    const pizzas = filteredProdutos.filter(produto => pizzasCategories.includes(produto.tipo))
+    const bebidas = filteredProdutos.filter(produto => produto.tipo === 'bebida')
+    const outros = filteredProdutos.filter(produto => !pizzasCategories.includes(produto.tipo) && produto.tipo !== 'bebida')
+    
+    // Adicionar numeração sequencial para pizzas
+    const pizzasComNumeracao = pizzas.map((pizza, index) => ({
+      ...pizza,
+      numeroSequencial: String(index + 1).padStart(2, '0')
+    }))
+
+    return {
+      pizzas: pizzasComNumeracao,
+      bebidas,
+      outros
+    }
+  }
+
+  const { pizzas, bebidas, outros } = organizeProductsByCategory()
+
   const getProductIcon = (tipo: string) => {
     switch (tipo) {
       case 'pizza':
@@ -501,100 +523,323 @@ export default function AdminProdutosPage() {
           </CardHeader>
           <CardContent className="p-6">
             {filteredProdutos.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredProdutos.map((produto) => (
-                  <div
-                    key={produto.id}
-                    className="group bg-gradient-to-br from-white to-gray-50 border border-gray-100 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-gray-200"
-                  >
-                    <div className="flex items-start justify-between mb-4">
+              <div className="space-y-8">
+                {/* Seção de Pizzas */}
+                {pizzas.length > 0 && (
+                  <div>
+                    <div className="bg-gradient-to-r from-orange-100 to-amber-100 rounded-xl p-4 mb-6 border border-orange-200">
                       <div className="flex items-center gap-3">
-                        {getProductIcon(produto.tipo)}
-                        <div>
-                          <h3 className="font-semibold text-gray-900 text-lg leading-tight">
-                            {produto.nome}
-                          </h3>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge 
-                              variant={produto.ativo ? "default" : "secondary"}
-                              className="text-xs"
-                            >
-                              {produto.ativo ? "Ativo" : "Inativo"}
-                            </Badge>
-                            <span className="text-xs text-gray-500 capitalize">
-                              {produto.tipo}
-                            </span>
-                          </div>
+                        <div className="p-2 bg-orange-200 rounded-lg">
+                          <Pizza className="h-6 w-6 text-orange-700" />
                         </div>
-                      </div>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600"
-                          onClick={() => {
-                            setEditingProduto(produto)
-                            setIsDialogOpen(true)
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 hover:bg-red-50 text-red-600"
-                          onClick={() => handleDelete(produto.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div>
+                          <h2 className="text-xl font-bold text-orange-900">Pizzas</h2>
+                          <p className="text-sm text-orange-700">{pizzas.length} pizza{pizzas.length !== 1 ? 's' : ''} cadastrada{pizzas.length !== 1 ? 's' : ''}</p>
+                        </div>
                       </div>
                     </div>
-
-                    {produto.descricao && (
-                      <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-                        {produto.descricao}
-                      </p>
-                    )}
-
-                    <div className="space-y-3">
-                      <div className="bg-white rounded-lg p-3 border border-gray-100">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600 flex items-center gap-2">
-                            <Pizza className="h-4 w-4" />
-                            Tradicional
-                          </span>
-                          <span className="font-semibold text-green-600">
-                            {formatCurrency(produto.preco_tradicional)}
-                          </span>
-                        </div>
-                        {produto.preco_broto && (
-                          <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100">
-                            <span className="text-sm text-gray-600 flex items-center gap-2">
-                              <Pizza className="h-3 w-3" />
-                              Broto
-                            </span>
-                            <span className="font-semibold text-green-600">
-                              {formatCurrency(produto.preco_broto)}
-                            </span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                      {pizzas.map((produto) => (
+                        <div
+                          key={produto.id}
+                          className="group bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-100 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-orange-200"
+                        >
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              {getProductIcon(produto.tipo)}
+                              <div>
+                                <h3 className="font-semibold text-gray-900 text-lg leading-tight">
+                                  <span className="inline-block bg-orange-200 text-orange-800 text-sm font-bold px-2 py-1 rounded-md mr-2">
+                                    {produto.numeroSequencial}
+                                  </span>
+                                  {produto.nome}
+                                </h3>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Badge 
+                                    variant={produto.ativo ? "default" : "secondary"}
+                                    className="text-xs"
+                                  >
+                                    {produto.ativo ? "Ativo" : "Inativo"}
+                                  </Badge>
+                                  <span className="text-xs text-gray-500 capitalize">
+                                    {produto.tipo}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600"
+                                onClick={() => {
+                                  setEditingProduto(produto)
+                                  setIsDialogOpen(true)
+                                }}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-red-50 text-red-600"
+                                onClick={() => handleDelete(produto.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </div>
-                        )}
-                      </div>
 
-                      <div className="flex items-center justify-between text-xs text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <ArrowUpDown className="h-3 w-3" />
-                          Ordem: {produto.ordem}
-                        </span>
-                        {produto.categoria_id && (
-                          <span className="flex items-center gap-1">
-                            <Tag className="h-3 w-3" />
-                            {categorias.find(c => c.id === produto.categoria_id)?.nome || 'Sem categoria'}
-                          </span>
-                        )}
-                      </div>
+                          {produto.descricao && (
+                            <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                              {produto.descricao}
+                            </p>
+                          )}
+
+                          <div className="space-y-3">
+                            <div className="bg-white rounded-lg p-3 border border-orange-100">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-600 flex items-center gap-2">
+                                  <Pizza className="h-4 w-4" />
+                                  Tradicional
+                                </span>
+                                <span className="font-semibold text-green-600">
+                                  {formatCurrency(produto.preco_tradicional)}
+                                </span>
+                              </div>
+                              {produto.preco_broto && (
+                                <div className="flex justify-between items-center mt-2 pt-2 border-t border-orange-100">
+                                  <span className="text-sm text-gray-600 flex items-center gap-2">
+                                    <Pizza className="h-3 w-3" />
+                                    Broto
+                                  </span>
+                                  <span className="font-semibold text-green-600">
+                                    {formatCurrency(produto.preco_broto)}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="flex items-center justify-between text-xs text-gray-500">
+                              <span className="flex items-center gap-1">
+                                <ArrowUpDown className="h-3 w-3" />
+                                Ordem: {produto.ordem}
+                              </span>
+                              {produto.categoria_id && (
+                                <span className="flex items-center gap-1">
+                                  <Tag className="h-3 w-3" />
+                                  {categorias.find(c => c.id === produto.categoria_id)?.nome || 'Sem categoria'}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))}
+                )}
+
+                {/* Seção de Bebidas */}
+                {bebidas.length > 0 && (
+                  <div>
+                    <div className="bg-gradient-to-r from-blue-100 to-cyan-100 rounded-xl p-4 mb-6 border border-blue-200">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-blue-200 rounded-lg">
+                          <Coffee className="h-6 w-6 text-blue-700" />
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-bold text-blue-900">Bebidas</h2>
+                          <p className="text-sm text-blue-700">{bebidas.length} bebida{bebidas.length !== 1 ? 's' : ''} cadastrada{bebidas.length !== 1 ? 's' : ''}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                      {bebidas.map((produto) => (
+                        <div
+                          key={produto.id}
+                          className="group bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-100 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-200"
+                        >
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              {getProductIcon(produto.tipo)}
+                              <div>
+                                <h3 className="font-semibold text-gray-900 text-lg leading-tight">
+                                  {produto.nome}
+                                </h3>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Badge 
+                                    variant={produto.ativo ? "default" : "secondary"}
+                                    className="text-xs"
+                                  >
+                                    {produto.ativo ? "Ativo" : "Inativo"}
+                                  </Badge>
+                                  <span className="text-xs text-gray-500 capitalize">
+                                    {produto.tipo}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600"
+                                onClick={() => {
+                                  setEditingProduto(produto)
+                                  setIsDialogOpen(true)
+                                }}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-red-50 text-red-600"
+                                onClick={() => handleDelete(produto.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+
+                          {produto.descricao && (
+                            <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                              {produto.descricao}
+                            </p>
+                          )}
+
+                          <div className="space-y-3">
+                            <div className="bg-white rounded-lg p-3 border border-blue-100">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-600 flex items-center gap-2">
+                                  <Coffee className="h-4 w-4" />
+                                  Preço
+                                </span>
+                                <span className="font-semibold text-green-600">
+                                  {formatCurrency(produto.preco_tradicional)}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between text-xs text-gray-500">
+                              <span className="flex items-center gap-1">
+                                <ArrowUpDown className="h-3 w-3" />
+                                Ordem: {produto.ordem}
+                              </span>
+                              {produto.categoria_id && (
+                                <span className="flex items-center gap-1">
+                                  <Tag className="h-3 w-3" />
+                                  {categorias.find(c => c.id === produto.categoria_id)?.nome || 'Sem categoria'}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Seção de Outras Categorias */}
+                {outros.length > 0 && (
+                  <div>
+                    <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl p-4 mb-6 border border-purple-200">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-purple-200 rounded-lg">
+                          <Package className="h-6 w-6 text-purple-700" />
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-bold text-purple-900">Outras Categorias</h2>
+                          <p className="text-sm text-purple-700">{outros.length} produto{outros.length !== 1 ? 's' : ''} cadastrado{outros.length !== 1 ? 's' : ''}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                      {outros.map((produto) => (
+                        <div
+                          key={produto.id}
+                          className="group bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-purple-200"
+                        >
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              {getProductIcon(produto.tipo)}
+                              <div>
+                                <h3 className="font-semibold text-gray-900 text-lg leading-tight">
+                                  {produto.nome}
+                                </h3>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Badge 
+                                    variant={produto.ativo ? "default" : "secondary"}
+                                    className="text-xs"
+                                  >
+                                    {produto.ativo ? "Ativo" : "Inativo"}
+                                  </Badge>
+                                  <span className="text-xs text-gray-500 capitalize">
+                                    {produto.tipo}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600"
+                                onClick={() => {
+                                  setEditingProduto(produto)
+                                  setIsDialogOpen(true)
+                                }}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-red-50 text-red-600"
+                                onClick={() => handleDelete(produto.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+
+                          {produto.descricao && (
+                            <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                              {produto.descricao}
+                            </p>
+                          )}
+
+                          <div className="space-y-3">
+                            <div className="bg-white rounded-lg p-3 border border-purple-100">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-600 flex items-center gap-2">
+                                  <Package className="h-4 w-4" />
+                                  Preço
+                                </span>
+                                <span className="font-semibold text-green-600">
+                                  {formatCurrency(produto.preco_tradicional)}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between text-xs text-gray-500">
+                              <span className="flex items-center gap-1">
+                                <ArrowUpDown className="h-3 w-3" />
+                                Ordem: {produto.ordem}
+                              </span>
+                              {produto.categoria_id && (
+                                <span className="flex items-center gap-1">
+                                  <Tag className="h-3 w-3" />
+                                  {categorias.find(c => c.id === produto.categoria_id)?.nome || 'Sem categoria'}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="text-center py-16">
