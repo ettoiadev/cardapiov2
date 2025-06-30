@@ -35,6 +35,11 @@ import {
   Search
 } from "lucide-react"
 
+interface Adicional {
+  nome: string
+  preco: number
+}
+
 interface Produto {
   id: string
   categoria_id: string | null
@@ -45,6 +50,7 @@ interface Produto {
   tipo: string
   ativo: boolean
   ordem: number
+  adicionais?: Adicional[]
 }
 
 interface Categoria {
@@ -933,6 +939,7 @@ function ProdutoForm({
     preco_broto: produto?.preco_broto || 0,
     ativo: produto?.ativo ?? true,
     ordem: produto?.ordem || 0,
+    adicionais: produto?.adicionais || []
   })
 
   // Estados para os valores formatados dos preços
@@ -943,9 +950,30 @@ function ProdutoForm({
     produto?.preco_broto ? formatCurrencyInput((produto.preco_broto * 100).toString()) : ""
   )
 
+  // Estado para controlar adicionais
+  const [adicionais, setAdicionais] = useState<Adicional[]>(produto?.adicionais || [])
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSave(formData)
+    onSave({ ...formData, adicionais })
+  }
+
+  const adicionarAdicional = () => {
+    setAdicionais([...adicionais, { nome: "", preco: 0 }])
+  }
+
+  const removerAdicional = (index: number) => {
+    setAdicionais(adicionais.filter((_, i) => i !== index))
+  }
+
+  const atualizarAdicional = (index: number, campo: keyof Adicional, valor: string | number) => {
+    const novosAdicionais = [...adicionais]
+    if (campo === 'preco') {
+      novosAdicionais[index][campo] = typeof valor === 'string' ? parseFloat(valor) || 0 : valor
+    } else {
+      novosAdicionais[index][campo] = valor as string
+    }
+    setAdicionais(novosAdicionais)
   }
 
   return (
@@ -1042,16 +1070,81 @@ function ProdutoForm({
         )}
       </div>
 
-      <div className="flex items-center justify-between">
-        <label className="flex items-center space-x-3">
+      {/* Toggle Produto Disponível */}
+      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-700">Produto disponível</span>
+          </div>
+        </div>
+        <label className="relative inline-flex items-center cursor-pointer">
           <input
             type="checkbox"
             checked={formData.ativo}
             onChange={(e) => setFormData({ ...formData, ativo: e.target.checked })}
-            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            className="sr-only peer"
           />
-          <span className="text-sm font-medium text-gray-700">Produto ativo</span>
+          <div className={`w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all ${formData.ativo ? 'peer-checked:bg-red-600' : ''}`}></div>
         </label>
+      </div>
+
+      {/* Seção de Adicionais */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Label className="text-sm font-medium text-gray-700">Adicionais (Opcional)</Label>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={adicionarAdicional}
+            className="text-blue-600 border-blue-200 hover:bg-blue-50"
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Adicionar Adicional
+          </Button>
+        </div>
+        
+        {adicionais.length > 0 && (
+          <div className="space-y-3">
+            {adicionais.map((adicional, index) => (
+              <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border">
+                <div className="flex-1">
+                  <Input
+                    placeholder="Ex: Queijo Extra, Azeitona"
+                    value={adicional.nome}
+                    onChange={(e) => atualizarAdicional(index, 'nome', e.target.value)}
+                    className="border-gray-200 focus:border-blue-300 focus:ring-blue-200"
+                  />
+                </div>
+                <div className="w-32">
+                  <Input
+                    type="text"
+                    placeholder="R$ 0,00"
+                    value={adicional.preco ? formatCurrencyInput((adicional.preco * 100).toString()) : ""}
+                    onChange={(e) => {
+                      const valorFormatado = formatCurrencyInput(e.target.value)
+                      const valorNumerico = parseCurrencyInput(valorFormatado)
+                      atualizarAdicional(index, 'preco', valorNumerico)
+                    }}
+                    className="border-gray-200 focus:border-blue-300 focus:ring-blue-200"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removerAdicional(index)}
+                  className="h-8 w-8 p-0 hover:bg-red-50 text-red-600"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center justify-end">
         <div className="flex items-center gap-2">
           <Label htmlFor="ordem" className="text-sm font-medium text-gray-700">Ordem</Label>
           <Input

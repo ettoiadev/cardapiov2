@@ -32,6 +32,11 @@ interface PizzariaConfig {
   horario_funcionamento: any
 }
 
+interface Adicional {
+  nome: string
+  preco: number
+}
+
 interface Produto {
   id: string
   nome: string
@@ -40,6 +45,7 @@ interface Produto {
   preco_broto: number | null
   tipo: string
   ativo: boolean
+  adicionais?: Adicional[]
 }
 
 // Mock data for when Supabase is not configured
