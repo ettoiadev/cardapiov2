@@ -78,7 +78,7 @@ export function CartFooter() {
   return (
     <>
       {/* Desktop Layout */}
-      <div className="hidden md:block fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 cart-footer-shadow z-50">
+      <div className="hidden md:block fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 cart-footer-shadow cart-footer-desktop z-50">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="grid grid-cols-3 items-center gap-4">
             {/* Coluna Esquerda - Lixeira */}
@@ -141,7 +141,7 @@ export function CartFooter() {
       </div>
 
       {/* Mobile Layout */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 cart-footer-shadow z-50">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 cart-footer-shadow cart-footer-mobile z-50">
         <div className="p-4 space-y-3">
           {/* Linha Superior - Contador e Lixeira */}
           <div className="flex items-center justify-between">

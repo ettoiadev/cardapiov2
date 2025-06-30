@@ -47,6 +47,10 @@ body {
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Cart Footer Heights - Responsive Design */
+    --cart-footer-height-mobile: 140px;
+    --cart-footer-height-desktop: 80px;
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -142,5 +146,27 @@ body {
   @keyframes loadingPulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.7; }
+  }
+  
+  /* Dynamic padding for cart footer - Modern responsive approach */
+  .pb-cart-safe {
+    padding-bottom: var(--cart-footer-height-mobile);
+    scroll-padding-bottom: var(--cart-footer-height-mobile);
+  }
+  
+  @media (min-width: 768px) {
+    .pb-cart-safe {
+      padding-bottom: var(--cart-footer-height-desktop);
+      scroll-padding-bottom: var(--cart-footer-height-desktop);
+    }
+  }
+  
+  /* Cart footer with exact heights */
+  .cart-footer-mobile {
+    height: var(--cart-footer-height-mobile);
+  }
+  
+  .cart-footer-desktop {
+    height: var(--cart-footer-height-desktop);
   }
 }
