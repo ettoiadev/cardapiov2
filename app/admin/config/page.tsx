@@ -137,9 +137,22 @@ export default function AdminConfigPage() {
   }
 
   // Função para fazer upload da imagem
-  const uploadImage = async (file: File, folder: string): Promise<string> => {
+  const uploadImage = async (file: File | Blob, folder: string, originalFileName?: string): Promise<string> => {
     try {
-      const fileName = `${folder}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '')}`
+      // Verificar se temos um nome de arquivo válido
+      let baseName = 'image'
+      if (file instanceof File && file.name) {
+        baseName = file.name.replace(/[^a-zA-Z0-9.-]/g, '')
+      } else if (originalFileName) {
+        baseName = originalFileName.replace(/[^a-zA-Z0-9.-]/g, '')
+      }
+      
+      // Garantir que temos uma extensão
+      if (!baseName.includes('.')) {
+        baseName += '.jpg'
+      }
+      
+      const fileName = `${folder}/${Date.now()}-${baseName}`
       
       let uploadResult = await supabase.storage
         .from('images')
@@ -179,7 +192,10 @@ export default function AdminConfigPage() {
       return urlData.publicUrl
     } catch (error) {
       console.error('Erro no upload:', error)
-      throw new Error('Erro ao fazer upload da imagem')
+      if (error instanceof Error) {
+        throw new Error(`Falha no upload: ${error.message}`)
+      }
+      throw new Error('Falha ao carregar imagem. Verifique o formato e tente novamente.')
     }
   }
 
@@ -188,17 +204,35 @@ export default function AdminConfigPage() {
     const file = event.target.files?.[0]
     if (!file) return
 
+    // Validar arquivo
+    if (!file.name) {
+      setMessage("Falha ao carregar imagem. Arquivo inválido.")
+      return
+    }
+
+    // Validar tipo de arquivo
+    if (!file.type.startsWith('image/')) {
+      setMessage("Falha ao carregar imagem. Verifique o formato e tente novamente.")
+      return
+    }
+
+    // Validar tamanho (5MB)
+    if (file.size > 5242880) {
+      setMessage("Falha ao carregar imagem. Arquivo muito grande (máximo 5MB).")
+      return
+    }
+
     setUploadingCapa(true)
     try {
       // Redimensionar para 1200x675px (16:9)
       const resizedFile = await resizeImage(file, 1200, 675)
-      const url = await uploadImage(resizedFile as File, 'capas')
+      const url = await uploadImage(resizedFile, 'capas', file.name)
       
       setConfig({ ...config, foto_capa: url })
       setMessage("Foto de capa carregada com sucesso!")
     } catch (error) {
       console.error('Erro ao processar capa:', error)
-      setMessage("Erro ao carregar foto de capa")
+      setMessage("Falha ao carregar imagem. Verifique o formato e tente novamente.")
     } finally {
       setUploadingCapa(false)
       if (capaInputRef.current) {
@@ -212,17 +246,35 @@ export default function AdminConfigPage() {
     const file = event.target.files?.[0]
     if (!file) return
 
+    // Validar arquivo
+    if (!file.name) {
+      setMessage("Falha ao carregar imagem. Arquivo inválido.")
+      return
+    }
+
+    // Validar tipo de arquivo
+    if (!file.type.startsWith('image/')) {
+      setMessage("Falha ao carregar imagem. Verifique o formato e tente novamente.")
+      return
+    }
+
+    // Validar tamanho (5MB)
+    if (file.size > 5242880) {
+      setMessage("Falha ao carregar imagem. Arquivo muito grande (máximo 5MB).")
+      return
+    }
+
     setUploadingPerfil(true)
     try {
       // Redimensionar para 300x300px (1:1)
       const resizedFile = await resizeImage(file, 300, 300)
-      const url = await uploadImage(resizedFile as File, 'perfis')
+      const url = await uploadImage(resizedFile, 'perfis', file.name)
       
       setConfig({ ...config, foto_perfil: url })
       setMessage("Foto de perfil carregada com sucesso!")
     } catch (error) {
       console.error('Erro ao processar perfil:', error)
-      setMessage("Erro ao carregar foto de perfil")
+      setMessage("Falha ao carregar imagem. Verifique o formato e tente novamente.")
     } finally {
       setUploadingPerfil(false)
       if (perfilInputRef.current) {
