@@ -25,7 +25,8 @@ import {
   AlertCircle,
   Upload,
   FileImage,
-  Loader2
+  Loader2,
+  Trash2
 } from "lucide-react"
 
 interface PizzariaConfig {
@@ -280,6 +281,107 @@ export default function AdminConfigPage() {
       if (perfilInputRef.current) {
         perfilInputRef.current.value = ''
       }
+    }
+  }
+
+  // Função para extrair o nome do arquivo da URL do Supabase
+  const extractFilePathFromUrl = (url: string): string | null => {
+    try {
+      // URL padrão do Supabase: https://projeto.supabase.co/storage/v1/object/public/bucket/path/file.jpg
+      const urlParts = url.split('/storage/v1/object/public/images/')
+      if (urlParts.length > 1) {
+        return urlParts[1]
+      }
+      return null
+    } catch (error) {
+      console.error('Erro ao extrair caminho do arquivo:', error)
+      return null
+    }
+  }
+
+  // Função para excluir foto de capa
+  const handleDeleteCapa = async () => {
+    if (!config.foto_capa) return
+
+    const confirmDelete = confirm("Tem certeza que deseja excluir a foto de capa?")
+    if (!confirmDelete) return
+
+    try {
+      // Extrair caminho do arquivo da URL
+      const filePath = extractFilePathFromUrl(config.foto_capa)
+      
+      if (filePath) {
+        // Tentar remover do Supabase Storage
+        const { error: storageError } = await supabase.storage
+          .from('images')
+          .remove([filePath])
+        
+        if (storageError) {
+          console.warn('Aviso: Não foi possível remover arquivo do storage:', storageError.message)
+        }
+      }
+
+      // Atualizar estado local
+      setConfig({ ...config, foto_capa: "" })
+      
+      // Atualizar banco de dados
+      const { error: dbError } = await supabase
+        .from('pizzaria_config')
+        .update({ foto_capa: null })
+        .eq('id', config.id)
+
+      if (dbError) {
+        console.error('Erro ao atualizar banco:', dbError)
+        setMessage("Erro ao excluir imagem. Tente novamente.")
+      } else {
+        setMessage("Imagem excluída com sucesso.")
+      }
+    } catch (error) {
+      console.error('Erro ao excluir capa:', error)
+      setMessage("Erro ao excluir imagem. Tente novamente.")
+    }
+  }
+
+  // Função para excluir foto de perfil
+  const handleDeletePerfil = async () => {
+    if (!config.foto_perfil) return
+
+    const confirmDelete = confirm("Tem certeza que deseja excluir a foto de perfil?")
+    if (!confirmDelete) return
+
+    try {
+      // Extrair caminho do arquivo da URL
+      const filePath = extractFilePathFromUrl(config.foto_perfil)
+      
+      if (filePath) {
+        // Tentar remover do Supabase Storage
+        const { error: storageError } = await supabase.storage
+          .from('images')
+          .remove([filePath])
+        
+        if (storageError) {
+          console.warn('Aviso: Não foi possível remover arquivo do storage:', storageError.message)
+        }
+      }
+
+      // Atualizar estado local
+      setConfig({ ...config, foto_perfil: "" })
+      
+      // Atualizar banco de dados
+      const { error: dbError } = await supabase
+        .from('pizzaria_config')
+        .update({ foto_perfil: null })
+        .eq('id', config.id)
+
+      if (dbError) {
+        console.error('Erro ao atualizar banco:', dbError)
+        setMessage("Erro ao excluir imagem. Tente novamente.")
+      } else {
+        setMessage("Imagem excluída com sucesso.")
+      }
+    } catch (error) {
+      console.error('Erro ao excluir perfil:', error)
+      setMessage("Erro ao excluir imagem. Tente novamente.")
     }
   }
 
@@ -689,6 +791,17 @@ export default function AdminConfigPage() {
                       alt="Preview da capa"
                       className="w-full h-40 object-cover rounded-lg border border-gray-200"
                     />
+                    <div className="absolute top-2 right-2">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={handleDeleteCapa}
+                        className="h-8 px-3 bg-red-600 hover:bg-red-700 text-white shadow-lg"
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Excluir
+                      </Button>
+                    </div>
                   </div>
                 )}
                 
@@ -735,12 +848,23 @@ export default function AdminConfigPage() {
               <div className="space-y-3">
                 {/* Preview da imagem atual */}
                 {config.foto_perfil && (
-                  <div className="relative">
+                  <div className="relative inline-block">
                     <img
                       src={config.foto_perfil}
                       alt="Preview do perfil"
                       className="w-24 h-24 object-cover rounded-lg border border-gray-200"
                     />
+                    <div className="absolute -top-2 -right-2">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={handleDeletePerfil}
+                        className="h-8 px-3 bg-red-600 hover:bg-red-700 text-white shadow-lg"
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Excluir
+                      </Button>
+                    </div>
                   </div>
                 )}
                 
