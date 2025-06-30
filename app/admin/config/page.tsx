@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -22,7 +22,10 @@ import {
   CreditCard, 
   Image,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Upload,
+  FileImage,
+  Loader2
 } from "lucide-react"
 
 interface PizzariaConfig {
@@ -70,14 +73,163 @@ export default function AdminConfigPage() {
   })
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
+  const [uploadingCapa, setUploadingCapa] = useState(false)
+  const [uploadingPerfil, setUploadingPerfil] = useState(false)
 
   // Estados para valores formatados
   const [taxaEntregaFormatada, setTaxaEntregaFormatada] = useState("")
   const [valorMinimoFormatado, setValorMinimoFormatado] = useState("")
 
+  // Refs para inputs de arquivo
+  const capaInputRef = useRef<HTMLInputElement>(null)
+  const perfilInputRef = useRef<HTMLInputElement>(null)
+
   useEffect(() => {
     loadConfig()
   }, [])
+
+  // Função para redimensionar imagem
+  const resizeImage = (file: File, maxWidth: number, maxHeight: number): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      const img = new window.Image()
+
+      if (!ctx) {
+        reject(new Error('Não foi possível obter contexto do canvas'))
+        return
+      }
+
+      img.onload = () => {
+        // Calcular novas dimensões mantendo proporção
+        let { width, height } = img
+        
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width
+            width = maxWidth
+          }
+        } else {
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height
+            height = maxHeight
+          }
+        }
+
+        canvas.width = width
+        canvas.height = height
+
+        // Desenhar imagem redimensionada
+        ctx.drawImage(img, 0, 0, width, height)
+
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(blob)
+          } else {
+            reject(new Error('Erro ao processar imagem'))
+          }
+        }, 'image/jpeg', 0.9)
+      }
+
+      img.onerror = () => reject(new Error('Erro ao carregar imagem'))
+      img.src = URL.createObjectURL(file)
+    })
+  }
+
+  // Função para fazer upload da imagem
+  const uploadImage = async (file: File, folder: string): Promise<string> => {
+    try {
+      const fileName = `${folder}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '')}`
+      
+      let uploadResult = await supabase.storage
+        .from('images')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
+
+      if (uploadResult.error) {
+        // Se o bucket não existir, tentar criar
+        if (uploadResult.error.message.includes('Bucket not found')) {
+          await supabase.storage.createBucket('images', {
+            public: true,
+            allowedMimeTypes: ['image/*'],
+            fileSizeLimit: 5242880 // 5MB
+          })
+          
+          // Tentar upload novamente
+          uploadResult = await supabase.storage
+            .from('images')
+            .upload(fileName, file, {
+              cacheControl: '3600',
+              upsert: false
+            })
+          
+          if (uploadResult.error) throw uploadResult.error
+        } else {
+          throw uploadResult.error
+        }
+      }
+
+      // Obter URL pública
+      const { data: urlData } = supabase.storage
+        .from('images')
+        .getPublicUrl(fileName)
+
+      return urlData.publicUrl
+    } catch (error) {
+      console.error('Erro no upload:', error)
+      throw new Error('Erro ao fazer upload da imagem')
+    }
+  }
+
+  // Função para processar upload da foto de capa
+  const handleCapaUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    setUploadingCapa(true)
+    try {
+      // Redimensionar para 1200x675px (16:9)
+      const resizedFile = await resizeImage(file, 1200, 675)
+      const url = await uploadImage(resizedFile as File, 'capas')
+      
+      setConfig({ ...config, foto_capa: url })
+      setMessage("Foto de capa carregada com sucesso!")
+    } catch (error) {
+      console.error('Erro ao processar capa:', error)
+      setMessage("Erro ao carregar foto de capa")
+    } finally {
+      setUploadingCapa(false)
+      if (capaInputRef.current) {
+        capaInputRef.current.value = ''
+      }
+    }
+  }
+
+  // Função para processar upload da foto de perfil
+  const handlePerfilUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    setUploadingPerfil(true)
+    try {
+      // Redimensionar para 300x300px (1:1)
+      const resizedFile = await resizeImage(file, 300, 300)
+      const url = await uploadImage(resizedFile as File, 'perfis')
+      
+      setConfig({ ...config, foto_perfil: url })
+      setMessage("Foto de perfil carregada com sucesso!")
+    } catch (error) {
+      console.error('Erro ao processar perfil:', error)
+      setMessage("Erro ao carregar foto de perfil")
+    } finally {
+      setUploadingPerfil(false)
+      if (perfilInputRef.current) {
+        perfilInputRef.current.value = ''
+      }
+    }
+  }
 
   const loadConfig = async () => {
     try {
@@ -463,40 +615,114 @@ export default function AdminConfigPage() {
                   Imagens da Pizzaria
                 </CardTitle>
                 <p className="text-sm text-gray-600 mt-1">
-                  URLs das imagens que aparecerão no cardápio
+                  Faça upload das imagens que aparecerão no cardápio
                 </p>
               </div>
             </div>
           </CardHeader>
           <CardContent className="p-6 space-y-6">
+            {/* Upload Foto de Capa */}
             <div>
-              <Label htmlFor="foto_capa" className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <Image className="h-4 w-4" />
-                URL da Foto de Capa
+              <Label className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-3">
+                <FileImage className="h-4 w-4" />
+                Foto de Capa
               </Label>
-              <Input
-                id="foto_capa"
-                value={config.foto_capa}
-                onChange={(e) => setConfig({ ...config, foto_capa: e.target.value })}
-                placeholder="https://exemplo.com/capa.jpg"
-                className="mt-1 rounded-lg border-gray-200 focus:border-orange-300 focus:ring-orange-200"
-              />
-              <p className="text-xs text-gray-500 mt-1">Imagem principal que aparecerá no topo do cardápio</p>
+              
+              <div className="space-y-3">
+                {/* Preview da imagem atual */}
+                {config.foto_capa && (
+                  <div className="relative">
+                    <img
+                      src={config.foto_capa}
+                      alt="Preview da capa"
+                      className="w-full h-40 object-cover rounded-lg border border-gray-200"
+                    />
+                  </div>
+                )}
+                
+                {/* Área de upload */}
+                <div 
+                  className="border-2 border-dashed border-orange-300 rounded-lg p-6 text-center hover:border-orange-400 transition-colors cursor-pointer"
+                  onClick={() => capaInputRef.current?.click()}
+                >
+                  {uploadingCapa ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader2 className="h-8 w-8 text-orange-600 animate-spin" />
+                      <p className="text-sm text-gray-600">Processando imagem...</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2">
+                      <Upload className="h-8 w-8 text-orange-600" />
+                      <p className="text-sm font-medium text-gray-700">Clique para selecionar imagem</p>
+                      <p className="text-xs text-gray-500">PNG, JPG até 5MB</p>
+                    </div>
+                  )}
+                </div>
+                
+                <input
+                  ref={capaInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleCapaUpload}
+                  className="hidden"
+                />
+                
+                <p className="text-xs text-gray-500">
+                  Imagem principal exibida no topo do cardápio. Tamanho ideal: 1200x675px.
+                </p>
+              </div>
             </div>
 
+            {/* Upload Foto de Perfil */}
             <div>
-              <Label htmlFor="foto_perfil" className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <Image className="h-4 w-4" />
-                URL da Foto de Perfil
+              <Label className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-3">
+                <FileImage className="h-4 w-4" />
+                Foto de Perfil
               </Label>
-              <Input
-                id="foto_perfil"
-                value={config.foto_perfil}
-                onChange={(e) => setConfig({ ...config, foto_perfil: e.target.value })}
-                placeholder="https://exemplo.com/perfil.jpg"
-                className="mt-1 rounded-lg border-gray-200 focus:border-orange-300 focus:ring-orange-200"
-              />
-              <p className="text-xs text-gray-500 mt-1">Logo ou imagem de perfil da pizzaria</p>
+              
+              <div className="space-y-3">
+                {/* Preview da imagem atual */}
+                {config.foto_perfil && (
+                  <div className="relative">
+                    <img
+                      src={config.foto_perfil}
+                      alt="Preview do perfil"
+                      className="w-24 h-24 object-cover rounded-lg border border-gray-200"
+                    />
+                  </div>
+                )}
+                
+                {/* Área de upload */}
+                <div 
+                  className="border-2 border-dashed border-orange-300 rounded-lg p-6 text-center hover:border-orange-400 transition-colors cursor-pointer"
+                  onClick={() => perfilInputRef.current?.click()}
+                >
+                  {uploadingPerfil ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader2 className="h-8 w-8 text-orange-600 animate-spin" />
+                      <p className="text-sm text-gray-600">Processando imagem...</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2">
+                      <Upload className="h-8 w-8 text-orange-600" />
+                      <p className="text-sm font-medium text-gray-700">Clique para selecionar imagem</p>
+                      <p className="text-xs text-gray-500">PNG, JPG até 5MB</p>
+                    </div>
+                  )}
+                </div>
+                
+                <input
+                  ref={perfilInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePerfilUpload}
+                  className="hidden"
+                />
+                
+                <p className="text-xs text-gray-500">
+                  Logo ou imagem de perfil da pizzaria. Tamanho ideal: 300x300px.
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
