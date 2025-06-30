@@ -89,11 +89,11 @@ export function CartFooter() {
                   disabled={isClearing}
                   variant="ghost"
                   size="icon"
-                  className="h-11 w-11 rounded-lg text-neutral-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="h-12 w-12 rounded-lg text-neutral-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                   onMouseEnter={() => !isClearing && setShowTooltip(true)}
                   onMouseLeave={() => setShowTooltip(false)}
                 >
-                  <Trash2 className="w-5 h-5 stroke-2" />
+                  <Trash2 className="w-6 h-6 stroke-2" />
                 </Button>
                 
                 {/* Tooltip */}
@@ -107,9 +107,9 @@ export function CartFooter() {
             </div>
 
             {/* Coluna Central - Contador de Itens */}
-            <div className={`flex items-center justify-center space-x-2 ${itemsAnimation ? 'smooth-bounce' : ''}`}>
-              <ShoppingCart className="w-5 h-5 text-neutral-600 stroke-2" />
-              <span className="text-neutral-800 font-medium">
+            <div className={`flex items-center justify-center space-x-3 ${itemsAnimation ? 'smooth-bounce' : ''}`}>
+              <ShoppingCart className="w-6 h-6 text-neutral-600 stroke-2" />
+              <span className="text-neutral-800 font-semibold text-base">
                 {totalItems} {totalItems === 1 ? "item" : "itens"}
               </span>
             </div>
@@ -129,7 +129,7 @@ export function CartFooter() {
                 ) : (
                   <div className="flex items-center justify-between w-full">
                     <span>Fechar pedido</span>
-                    <span className="font-bold text-green-100 ml-3">
+                    <span className="font-bold text-emerald-100 ml-3">
                       {formatCurrency(cartTotal)}
                     </span>
                   </div>
@@ -145,9 +145,9 @@ export function CartFooter() {
         <div className="p-4 space-y-3">
           {/* Linha Superior - Contador e Lixeira */}
           <div className="flex items-center justify-between">
-            <div className={`flex items-center space-x-2 ${itemsAnimation ? 'smooth-bounce' : ''}`}>
-              <ShoppingCart className="w-5 h-5 text-neutral-600 stroke-2" />
-              <span className="text-neutral-800 font-medium">
+            <div className={`flex items-center space-x-3 ${itemsAnimation ? 'smooth-bounce' : ''}`}>
+              <ShoppingCart className="w-6 h-6 text-neutral-600 stroke-2" />
+              <span className="text-neutral-800 font-semibold text-base">
                 {totalItems} {totalItems === 1 ? "item" : "itens"}
               </span>
             </div>
@@ -158,11 +158,11 @@ export function CartFooter() {
                 disabled={isClearing}
                 variant="ghost"
                 size="icon"
-                className="h-10 w-10 rounded-lg text-neutral-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-11 w-11 rounded-lg text-neutral-600 hover:text-red-500 hover:bg-red-50 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 onTouchStart={() => !isClearing && setShowTooltip(true)}
                 onTouchEnd={() => setTimeout(() => setShowTooltip(false), 1500)}
               >
-                <Trash2 className="w-5 h-5 stroke-2" />
+                <Trash2 className="w-6 h-6 stroke-2" />
               </Button>
               
               {/* Tooltip Mobile */}
@@ -178,7 +178,7 @@ export function CartFooter() {
           {/* Linha Inferior - Total e Botão */}
           <div className="space-y-2">
             <div className="text-center">
-              <span className="text-lg font-bold text-neutral-800">
+              <span className="text-lg font-bold text-emerald-600">
                 Total: {formatCurrency(cartTotal)}
               </span>
             </div>
