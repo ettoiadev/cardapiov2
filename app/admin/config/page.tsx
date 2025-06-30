@@ -40,6 +40,8 @@ interface PizzariaConfig {
   valor_minimo: number
   aceita_dinheiro: boolean
   aceita_cartao: boolean
+  aceita_pix: boolean
+  aceita_ticket_alimentacao: boolean
   endereco: string
   telefone: string
   whatsapp: string
@@ -59,6 +61,8 @@ export default function AdminConfigPage() {
     valor_minimo: 20.0,
     aceita_dinheiro: true,
     aceita_cartao: true,
+    aceita_pix: true,
+    aceita_ticket_alimentacao: false,
     endereco: "",
     telefone: "",
     whatsapp: "",
@@ -403,6 +407,8 @@ export default function AdminConfigPage() {
           endereco: data.endereco || "",
           telefone: data.telefone || "",
           whatsapp: data.whatsapp || "",
+          aceita_pix: data.aceita_pix !== undefined ? data.aceita_pix : true,
+          aceita_ticket_alimentacao: data.aceita_ticket_alimentacao !== undefined ? data.aceita_ticket_alimentacao : false,
           horario_funcionamento: data.horario_funcionamento || {
             segunda: "18:00-23:00",
             terca: "18:00-23:00",
@@ -679,7 +685,7 @@ export default function AdminConfigPage() {
                   Formas de Pagamento
                 </Label>
                 <div className="space-y-3">
-                  <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 transition-colors hover:bg-gray-100">
                     <input
                       type="checkbox"
                       checked={config.aceita_dinheiro}
@@ -688,7 +694,7 @@ export default function AdminConfigPage() {
                     />
                     <span className="text-sm font-medium text-gray-900">💵 Dinheiro</span>
                   </label>
-                  <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 transition-colors hover:bg-gray-100">
                     <input
                       type="checkbox"
                       checked={config.aceita_cartao}
@@ -696,6 +702,24 @@ export default function AdminConfigPage() {
                       className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
                     />
                     <span className="text-sm font-medium text-gray-900">💳 Cartão</span>
+                  </label>
+                  <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 transition-colors hover:bg-gray-100">
+                    <input
+                      type="checkbox"
+                      checked={config.aceita_pix}
+                      onChange={(e) => setConfig({ ...config, aceita_pix: e.target.checked })}
+                      className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                    />
+                    <span className="text-sm font-medium text-gray-900">🏦 Pix</span>
+                  </label>
+                  <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 transition-colors hover:bg-gray-100">
+                    <input
+                      type="checkbox"
+                      checked={config.aceita_ticket_alimentacao}
+                      onChange={(e) => setConfig({ ...config, aceita_ticket_alimentacao: e.target.checked })}
+                      className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                    />
+                    <span className="text-sm font-medium text-gray-900">🍽️ Ticket Alimentação</span>
                   </label>
                 </div>
               </div>

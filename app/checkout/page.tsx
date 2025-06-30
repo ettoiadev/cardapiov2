@@ -18,6 +18,10 @@ interface StoreConfig {
   whatsapp: string | null
   taxa_entrega: number
   valor_minimo: number
+  aceita_dinheiro?: boolean
+  aceita_cartao?: boolean
+  aceita_pix?: boolean
+  aceita_ticket_alimentacao?: boolean
 }
 
 interface AddressData {
@@ -51,12 +55,37 @@ export default function CheckoutPage() {
   
   // Observações e pagamento
   const [orderNotes, setOrderNotes] = useState("")
-  const [paymentMethod, setPaymentMethod] = useState<"pix" | "dinheiro" | "debito" | "credito">("pix")
+  const [paymentMethod, setPaymentMethod] = useState<"pix" | "dinheiro" | "debito" | "credito" | "ticket_alimentacao">("pix")
   
     // Carregar configurações da loja
   useEffect(() => {
     loadStoreConfig()
   }, [])
+
+  // Ajustar método de pagamento baseado nas configurações disponíveis
+  useEffect(() => {
+    if (storeConfig) {
+      // Verificar se o método atual está habilitado
+      const isCurrentMethodEnabled = 
+        (paymentMethod === "pix" && storeConfig.aceita_pix) ||
+        (paymentMethod === "dinheiro" && storeConfig.aceita_dinheiro) ||
+        ((paymentMethod === "debito" || paymentMethod === "credito") && storeConfig.aceita_cartao) ||
+        (paymentMethod === "ticket_alimentacao" && storeConfig.aceita_ticket_alimentacao)
+
+      if (!isCurrentMethodEnabled) {
+        // Definir o primeiro método disponível
+        if (storeConfig.aceita_pix) {
+          setPaymentMethod("pix")
+        } else if (storeConfig.aceita_dinheiro) {
+          setPaymentMethod("dinheiro")
+        } else if (storeConfig.aceita_cartao) {
+          setPaymentMethod("debito")
+        } else if (storeConfig.aceita_ticket_alimentacao) {
+          setPaymentMethod("ticket_alimentacao")
+        }
+      }
+    }
+  }, [storeConfig, paymentMethod])
   
   // Verificar carrinho vazio e redirecionar se necessário
   useEffect(() => {
@@ -74,7 +103,7 @@ export default function CheckoutPage() {
     try {
       const { data } = await supabase
         .from("pizzaria_config")
-        .select("nome, whatsapp, taxa_entrega, valor_minimo")
+        .select("nome, whatsapp, taxa_entrega, valor_minimo, aceita_dinheiro, aceita_cartao, aceita_pix, aceita_ticket_alimentacao")
         .single()
       
       if (data) {
@@ -85,7 +114,11 @@ export default function CheckoutPage() {
           nome: "Pizzaria",
           whatsapp: "5511999999999",
           taxa_entrega: 5,
-          valor_minimo: 20
+          valor_minimo: 20,
+          aceita_dinheiro: true,
+          aceita_cartao: true,
+          aceita_pix: true,
+          aceita_ticket_alimentacao: false
         })
       }
     } catch (error) {
@@ -94,7 +127,11 @@ export default function CheckoutPage() {
         nome: "Pizzaria",
         whatsapp: "5511999999999",
         taxa_entrega: 5,
-        valor_minimo: 20
+        valor_minimo: 20,
+        aceita_dinheiro: true,
+        aceita_cartao: true,
+        aceita_pix: true,
+        aceita_ticket_alimentacao: false
       })
     } finally {
       setLoading(false)
@@ -231,7 +268,8 @@ export default function CheckoutPage() {
       pix: "PIX",
       dinheiro: "Dinheiro",
       debito: "Cartão de Débito",
-      credito: "Cartão de Crédito"
+      credito: "Cartão de Crédito",
+      ticket_alimentacao: "Ticket Alimentação"
     }
     message += `💳 *FORMA DE PAGAMENTO:* ${paymentLabels[paymentMethod]}\n\n`
     
@@ -494,30 +532,46 @@ export default function CheckoutPage() {
             <h2 className="text-lg font-semibold mb-4">Forma de Pagamento</h2>
             <RadioGroup value={paymentMethod} onValueChange={(value: any) => setPaymentMethod(value)}>
               <div className="grid grid-cols-2 gap-3">
-                <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
-                  <RadioGroupItem value="pix" id="pix" />
-                  <Label htmlFor="pix" className="cursor-pointer">
-                    <Smartphone className="inline w-4 h-4 mr-1" /> PIX
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
-                  <RadioGroupItem value="dinheiro" id="dinheiro" />
-                  <Label htmlFor="dinheiro" className="cursor-pointer">
-                    <DollarSign className="inline w-4 h-4 mr-1" /> Dinheiro
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
-                  <RadioGroupItem value="debito" id="debito" />
-                  <Label htmlFor="debito" className="cursor-pointer">
-                    <CreditCard className="inline w-4 h-4 mr-1" /> Débito
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
-                  <RadioGroupItem value="credito" id="credito" />
-                  <Label htmlFor="credito" className="cursor-pointer">
-                    <CreditCard className="inline w-4 h-4 mr-1" /> Crédito
-                  </Label>
-                </div>
+                {storeConfig?.aceita_pix && (
+                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                    <RadioGroupItem value="pix" id="pix" />
+                    <Label htmlFor="pix" className="cursor-pointer">
+                      🏦 PIX
+                    </Label>
+                  </div>
+                )}
+                {storeConfig?.aceita_dinheiro && (
+                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                    <RadioGroupItem value="dinheiro" id="dinheiro" />
+                    <Label htmlFor="dinheiro" className="cursor-pointer">
+                      💵 Dinheiro
+                    </Label>
+                  </div>
+                )}
+                {storeConfig?.aceita_cartao && (
+                  <>
+                    <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                      <RadioGroupItem value="debito" id="debito" />
+                      <Label htmlFor="debito" className="cursor-pointer">
+                        💳 Cartão de Débito
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                      <RadioGroupItem value="credito" id="credito" />
+                      <Label htmlFor="credito" className="cursor-pointer">
+                        💳 Cartão de Crédito
+                      </Label>
+                    </div>
+                  </>
+                )}
+                {storeConfig?.aceita_ticket_alimentacao && (
+                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                    <RadioGroupItem value="ticket_alimentacao" id="ticket_alimentacao" />
+                    <Label htmlFor="ticket_alimentacao" className="cursor-pointer">
+                      🍽️ Ticket Alimentação
+                    </Label>
+                  </div>
+                )}
               </div>
             </RadioGroup>
           </div>
