@@ -298,16 +298,17 @@ export default function CheckoutPage() {
             <h2 className="text-xl font-semibold mb-6 text-foreground">Tipo de Entrega</h2>
             <RadioGroup value={deliveryType} onValueChange={(value: "balcao" | "delivery") => setDeliveryType(value)}>
               <div className="grid grid-cols-2 gap-4">
-                <div className={`relative p-4 border-2 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md cursor-pointer ${
+                <div className={`relative p-4 border-2 rounded-xl shadow-sm transition-colors duration-200 hover:shadow-md cursor-pointer ${
                   deliveryType === "balcao" 
-                    ? "border-orange-400 ring-1 ring-orange-300 bg-orange-100" 
-                    : "border-orange-300 hover:border-orange-400 bg-orange-50"
-                }`}>
+                    ? "border-orange-400 ring-1 ring-orange-300" 
+                    : "border-orange-300 hover:border-orange-400"
+                }`} style={{
+                  backgroundColor: deliveryType === "balcao" ? "#FFF4E5" : "#FFF4E5",
+                  borderColor: deliveryType === "balcao" ? "#FFA726" : "#FFA726"
+                }}>
                   <RadioGroupItem value="balcao" id="balcao" className="absolute top-3 right-3" />
                   <Label htmlFor="balcao" className="flex flex-col items-center text-center space-y-3 cursor-pointer">
-                    <div className={`p-3 rounded-full transition-colors ${
-                      deliveryType === "balcao" ? "bg-primary text-primary-foreground" : "bg-muted"
-                    }`}>
+                    <div className="p-3 rounded-full transition-colors bg-black text-white">
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                       </svg>
@@ -318,16 +319,17 @@ export default function CheckoutPage() {
                     </div>
                   </Label>
                 </div>
-                <div className={`relative p-4 border-2 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md cursor-pointer ${
+                <div className={`relative p-4 border-2 rounded-xl shadow-sm transition-colors duration-200 hover:shadow-md cursor-pointer ${
                   deliveryType === "delivery" 
-                    ? "border-blue-400 ring-1 ring-blue-300 bg-blue-100" 
-                    : "border-blue-300 hover:border-blue-400 bg-blue-50"
-                }`}>
+                    ? "border-blue-400 ring-1 ring-blue-300" 
+                    : "border-blue-300 hover:border-blue-400"
+                }`} style={{
+                  backgroundColor: deliveryType === "delivery" ? "#E3F2FD" : "#E3F2FD",
+                  borderColor: deliveryType === "delivery" ? "#42A5F5" : "#42A5F5"
+                }}>
                   <RadioGroupItem value="delivery" id="delivery" className="absolute top-3 right-3" />
                   <Label htmlFor="delivery" className="flex flex-col items-center text-center space-y-3 cursor-pointer">
-                    <div className={`p-3 rounded-full transition-colors ${
-                      deliveryType === "delivery" ? "bg-primary text-primary-foreground" : "bg-muted"
-                    }`}>
+                    <div className="p-3 rounded-full transition-colors bg-black text-white">
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
                       </svg>
