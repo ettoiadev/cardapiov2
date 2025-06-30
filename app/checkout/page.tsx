@@ -292,6 +292,31 @@ export default function CheckoutPage() {
       </div>
       
       <div className="max-w-2xl mx-auto p-4 pb-24">
+        {/* Tipo de Entrega */}
+        <Card className="mb-4">
+          <div className="p-4">
+            <h2 className="text-lg font-semibold mb-4">Tipo de Entrega</h2>
+            <RadioGroup value={deliveryType} onValueChange={(value: "balcao" | "delivery") => setDeliveryType(value)}>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
+                  <RadioGroupItem value="balcao" id="balcao" />
+                  <Label htmlFor="balcao" className="flex-1 cursor-pointer">
+                    <span className="font-medium">🏬 Retirada no Balcão</span>
+                    <p className="text-sm text-gray-600">Retire seu pedido na loja</p>
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
+                  <RadioGroupItem value="delivery" id="delivery" />
+                  <Label htmlFor="delivery" className="flex-1 cursor-pointer">
+                    <span className="font-medium">🚲 Delivery</span>
+                    <p className="text-sm text-gray-600">Receba em casa (+{formatCurrency(storeConfig?.taxa_entrega || 0)})</p>
+                  </Label>
+                </div>
+              </div>
+            </RadioGroup>
+          </div>
+        </Card>
+        
         {/* Resumo do Pedido */}
         <Card className="mb-4">
           <div className="p-4">
@@ -312,28 +337,16 @@ export default function CheckoutPage() {
           </div>
         </Card>
         
-        {/* Tipo de Entrega */}
+        {/* Observações do Pedido */}
         <Card className="mb-4">
           <div className="p-4">
-            <h2 className="text-lg font-semibold mb-4">Tipo de Entrega</h2>
-            <RadioGroup value={deliveryType} onValueChange={(value: "balcao" | "delivery") => setDeliveryType(value)}>
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
-                  <RadioGroupItem value="balcao" id="balcao" />
-                  <Label htmlFor="balcao" className="flex-1 cursor-pointer">
-                    <span className="font-medium">🏬 Retirada no Balcão</span>
-                    <p className="text-sm text-gray-600">Retire seu pedido na loja</p>
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
-                  <RadioGroupItem value="delivery" id="delivery" />
-                  <Label htmlFor="delivery" className="flex-1 cursor-pointer">
-                    <span className="font-medium">🚲 Delivery</span>
-                    <p className="text-sm text-gray-600">Receba em casa (+{formatCurrency(storeConfig?.taxa_entrega || 0)})</p>
-                  </Label>
-                </div>
-              </div>
-            </RadioGroup>
+            <h2 className="text-lg font-semibold mb-4">Observações do Pedido</h2>
+            <Textarea
+              placeholder="Ex: Sem cebola, bem passado..."
+              value={orderNotes}
+              onChange={(e) => setOrderNotes(e.target.value)}
+              rows={3}
+            />
           </div>
         </Card>
         
@@ -446,19 +459,6 @@ export default function CheckoutPage() {
             </div>
           </Card>
         )}
-        
-        {/* Observações do Pedido */}
-        <Card className="mb-4">
-          <div className="p-4">
-            <h2 className="text-lg font-semibold mb-4">Observações do Pedido</h2>
-            <Textarea
-              placeholder="Ex: Sem cebola, bem passado..."
-              value={orderNotes}
-              onChange={(e) => setOrderNotes(e.target.value)}
-              rows={3}
-            />
-          </div>
-        </Card>
         
         {/* Forma de Pagamento */}
         <Card className="mb-4">
