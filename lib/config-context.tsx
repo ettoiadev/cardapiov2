@@ -19,13 +19,14 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
   const [config, setConfig] = useState<PizzariaConfig>({
     habilitar_broto: true
   })
+  const [configId, setConfigId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   const loadConfig = async () => {
     try {
       const { data, error } = await supabase
         .from("pizzaria_config")
-        .select("habilitar_broto")
+        .select("id, habilitar_broto")
         .single()
 
       if (error) {
@@ -34,6 +35,7 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
       }
 
       if (data) {
+        setConfigId(data.id)
         setConfig({
           habilitar_broto: data.habilitar_broto ?? true
         })
@@ -47,10 +49,14 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
 
   const updateConfig = async (newConfig: Partial<PizzariaConfig>) => {
     try {
+      if (!configId) {
+        throw new Error("ID da configuração não encontrado")
+      }
+
       const { error } = await supabase
         .from("pizzaria_config")
         .update(newConfig)
-        .eq("id", "1")
+        .eq("id", configId)
 
       if (error) throw error
 
