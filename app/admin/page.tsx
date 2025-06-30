@@ -6,21 +6,21 @@ import { AdminLayout } from "@/components/admin-layout"
 import { supabase } from "@/lib/supabase"
 import { 
   Package, 
-  Users, 
   BarChart3, 
   Activity,
-  ChefHat
+  ChefHat,
+  Settings
 } from "lucide-react"
 
 interface DashboardStats {
   totalProdutos: number
-  totalClientes: number
+  totalCategorias: number
 }
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats>({
     totalProdutos: 0,
-    totalClientes: 0,
+    totalCategorias: 0,
   })
 
   useEffect(() => {
@@ -30,17 +30,17 @@ export default function AdminDashboard() {
   const loadStats = async () => {
     try {
       // Carregar estatísticas
-      const [produtosRes, clientesRes] = await Promise.all([
+      const [produtosRes, categoriasRes] = await Promise.all([
         supabase.from("produtos").select("id", { count: "exact" }).eq("ativo", true),
-        supabase.from("clientes").select("id", { count: "exact" }),
+        supabase.from("categorias").select("id", { count: "exact" }).eq("ativo", true),
       ])
 
       const totalProdutos = produtosRes.count || 0
-      const totalClientes = clientesRes.count || 0
+      const totalCategorias = categoriasRes.count || 0
 
       setStats({
         totalProdutos,
-        totalClientes,
+        totalCategorias,
       })
     } catch (error) {
       console.error("Erro ao carregar estatísticas:", error)
@@ -86,16 +86,16 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg border-0 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl overflow-hidden hover:shadow-xl transition-shadow">
+          <Card className="shadow-lg border-0 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl overflow-hidden hover:shadow-xl transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-blue-600">Total de Clientes</p>
-                  <p className="text-3xl font-bold text-gray-900">{stats.totalClientes}</p>
-                  <p className="text-xs text-blue-500">clientes cadastrados</p>
+                  <p className="text-sm font-medium text-green-600">Categorias Ativas</p>
+                  <p className="text-3xl font-bold text-gray-900">{stats.totalCategorias}</p>
+                  <p className="text-xs text-green-500">categorias do cardápio</p>
                 </div>
-                <div className="p-3 bg-blue-200 rounded-xl">
-                  <Users className="h-8 w-8 text-blue-600" />
+                <div className="p-3 bg-green-200 rounded-xl">
+                  <ChefHat className="h-8 w-8 text-green-600" />
                 </div>
               </div>
             </CardContent>
@@ -130,12 +130,12 @@ export default function AdminDashboard() {
                   <span className="text-xl font-bold text-orange-600">{stats.totalProdutos}</span>
                 </div>
                 
-                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-100">
+                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100">
                   <div className="flex items-center gap-3">
-                    <Users className="h-5 w-5 text-blue-600" />
-                    <span className="font-medium text-gray-900">Clientes cadastrados</span>
+                    <ChefHat className="h-5 w-5 text-green-600" />
+                    <span className="font-medium text-gray-900">Categorias ativas</span>
                   </div>
-                  <span className="text-xl font-bold text-blue-600">{stats.totalClientes}</span>
+                  <span className="text-xl font-bold text-green-600">{stats.totalCategorias}</span>
                 </div>
               </div>
             </CardContent>
@@ -168,16 +168,7 @@ export default function AdminDashboard() {
                     <p className="text-sm text-gray-600">Organize produtos e categorias do cardápio</p>
                   </div>
                 </div>
-                
-                <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200 hover:shadow-md transition-shadow">
-                  <div className="p-2 bg-blue-200 rounded-lg">
-                    <Users className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Visualizar Clientes</h3>
-                    <p className="text-sm text-gray-600">Acompanhe clientes cadastrados</p>
-                  </div>
-                </div>
+
                 
                 <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
                   <div className="p-2 bg-gray-200 rounded-lg">

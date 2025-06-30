@@ -128,41 +128,10 @@ export type Database = {
           ordem?: number
         }
       }
-      clientes: {
-        Row: {
-          id: string
-          nome: string
-          email: string | null
-          telefone: string | null
-          endereco: string | null
-          cep: string | null
-          cidade: string | null
-          estado: string | null
-          created_at: string
-        }
-        Insert: {
-          nome: string
-          email?: string | null
-          telefone?: string | null
-          endereco?: string | null
-          cep?: string | null
-          cidade?: string | null
-          estado?: string | null
-        }
-        Update: {
-          nome?: string
-          email?: string | null
-          telefone?: string | null
-          endereco?: string | null
-          cep?: string | null
-          cidade?: string | null
-          estado?: string | null
-        }
-      }
+
       pedidos: {
         Row: {
           id: string
-          cliente_id: string | null
           tipo_entrega: string
           endereco_entrega: string | null
           forma_pagamento: string | null
@@ -175,7 +144,6 @@ export type Database = {
           created_at: string
         }
         Insert: {
-          cliente_id?: string | null
           tipo_entrega: string
           endereco_entrega?: string | null
           forma_pagamento?: string | null
@@ -187,7 +155,6 @@ export type Database = {
           enviado_whatsapp?: boolean
         }
         Update: {
-          cliente_id?: string | null
           tipo_entrega?: string
           endereco_entrega?: string | null
           forma_pagamento?: string | null
