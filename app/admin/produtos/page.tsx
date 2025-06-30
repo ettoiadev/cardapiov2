@@ -167,6 +167,21 @@ export default function AdminProdutosPage() {
     }
   }
 
+  const handleToggleDisponibilidade = async (produtoId: string, novoStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('produtos')
+        .update({ ativo: novoStatus })
+        .eq('id', produtoId)
+
+      if (error) throw error
+      await loadData()
+    } catch (error) {
+      console.error('Erro ao atualizar disponibilidade:', error)
+      alert('Erro ao atualizar disponibilidade. Tente novamente.')
+    }
+  }
+
   const handleSaveCategoria = async (categoria: Partial<Categoria>) => {
     try {
       if (editingCategoria?.id) {
@@ -593,7 +608,7 @@ export default function AdminProdutosPage() {
                                 <div className="flex items-center gap-2 mt-1">
                                   <Badge 
                                     variant={produto.ativo ? "default" : "secondary"}
-                                    className="text-xs"
+                                    className={`text-xs ${produto.ativo ? 'bg-green-600 hover:bg-green-700 text-white' : ''}`}
                                   >
                                     {produto.ativo ? "Ativo" : "Inativo"}
                                   </Badge>
@@ -632,6 +647,23 @@ export default function AdminProdutosPage() {
                             </p>
                           )}
 
+                          {/* Exibir adicionais se existirem */}
+                          {produto.adicionais && produto.adicionais.length > 0 && (
+                            <div className="mb-4">
+                              <div className="text-xs text-gray-500 mb-2 font-medium">Adicionais:</div>
+                              <div className="space-y-1">
+                                {produto.adicionais.map((adicional, index) => (
+                                  <div key={index} className="flex justify-between items-center text-xs text-gray-600 bg-orange-50 px-2 py-1 rounded">
+                                    <span>{adicional.nome}</span>
+                                    <span className="font-medium text-green-600">
+                                      +{formatCurrency(adicional.preco)}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
                           <div className="space-y-3">
                             <div className="bg-white rounded-lg p-3 border border-orange-100">
                               <div className="flex justify-between items-center">
@@ -654,6 +686,22 @@ export default function AdminProdutosPage() {
                                   </span>
                                 </div>
                               )}
+                            </div>
+
+                            {/* Toggle de disponibilidade no card */}
+                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-orange-100">
+                              <span className="text-xs text-gray-600 font-medium">
+                                {produto.ativo ? "Disponível" : "Indisponível"}
+                              </span>
+                              <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={produto.ativo}
+                                  onChange={(e) => handleToggleDisponibilidade(produto.id, e.target.checked)}
+                                  className="sr-only peer"
+                                />
+                                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-600"></div>
+                              </label>
                             </div>
 
                             <div className="flex items-center justify-between text-xs text-gray-500">
@@ -1074,7 +1122,9 @@ function ProdutoForm({
       <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-700">Produto disponível</span>
+            <span className="text-sm font-medium text-gray-700">
+              {formData.ativo ? "Produto disponível" : "Produto indisponível"}
+            </span>
           </div>
         </div>
         <label className="relative inline-flex items-center cursor-pointer">
