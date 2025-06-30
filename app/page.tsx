@@ -491,7 +491,7 @@ function HomePageContent() {
   }
 
   return (
-      <div className="min-h-screen bg-gray-50 scroll-smooth">
+      <div className="relative min-h-screen bg-gray-50 scroll-smooth">
         {/* Header com foto de capa e perfil */}
         <div className="relative">
           <div
@@ -548,7 +548,7 @@ function HomePageContent() {
         </div>
 
         {/* Cardápio */}
-        <div className="px-4 py-4 space-y-4 pb-cart-safe overflow-y-auto">
+        <div className="px-4 py-4 space-y-4 pb-36 md:pb-20 overflow-y-auto">
           {/* Seção Pizzas */}
           <Card>
             <CardContent className="p-4">

@@ -78,9 +78,9 @@ export function CartFooter() {
   return (
     <>
       {/* Desktop Layout */}
-      <div className="hidden md:block fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 cart-footer-shadow cart-footer-desktop z-50">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="grid grid-cols-3 items-center gap-4">
+      <div className="hidden md:block fixed bottom-0 left-0 right-0 w-full h-20 bg-white border-t border-neutral-200 cart-footer-shadow z-50">
+        <div className="max-w-7xl mx-auto px-4 h-full flex items-center">
+          <div className="grid grid-cols-3 items-center gap-4 w-full">
             {/* Coluna Esquerda - Lixeira */}
             <div className="flex justify-start">
               <div className="relative">
@@ -141,8 +141,8 @@ export function CartFooter() {
       </div>
 
       {/* Mobile Layout */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 cart-footer-shadow cart-footer-mobile z-50">
-        <div className="p-4 space-y-3">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 w-full min-h-[140px] bg-white border-t border-neutral-200 cart-footer-shadow z-50">
+        <div className="p-4 space-y-3 h-full flex flex-col justify-center">
           {/* Linha Superior - Contador e Lixeira */}
           <div className="flex items-center justify-between">
             <div className={`flex items-center space-x-3 ${itemsAnimation ? 'smooth-bounce' : ''}`}>
