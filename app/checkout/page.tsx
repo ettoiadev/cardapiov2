@@ -300,8 +300,8 @@ export default function CheckoutPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className={`relative p-4 border-2 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md cursor-pointer ${
                   deliveryType === "balcao" 
-                    ? "border-primary ring-1 ring-primary/30 bg-orange-100" 
-                    : "border-border hover:border-primary/50 bg-orange-50"
+                    ? "border-orange-400 ring-1 ring-orange-300 bg-orange-100" 
+                    : "border-orange-300 hover:border-orange-400 bg-orange-50"
                 }`}>
                   <RadioGroupItem value="balcao" id="balcao" className="absolute top-3 right-3" />
                   <Label htmlFor="balcao" className="flex flex-col items-center text-center space-y-3 cursor-pointer">
@@ -320,8 +320,8 @@ export default function CheckoutPage() {
                 </div>
                 <div className={`relative p-4 border-2 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md cursor-pointer ${
                   deliveryType === "delivery" 
-                    ? "border-primary ring-1 ring-primary/30 bg-blue-100" 
-                    : "border-border hover:border-primary/50 bg-blue-50"
+                    ? "border-blue-400 ring-1 ring-blue-300 bg-blue-100" 
+                    : "border-blue-300 hover:border-blue-400 bg-blue-50"
                 }`}>
                   <RadioGroupItem value="delivery" id="delivery" className="absolute top-3 right-3" />
                   <Label htmlFor="delivery" className="flex flex-col items-center text-center space-y-3 cursor-pointer">
