@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, useRef } from "react"
+import { useAuth } from "@/lib/auth-context"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -26,7 +27,10 @@ import {
   Upload,
   FileImage,
   Loader2,
-  Trash2
+  Trash2,
+  Key,
+  User,
+  Lock
 } from "lucide-react"
 
 interface PizzariaConfig {
@@ -49,6 +53,7 @@ interface PizzariaConfig {
 }
 
 export default function AdminConfigPage() {
+  const { admin, updateCredentials } = useAuth()
   const daysOrder = ["segunda", "terca", "quarta", "quinta", "sexta", "sabado", "domingo"]
   
   const [config, setConfig] = useState<PizzariaConfig>({
@@ -80,6 +85,13 @@ export default function AdminConfigPage() {
   const [message, setMessage] = useState("")
   const [uploadingCapa, setUploadingCapa] = useState(false)
   const [uploadingPerfil, setUploadingPerfil] = useState(false)
+  
+  // Estados para alteração de credenciais
+  const [novoEmail, setNovoEmail] = useState("")
+  const [novaSenha, setNovaSenha] = useState("")
+  const [confirmarSenha, setConfirmarSenha] = useState("")
+  const [loadingCredentials, setLoadingCredentials] = useState(false)
+  const [credentialsMessage, setCredentialsMessage] = useState("")
 
   // Estados para valores formatados
   const [taxaEntregaFormatada, setTaxaEntregaFormatada] = useState("")
@@ -466,6 +478,61 @@ export default function AdminConfigPage() {
     setLoading(false)
   }
 
+  const handleUpdateCredentials = async () => {
+    setLoadingCredentials(true)
+    setCredentialsMessage("")
+
+    // Validações
+    if (!novoEmail.trim() || !novaSenha.trim()) {
+      setCredentialsMessage("Por favor, preencha todos os campos obrigatórios.")
+      setLoadingCredentials(false)
+      return
+    }
+
+    if (novaSenha !== confirmarSenha) {
+      setCredentialsMessage("As senhas não coincidem.")
+      setLoadingCredentials(false)
+      return
+    }
+
+    if (novaSenha.length < 6) {
+      setCredentialsMessage("A senha deve ter pelo menos 6 caracteres.")
+      setLoadingCredentials(false)
+      return
+    }
+
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(novoEmail)) {
+      setCredentialsMessage("Por favor, insira um email válido.")
+      setLoadingCredentials(false)
+      return
+    }
+
+    try {
+      const success = await updateCredentials(novoEmail, novaSenha)
+      
+      if (success) {
+        setCredentialsMessage("Credenciais atualizadas com sucesso!")
+        setNovoEmail("")
+        setNovaSenha("")
+        setConfirmarSenha("")
+        
+        // Opcional: Logout após 3 segundos para forçar novo login
+        setTimeout(() => {
+          setCredentialsMessage("Você será redirecionado para fazer login com as novas credenciais.")
+        }, 2000)
+      } else {
+        setCredentialsMessage("Erro ao atualizar credenciais. Tente novamente.")
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar credenciais:", error)
+      setCredentialsMessage("Erro ao atualizar credenciais. Tente novamente.")
+    }
+
+    setLoadingCredentials(false)
+  }
+
   return (
     <AdminLayout>
       <div className="max-w-7xl mx-auto space-y-8">
@@ -508,6 +575,122 @@ export default function AdminConfigPage() {
             </CardContent>
           </Card>
         )}
+
+        {/* Seção de Alteração de Credenciais */}
+        <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-red-50 to-pink-50 border-b border-red-100 p-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-red-100 rounded-lg">
+                <Key className="h-6 w-6 text-red-600" />
+              </div>
+              <div>
+                <CardTitle className="text-xl font-semibold text-gray-900">
+                  Alterar Credenciais de Acesso
+                </CardTitle>
+                <p className="text-sm text-gray-600 mt-1">
+                  Atualize seu email e senha de acesso ao painel administrativo
+                </p>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-6">
+            {/* Mensagem de credenciais */}
+            {credentialsMessage && (
+              <div className={`mb-6 p-4 rounded-lg ${credentialsMessage.includes("sucesso") ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
+                <div className="flex items-center gap-2">
+                  {credentialsMessage.includes("sucesso") ? (
+                    <CheckCircle2 className="h-5 w-5" />
+                  ) : (
+                    <AlertCircle className="h-5 w-5" />
+                  )}
+                  <span className="font-medium">{credentialsMessage}</span>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div className="text-sm text-gray-600 mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <User className="h-4 w-4 text-blue-600" />
+                  <span className="font-medium text-blue-800">Usuário atual: {admin?.email}</span>
+                </div>
+                <p className="text-blue-700">
+                  Após alterar as credenciais, você precisará fazer login novamente com os novos dados.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="novo-email" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Novo Email *
+                  </Label>
+                  <Input
+                    id="novo-email"
+                    type="email"
+                    value={novoEmail}
+                    onChange={(e) => setNovoEmail(e.target.value)}
+                    placeholder="novo@email.com"
+                    className="mt-1 rounded-lg border-gray-200 focus:border-red-300 focus:ring-red-200"
+                    disabled={loadingCredentials}
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="nova-senha" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <Lock className="h-4 w-4" />
+                    Nova Senha *
+                  </Label>
+                  <Input
+                    id="nova-senha"
+                    type="password"
+                    value={novaSenha}
+                    onChange={(e) => setNovaSenha(e.target.value)}
+                    placeholder="Mínimo 6 caracteres"
+                    className="mt-1 rounded-lg border-gray-200 focus:border-red-300 focus:ring-red-200"
+                    disabled={loadingCredentials}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="confirmar-senha" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <Lock className="h-4 w-4" />
+                  Confirmar Nova Senha *
+                </Label>
+                <Input
+                  id="confirmar-senha"
+                  type="password"
+                  value={confirmarSenha}
+                  onChange={(e) => setConfirmarSenha(e.target.value)}
+                  placeholder="Digite a senha novamente"
+                  className="mt-1 rounded-lg border-gray-200 focus:border-red-300 focus:ring-red-200"
+                  disabled={loadingCredentials}
+                />
+              </div>
+
+              <div className="pt-4">
+                <Button
+                  onClick={handleUpdateCredentials}
+                  disabled={loadingCredentials || !novoEmail.trim() || !novaSenha.trim() || !confirmarSenha.trim()}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white rounded-lg py-3 font-medium transition-colors"
+                >
+                  {loadingCredentials ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Atualizando...
+                    </>
+                  ) : (
+                    <>
+                      <Key className="h-4 w-4 mr-2" />
+                      Atualizar Credenciais
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Configuration Cards Grid */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">

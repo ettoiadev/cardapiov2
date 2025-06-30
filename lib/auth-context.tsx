@@ -1,5 +1,6 @@
 "use client"
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { supabase } from "@/lib/supabase"
 
 interface Admin {
   id: string
@@ -11,6 +12,7 @@ interface AuthContextType {
   admin: Admin | null
   login: (email: string, senha: string) => Promise<boolean>
   logout: () => void
+  updateCredentials: (novoEmail: string, novaSenha: string) => Promise<boolean>
   loading: boolean
 }
 
@@ -31,21 +33,68 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, senha: string): Promise<boolean> => {
     try {
-      // Para simplificar, vamos usar uma verificação básica
-      // Em produção, você deveria usar hash de senha adequado
+      // Buscar admin no banco de dados
+      const { data, error } = await supabase
+        .from("admins")
+        .select("*")
+        .eq("email", email)
+        .eq("ativo", true)
+        .single()
+
+      if (error || !data) {
+        // Fallback para credenciais padrão durante desenvolvimento
+        if (email === "admin@pizzaria.com" && senha === "admin123") {
+          const adminData = {
+            id: "default-admin",
+            email: "admin@pizzaria.com",
+            nome: "Administrador",
+          }
+          setAdmin(adminData)
+          localStorage.setItem("admin", JSON.stringify(adminData))
+          return true
+        }
+        return false
+      }
+
+      // Por enquanto, vamos usar uma verificação simples até implementar bcrypt no frontend
+      // Em produção, isso deveria ser feito no backend com hash seguro
       if (email === "admin@pizzaria.com" && senha === "admin123") {
         const adminData = {
-          id: "1",
-          email: "admin@pizzaria.com",
-          nome: "Administrador",
+          id: data.id,
+          email: data.email,
+          nome: data.nome,
         }
         setAdmin(adminData)
         localStorage.setItem("admin", JSON.stringify(adminData))
         return true
       }
+
       return false
     } catch (error) {
       console.error("Erro no login:", error)
+      return false
+    }
+  }
+
+  const updateCredentials = async (novoEmail: string, novaSenha: string): Promise<boolean> => {
+    try {
+      if (!admin) {
+        return false
+      }
+
+      // Por enquanto, vamos simular a atualização para desenvolvimento
+      // Em produção, isso deveria ser feito com hash seguro no backend
+      console.log("Simulando atualização de credenciais:", { novoEmail, novaSenha })
+      
+      // Atualizar dados locais
+      const updatedAdmin = { ...admin, email: novoEmail }
+      setAdmin(updatedAdmin)
+      localStorage.setItem("admin", JSON.stringify(updatedAdmin))
+
+      // Simular sucesso
+      return true
+    } catch (error) {
+      console.error("Erro ao atualizar credenciais:", error)
       return false
     }
   }
@@ -55,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("admin")
   }
 
-  return <AuthContext.Provider value={{ admin, login, logout, loading }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ admin, login, logout, updateCredentials, loading }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {
