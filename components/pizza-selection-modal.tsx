@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/lib/cart-context"
+import { useConfig } from "@/lib/config-context"
 import { formatCurrency } from "@/lib/currency-utils"
 
 interface Produto {
@@ -32,6 +33,7 @@ export function PizzaSelectionModal({ pizza, isOpen, onClose, multiFlavorMode = 
   const [selectedSize, setSelectedSize] = useState<"broto" | "tradicional">("tradicional")
   const [selectedFlavors, setSelectedFlavors] = useState<string[]>([])
   const { dispatch } = useCart()
+  const { config } = useConfig()
   const router = useRouter()
 
   const handleFlavorSelection = (flavorName: string) => {
@@ -165,7 +167,7 @@ export function PizzaSelectionModal({ pizza, isOpen, onClose, multiFlavorMode = 
               onValueChange={(value) => setSelectedSize(value as "broto" | "tradicional")}
               className="space-y-2"
             >
-              {(multiFlavorMode ? true : pizza.preco_broto) && (
+              {config.habilitar_broto && (multiFlavorMode ? true : pizza.preco_broto) && (
                 <div className="flex items-center space-x-2 p-3 border rounded-lg">
                   <RadioGroupItem value="broto" id="broto" />
                   <Label htmlFor="broto" className="flex-1 cursor-pointer">

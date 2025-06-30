@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Plus, Minus, CreditCard, Banknote, Check } from "lucide-react"
 import { supabase, isSupabaseConfigured } from "@/lib/supabase"
 import { useCart } from "@/lib/cart-context"
+import { useConfig } from "@/lib/config-context"
 import { PizzaSelectionModal } from "@/components/pizza-selection-modal"
 import { StoreInfoModal } from "@/components/store-info-modal"
 import { CartFooter } from "@/components/cart-footer"
@@ -196,6 +197,7 @@ function HomePageContent() {
   const [selectedSingleFlavor, setSelectedSingleFlavor] = useState<string | null>(null)
 
   const { dispatch, state: cartState } = useCart()
+  const { config: pizzariaConfig } = useConfig()
   const router = useRouter()
 
   useEffect(() => {
@@ -664,7 +666,7 @@ function HomePageContent() {
                           </div>
                           {pizza.descricao && <p className="text-sm text-gray-600 mt-1">{pizza.descricao}</p>}
                           <div className="flex items-center space-x-4 mt-2">
-                            {pizza.preco_broto && (
+                            {pizzariaConfig.habilitar_broto && pizza.preco_broto && (
                               <span className="text-sm">Broto: {formatCurrency(pizza.preco_broto)}</span>
                             )}
                             {pizza.preco_tradicional && (

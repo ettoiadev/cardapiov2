@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { AdminLayout } from "@/components/admin-layout"
 import { supabase } from "@/lib/supabase"
+import { useConfig } from "@/lib/config-context"
 import { formatCurrency, formatCurrencyInput, parseCurrencyInput } from "@/lib/currency-utils"
 import { 
   Plus, 
@@ -70,6 +71,8 @@ export default function AdminProdutosPage() {
   const [editingCategoria, setEditingCategoria] = useState<Categoria | null>(null)
   const [isCategoriaDialogOpen, setIsCategoriaDialogOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
+  
+  const { config, updateConfig } = useConfig()
 
   useEffect(() => {
     loadData()
@@ -146,6 +149,15 @@ export default function AdminProdutosPage() {
       )
     } catch (error) {
       console.error("Erro ao atualizar opcao de sabor:", error)
+    }
+  }
+
+  const handleToggleBroto = async (novoStatus: boolean) => {
+    try {
+      await updateConfig({ habilitar_broto: novoStatus })
+    } catch (error) {
+      console.error("Erro ao atualizar configuração de broto:", error)
+      alert("Erro ao salvar configuração. Tente novamente.")
     }
   }
 
@@ -292,6 +304,7 @@ export default function AdminProdutosPage() {
                   <ProdutoForm
                     produto={editingProduto}
                     categorias={categorias}
+                    brotoHabilitado={config.habilitar_broto}
                     onSave={handleSave}
                     onCancel={() => setIsDialogOpen(false)}
                   />
@@ -528,13 +541,30 @@ export default function AdminProdutosPage() {
                 {pizzas.length > 0 && (
                   <div>
                     <div className="bg-gradient-to-r from-orange-100 to-amber-100 rounded-xl p-4 mb-6 border border-orange-200">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-orange-200 rounded-lg">
-                          <Pizza className="h-6 w-6 text-orange-700" />
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-orange-200 rounded-lg">
+                            <Pizza className="h-6 w-6 text-orange-700" />
+                          </div>
+                          <div>
+                            <h2 className="text-xl font-bold text-orange-900">Pizzas</h2>
+                            <p className="text-sm text-orange-700">{pizzas.length} pizza{pizzas.length !== 1 ? 's' : ''} cadastrada{pizzas.length !== 1 ? 's' : ''}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h2 className="text-xl font-bold text-orange-900">Pizzas</h2>
-                          <p className="text-sm text-orange-700">{pizzas.length} pizza{pizzas.length !== 1 ? 's' : ''} cadastrada{pizzas.length !== 1 ? 's' : ''}</p>
+                        <div className="flex items-center gap-3 bg-white/70 rounded-lg p-3 border border-orange-200">
+                          <div className="flex items-center gap-2">
+                            <Pizza className="h-4 w-4 text-orange-700" />
+                            <span className="text-sm font-medium text-orange-900">Habilitar Pizza Broto</span>
+                          </div>
+                          <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={config.habilitar_broto}
+                              onChange={(e) => handleToggleBroto(e.target.checked)}
+                              className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+                          </label>
                         </div>
                       </div>
                     </div>
@@ -607,7 +637,7 @@ export default function AdminProdutosPage() {
                                   {formatCurrency(produto.preco_tradicional)}
                                 </span>
                               </div>
-                              {produto.preco_broto && (
+                              {config.habilitar_broto && produto.preco_broto && (
                                 <div className="flex justify-between items-center mt-2 pt-2 border-t border-orange-100">
                                   <span className="text-sm text-gray-600 flex items-center gap-2">
                                     <Pizza className="h-3 w-3" />
@@ -884,11 +914,13 @@ export default function AdminProdutosPage() {
 function ProdutoForm({
   produto,
   categorias,
+  brotoHabilitado,
   onSave,
   onCancel,
 }: {
   produto: Produto | null
   categorias: Categoria[]
+  brotoHabilitado: boolean
   onSave: (produto: Partial<Produto>) => void
   onCancel: () => void
 }) {
@@ -990,22 +1022,24 @@ function ProdutoForm({
             className="mt-1 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200"
           />
         </div>
-        <div>
-          <Label htmlFor="preco_broto" className="text-sm font-medium text-gray-700">Preço Broto</Label>
-          <Input
-            id="preco_broto"
-            type="text"
-            value={precoBrotoFormatado}
-            onChange={(e) => {
-              const valorFormatado = formatCurrencyInput(e.target.value)
-              setPrecoBrotoFormatado(valorFormatado)
-              const valorNumerico = parseCurrencyInput(valorFormatado)
-              setFormData({ ...formData, preco_broto: valorNumerico })
-            }}
-            placeholder="R$ 0,00"
-            className="mt-1 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200"
-          />
-        </div>
+        {brotoHabilitado && (
+          <div>
+            <Label htmlFor="preco_broto" className="text-sm font-medium text-gray-700">Preço Broto</Label>
+            <Input
+              id="preco_broto"
+              type="text"
+              value={precoBrotoFormatado}
+              onChange={(e) => {
+                const valorFormatado = formatCurrencyInput(e.target.value)
+                setPrecoBrotoFormatado(valorFormatado)
+                const valorNumerico = parseCurrencyInput(valorFormatado)
+                setFormData({ ...formData, preco_broto: valorNumerico })
+              }}
+              placeholder="R$ 0,00"
+              className="mt-1 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200"
+            />
+          </div>
+        )}
       </div>
 
       <div className="flex items-center justify-between">
