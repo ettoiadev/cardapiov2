@@ -13,6 +13,7 @@ import { useConfig } from "@/lib/config-context"
 import { PizzaSelectionModal } from "@/components/pizza-selection-modal"
 import { StoreInfoModal } from "@/components/store-info-modal"
 import { CartFooter } from "@/components/cart-footer"
+import { SocialFooter } from "@/components/social-footer"
 import { formatCurrency } from "@/lib/currency-utils"
 
 interface PizzariaConfig {
@@ -771,6 +772,9 @@ function HomePageContent() {
         {/* Modals */}
 
         <StoreInfoModal isOpen={showStoreInfo} onClose={() => setShowStoreInfo(false)} config={config} />
+
+        {/* Rodapé com redes sociais */}
+        <SocialFooter hasCartItems={cartState.items.length > 0} />
 
         {/* Carrinho fixo no rodapé */}
         <CartFooter />

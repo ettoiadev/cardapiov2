@@ -30,7 +30,10 @@ import {
   Trash2,
   Key,
   User,
-  Lock
+  Lock,
+  Instagram,
+  Facebook,
+  Share2
 } from "lucide-react"
 
 interface PizzariaConfig {
@@ -50,6 +53,15 @@ interface PizzariaConfig {
   telefone: string
   whatsapp: string
   horario_funcionamento: any
+  whatsapp_ativo: boolean
+  whatsapp_link: string
+  instagram_ativo: boolean
+  instagram_link: string
+  facebook_ativo: boolean
+  facebook_link: string
+  maps_ativo: boolean
+  maps_link: string
+  compartilhar_ativo: boolean
 }
 
 export default function AdminConfigPage() {
@@ -80,6 +92,15 @@ export default function AdminConfigPage() {
       sabado: "18:00-00:00",
       domingo: "18:00-23:00",
     },
+    whatsapp_ativo: true,
+    whatsapp_link: "",
+    instagram_ativo: false,
+    instagram_link: "",
+    facebook_ativo: false,
+    facebook_link: "",
+    maps_ativo: false,
+    maps_link: "",
+    compartilhar_ativo: true,
   })
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
@@ -430,6 +451,15 @@ export default function AdminConfigPage() {
             sabado: "18:00-00:00",
             domingo: "18:00-23:00",
           },
+          whatsapp_ativo: data.whatsapp_ativo !== undefined ? data.whatsapp_ativo : true,
+          whatsapp_link: data.whatsapp_link || "",
+          instagram_ativo: data.instagram_ativo !== undefined ? data.instagram_ativo : false,
+          instagram_link: data.instagram_link || "",
+          facebook_ativo: data.facebook_ativo !== undefined ? data.facebook_ativo : false,
+          facebook_link: data.facebook_link || "",
+          maps_ativo: data.maps_ativo !== undefined ? data.maps_ativo : false,
+          maps_link: data.maps_link || "",
+          compartilhar_ativo: data.compartilhar_ativo !== undefined ? data.compartilhar_ativo : true,
         }
         setConfig(configData)
         
@@ -768,6 +798,124 @@ export default function AdminConfigPage() {
                     placeholder="5511999887766"
                     className="mt-1 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200"
                   />
+                </div>
+              </div>
+
+              {/* Seção Redes Sociais do Rodapé */}
+              <div className="border-t border-gray-200 pt-6">
+                <Label className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-4">
+                  <Share2 className="h-4 w-4" />
+                  Redes Sociais do Rodapé
+                </Label>
+                <p className="text-sm text-gray-600 mb-4">
+                  Configure quais ícones de redes sociais aparecerão no rodapé do cardápio
+                </p>
+                
+                <div className="space-y-4">
+                  {/* WhatsApp */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 transition-colors hover:bg-gray-100">
+                      <input
+                        type="checkbox"
+                        checked={config.whatsapp_ativo}
+                        onChange={(e) => setConfig({ ...config, whatsapp_ativo: e.target.checked })}
+                        className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                      />
+                      <MessageCircle className="h-4 w-4 text-green-600" />
+                      <span className="text-sm font-medium text-gray-900">WhatsApp</span>
+                    </label>
+                    {config.whatsapp_ativo && (
+                      <Input
+                        value={config.whatsapp_link}
+                        onChange={(e) => setConfig({ ...config, whatsapp_link: e.target.value })}
+                        placeholder="https://wa.me/5511999887766"
+                        className="ml-7 rounded-lg border-gray-200 focus:border-green-300 focus:ring-green-200"
+                      />
+                    )}
+                  </div>
+
+                  {/* Instagram */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 transition-colors hover:bg-gray-100">
+                      <input
+                        type="checkbox"
+                        checked={config.instagram_ativo}
+                        onChange={(e) => setConfig({ ...config, instagram_ativo: e.target.checked })}
+                        className="w-4 h-4 text-pink-600 border-gray-300 rounded focus:ring-pink-500"
+                      />
+                      <Instagram className="h-4 w-4 text-pink-600" />
+                      <span className="text-sm font-medium text-gray-900">Instagram</span>
+                    </label>
+                    {config.instagram_ativo && (
+                      <Input
+                        value={config.instagram_link}
+                        onChange={(e) => setConfig({ ...config, instagram_link: e.target.value })}
+                        placeholder="https://instagram.com/suapizzaria"
+                        className="ml-7 rounded-lg border-gray-200 focus:border-pink-300 focus:ring-pink-200"
+                      />
+                    )}
+                  </div>
+
+                  {/* Facebook */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 transition-colors hover:bg-gray-100">
+                      <input
+                        type="checkbox"
+                        checked={config.facebook_ativo}
+                        onChange={(e) => setConfig({ ...config, facebook_ativo: e.target.checked })}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <Facebook className="h-4 w-4 text-blue-600" />
+                      <span className="text-sm font-medium text-gray-900">Facebook</span>
+                    </label>
+                    {config.facebook_ativo && (
+                      <Input
+                        value={config.facebook_link}
+                        onChange={(e) => setConfig({ ...config, facebook_link: e.target.value })}
+                        placeholder="https://facebook.com/suapizzaria"
+                        className="ml-7 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200"
+                      />
+                    )}
+                  </div>
+
+                  {/* Google Maps */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 transition-colors hover:bg-gray-100">
+                      <input
+                        type="checkbox"
+                        checked={config.maps_ativo}
+                        onChange={(e) => setConfig({ ...config, maps_ativo: e.target.checked })}
+                        className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                      />
+                      <MapPin className="h-4 w-4 text-red-600" />
+                      <span className="text-sm font-medium text-gray-900">Google Maps</span>
+                    </label>
+                    {config.maps_ativo && (
+                      <Input
+                        value={config.maps_link}
+                        onChange={(e) => setConfig({ ...config, maps_link: e.target.value })}
+                        placeholder="https://maps.google.com/..."
+                        className="ml-7 rounded-lg border-gray-200 focus:border-red-300 focus:ring-red-200"
+                      />
+                    )}
+                  </div>
+
+                  {/* Compartilhar */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 transition-colors hover:bg-gray-100">
+                      <input
+                        type="checkbox"
+                        checked={config.compartilhar_ativo}
+                        onChange={(e) => setConfig({ ...config, compartilhar_ativo: e.target.checked })}
+                        className="w-4 h-4 text-gray-600 border-gray-300 rounded focus:ring-gray-500"
+                      />
+                      <Share2 className="h-4 w-4 text-gray-600" />
+                      <span className="text-sm font-medium text-gray-900">Compartilhar</span>
+                    </label>
+                    <p className="ml-7 text-xs text-gray-500">
+                      Permite que os clientes compartilhem o link do cardápio
+                    </p>
+                  </div>
                 </div>
               </div>
             </CardContent>
