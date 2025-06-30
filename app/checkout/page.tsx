@@ -295,21 +295,47 @@ export default function CheckoutPage() {
         {/* Tipo de Entrega */}
         <Card className="mb-4">
           <div className="p-4">
-            <h2 className="text-lg font-semibold mb-4">Tipo de Entrega</h2>
+            <h2 className="text-xl font-semibold mb-6 text-foreground">Tipo de Entrega</h2>
             <RadioGroup value={deliveryType} onValueChange={(value: "balcao" | "delivery") => setDeliveryType(value)}>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
-                  <RadioGroupItem value="balcao" id="balcao" />
-                  <Label htmlFor="balcao" className="flex-1 cursor-pointer">
-                    <span className="font-medium">🏬 Retirada no Balcão</span>
-                    <p className="text-sm text-gray-600">Retire seu pedido na loja</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div className={`relative p-4 border-2 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md cursor-pointer ${
+                  deliveryType === "balcao" 
+                    ? "border-primary ring-1 ring-primary/30 bg-primary/5" 
+                    : "border-border hover:border-primary/50"
+                }`}>
+                  <RadioGroupItem value="balcao" id="balcao" className="absolute top-3 right-3" />
+                  <Label htmlFor="balcao" className="flex flex-col items-center text-center space-y-3 cursor-pointer">
+                    <div className={`p-3 rounded-full transition-colors ${
+                      deliveryType === "balcao" ? "bg-primary text-primary-foreground" : "bg-muted"
+                    }`}>
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                    </div>
+                    <div>
+                      <span className="font-semibold text-base text-foreground block">Retirada no Balcão</span>
+                      <p className="text-sm text-muted-foreground mt-1">Retire seu pedido na loja</p>
+                    </div>
                   </Label>
                 </div>
-                <div className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
-                  <RadioGroupItem value="delivery" id="delivery" />
-                  <Label htmlFor="delivery" className="flex-1 cursor-pointer">
-                    <span className="font-medium">🚲 Delivery</span>
-                    <p className="text-sm text-gray-600">Receba em casa (+{formatCurrency(storeConfig?.taxa_entrega || 0)})</p>
+                <div className={`relative p-4 border-2 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md cursor-pointer ${
+                  deliveryType === "delivery" 
+                    ? "border-primary ring-1 ring-primary/30 bg-primary/5" 
+                    : "border-border hover:border-primary/50"
+                }`}>
+                  <RadioGroupItem value="delivery" id="delivery" className="absolute top-3 right-3" />
+                  <Label htmlFor="delivery" className="flex flex-col items-center text-center space-y-3 cursor-pointer">
+                    <div className={`p-3 rounded-full transition-colors ${
+                      deliveryType === "delivery" ? "bg-primary text-primary-foreground" : "bg-muted"
+                    }`}>
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                      </svg>
+                    </div>
+                    <div>
+                      <span className="font-semibold text-base text-foreground block">Delivery</span>
+                      <p className="text-sm text-muted-foreground mt-1">Receba em casa (+{formatCurrency(storeConfig?.taxa_entrega || 0)})</p>
+                    </div>
                   </Label>
                 </div>
               </div>
