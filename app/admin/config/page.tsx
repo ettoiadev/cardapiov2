@@ -486,6 +486,39 @@ export default function AdminConfigPage() {
     })
   }
 
+  // Novas funções para gerenciar horários separados
+  const parseHorario = (horario: string) => {
+    if (!horario || horario.toLowerCase() === 'fechado') {
+      return { inicio: '', fim: '', fechado: true }
+    }
+    
+    const match = horario.match(/(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})/)
+    if (match) {
+      const [, inicioHora, inicioMin, fimHora, fimMin] = match
+      return {
+        inicio: `${inicioHora.padStart(2, '0')}:${inicioMin}`,
+        fim: `${fimHora.padStart(2, '0')}:${fimMin}`,
+        fechado: false
+      }
+    }
+    
+    return { inicio: '', fim: '', fechado: true }
+  }
+
+  const updateHorarioSeparado = (dia: string, inicio: string, fim: string, fechado: boolean) => {
+    let novoHorario: string
+    
+    if (fechado) {
+      novoHorario = 'Fechado'
+    } else if (inicio && fim) {
+      novoHorario = `${inicio}-${fim}`
+    } else {
+      novoHorario = 'Fechado'
+    }
+    
+    updateHorario(dia, novoHorario)
+  }
+
   const handleSave = async () => {
     setLoading(true)
     setMessage("")
@@ -1180,9 +1213,10 @@ export default function AdminConfigPage() {
             </div>
           </CardHeader>
           <CardContent className="p-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {daysOrder.map((dia) => {
                 const horario = config.horario_funcionamento?.[dia] || ""
+                const { inicio, fim, fechado } = parseHorario(horario)
                 const dayNames = {
                   segunda: 'Segunda-feira',
                   terca: 'Terça-feira',
@@ -1192,25 +1226,91 @@ export default function AdminConfigPage() {
                   sabado: 'Sábado',
                   domingo: 'Domingo'
                 }
+                
                 return (
                   <div key={dia} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                    <Label htmlFor={dia} className="text-sm font-medium text-gray-700 block mb-2">
-                      {dayNames[dia as keyof typeof dayNames]}
-                    </Label>
-                    <Input
-                      id={dia}
-                      value={horario}
-                      onChange={(e) => updateHorario(dia, e.target.value)}
-                      placeholder="18:00-23:00"
-                      className="rounded-lg border-gray-200 focus:border-purple-300 focus:ring-purple-200"
-                    />
+                    {/* Cabeçalho do dia com toggle Fechado */}
+                    <div className="flex items-center justify-between mb-4">
+                      <Label className="text-sm font-medium text-gray-700">
+                        {dayNames[dia as keyof typeof dayNames]}
+                      </Label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={fechado}
+                          onChange={(e) => {
+                            const novoFechado = e.target.checked
+                            updateHorarioSeparado(dia, inicio, fim, novoFechado)
+                          }}
+                          className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                        />
+                        <span className="text-sm text-gray-600">Fechado</span>
+                      </label>
+                    </div>
+                    
+                    {/* Campos de horário */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor={`${dia}-inicio`} className="text-xs text-gray-500 mb-1 block">
+                          Abertura
+                        </Label>
+                        <input
+                          id={`${dia}-inicio`}
+                          type="time"
+                          value={inicio}
+                          disabled={fechado}
+                          onChange={(e) => updateHorarioSeparado(dia, e.target.value, fim, fechado)}
+                          className={`w-full px-3 py-2 text-sm border rounded-lg transition-colors ${
+                            fechado 
+                              ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
+                              : 'bg-white border-gray-200 focus:border-purple-300 focus:ring-purple-200 focus:ring-2 focus:ring-opacity-20'
+                          }`}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor={`${dia}-fim`} className="text-xs text-gray-500 mb-1 block">
+                          Fechamento
+                        </Label>
+                        <input
+                          id={`${dia}-fim`}
+                          type="time"
+                          value={fim}
+                          disabled={fechado}
+                          onChange={(e) => updateHorarioSeparado(dia, inicio, e.target.value, fechado)}
+                          className={`w-full px-3 py-2 text-sm border rounded-lg transition-colors ${
+                            fechado 
+                              ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' 
+                              : 'bg-white border-gray-200 focus:border-purple-300 focus:ring-purple-200 focus:ring-2 focus:ring-opacity-20'
+                          }`}
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Indicador visual do status */}
+                    <div className="mt-3 text-center">
+                      {fechado ? (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                          Fechado
+                        </span>
+                      ) : inicio && fim ? (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                          {inicio} às {fim}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
+                          Horário incompleto
+                        </span>
+                      )}
+                    </div>
                   </div>
                 )
               })}
             </div>
+            
             <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
               <p className="text-sm text-blue-700">
-                💡 <strong>Dica:</strong> Use o formato "HH:MM-HH:MM" (ex: 18:00-23:00) ou digite "Fechado" para dias sem funcionamento.
+                💡 <strong>Dica:</strong> Para cada dia, defina os horários de abertura e fechamento ou marque como "Fechado". 
+                Os horários são salvos automaticamente no formato compatível com o sistema.
               </p>
             </div>
 
