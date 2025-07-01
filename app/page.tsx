@@ -704,7 +704,7 @@ function HomePageContent() {
         </div>
 
         {/* Cardápio */}
-        <div className="px-4 py-4 space-y-4 pb-44 md:pb-40 overflow-y-auto">
+        <div className="px-4 py-4 space-y-4 pb-24 md:pb-20 overflow-y-auto">
           {/* Seção Pizzas */}
           <Card>
             <CardContent className="p-4">
