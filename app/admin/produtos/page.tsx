@@ -301,37 +301,6 @@ export default function AdminProdutosPage() {
                 Gerencie produtos, categorias e configurações de sabores do seu cardápio digital.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    size="lg"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all"
-                    onClick={() => {
-                      setEditingProduto(null)
-                      setIsDialogOpen(true)
-                    }}
-                  >
-                    <Plus className="h-5 w-5 mr-2" />
-                    Novo Produto
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl">
-                  <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold">
-                      {editingProduto ? "Editar Produto" : "Novo Produto"}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <ProdutoForm
-                    produto={editingProduto}
-                    categorias={categorias}
-                    brotoHabilitado={config.habilitar_broto}
-                    onSave={handleSave}
-                    onCancel={() => setIsDialogOpen(false)}
-                  />
-                </DialogContent>
-              </Dialog>
-            </div>
           </div>
         </div>
 
@@ -552,6 +521,35 @@ export default function AdminProdutosPage() {
                     className="pl-10 w-64 rounded-lg border-gray-200 focus:border-orange-300 focus:ring-orange-200"
                   />
                 </div>
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      size="lg"
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                      onClick={() => {
+                        setEditingProduto(null)
+                        setIsDialogOpen(true)
+                      }}
+                    >
+                      <Plus className="h-5 w-5 mr-2" />
+                      Novo Produto
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle className="text-xl font-semibold">
+                        {editingProduto ? "Editar Produto" : "Novo Produto"}
+                      </DialogTitle>
+                    </DialogHeader>
+                    <ProdutoForm
+                      produto={editingProduto}
+                      categorias={categorias}
+                      brotoHabilitado={config.habilitar_broto}
+                      onSave={handleSave}
+                      onCancel={() => setIsDialogOpen(false)}
+                    />
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </CardHeader>
