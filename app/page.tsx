@@ -627,16 +627,32 @@ function HomePageContent() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-6">
               {/* Status da Pizzaria (dinâmico) */}
-              <div className="text-center">
-                <div className={`text-sm font-medium ${
-                  storeStatus.isOpen 
-                    ? "text-green-600" 
-                    : "text-red-500"
-                }`}>
-                  {storeStatus.status}
-                </div>
-                <div className="text-xs text-gray-500">
-                  {storeStatus.nextInfo || "status"}
+              <div className="flex items-center">
+                <div className={`
+                  px-3 py-1 rounded-full border transition-all duration-200 shadow-sm
+                  ${storeStatus.isOpen 
+                    ? "bg-green-100 border-green-300" 
+                    : "bg-red-100 border-red-300"
+                  }
+                `}>
+                  <div className="text-center min-w-0">
+                    <div className={`text-sm font-medium leading-tight ${
+                      storeStatus.isOpen 
+                        ? "text-green-700" 
+                        : "text-red-700"
+                    }`}>
+                      {storeStatus.status}
+                    </div>
+                    {storeStatus.nextInfo && (
+                      <div className={`text-xs leading-tight mt-0.5 ${
+                        storeStatus.isOpen 
+                          ? "text-green-700/70" 
+                          : "text-red-700/70"
+                      }`}>
+                        {storeStatus.nextInfo}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
