@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, ShoppingBag, MapPin, Phone, User, CreditCard, DollarSign, Smartphone, Loader2, Plus, Minus } from "lucide-react"
+import { ArrowLeft, ShoppingBag, MapPin, Phone, User, CreditCard, DollarSign, Smartphone, Loader2, Plus, Minus, QrCode, Banknote, UtensilsCrossed, Bike } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -292,7 +292,7 @@ export default function CheckoutPage() {
     })
     
     // Tipo de entrega
-    message += `🚚 *ENTREGA:* ${deliveryType === "delivery" ? "Delivery" : "Retirada no Balcão"}\n\n`
+          message += `🏍️ *ENTREGA:* ${deliveryType === "delivery" ? "Delivery" : "Retirada no Balcão"}\n\n`
     
     // Dados do cliente
     message += `👤 *DADOS DO CLIENTE:*\n`
@@ -684,16 +684,18 @@ export default function CheckoutPage() {
                 {storeConfig?.aceita_pix && (
                   <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
                     <RadioGroupItem value="pix" id="pix" />
-                    <Label htmlFor="pix" className="cursor-pointer">
-                      🏦 PIX
+                    <Label htmlFor="pix" className="cursor-pointer flex items-center gap-2">
+                      <QrCode className="h-4 w-4 text-blue-600" />
+                      PIX
                     </Label>
                   </div>
                 )}
                 {storeConfig?.aceita_dinheiro && (
                   <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
                     <RadioGroupItem value="dinheiro" id="dinheiro" />
-                    <Label htmlFor="dinheiro" className="cursor-pointer">
-                      💵 Dinheiro
+                    <Label htmlFor="dinheiro" className="cursor-pointer flex items-center gap-2">
+                      <Banknote className="h-4 w-4 text-green-600" />
+                      Dinheiro
                     </Label>
                   </div>
                 )}
@@ -701,14 +703,16 @@ export default function CheckoutPage() {
                   <>
                     <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
                       <RadioGroupItem value="debito" id="debito" />
-                      <Label htmlFor="debito" className="cursor-pointer">
-                        💳 Cartão de Débito
+                      <Label htmlFor="debito" className="cursor-pointer flex items-center gap-2">
+                        <CreditCard className="h-4 w-4 text-purple-600" />
+                        Cartão de Débito
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
                       <RadioGroupItem value="credito" id="credito" />
-                      <Label htmlFor="credito" className="cursor-pointer">
-                        💳 Cartão de Crédito
+                      <Label htmlFor="credito" className="cursor-pointer flex items-center gap-2">
+                        <CreditCard className="h-4 w-4 text-orange-600" />
+                        Cartão de Crédito
                       </Label>
                     </div>
                   </>
@@ -716,8 +720,9 @@ export default function CheckoutPage() {
                 {storeConfig?.aceita_ticket_alimentacao && (
                   <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
                     <RadioGroupItem value="ticket_alimentacao" id="ticket_alimentacao" />
-                    <Label htmlFor="ticket_alimentacao" className="cursor-pointer">
-                      🍽️ Ticket Alimentação
+                    <Label htmlFor="ticket_alimentacao" className="cursor-pointer flex items-center gap-2">
+                      <UtensilsCrossed className="h-4 w-4 text-amber-600" />
+                      Ticket Alimentação
                     </Label>
                   </div>
                 )}

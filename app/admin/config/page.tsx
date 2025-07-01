@@ -17,7 +17,7 @@ import {
   MapPin, 
   Phone, 
   MessageCircle, 
-  Truck, 
+  Bike, 
   DollarSign, 
   Clock, 
   CreditCard, 
@@ -33,7 +33,10 @@ import {
   Lock,
   Instagram,
   Facebook,
-  Share2
+  Share2,
+  QrCode,
+  Banknote,
+  UtensilsCrossed
 } from "lucide-react"
 
 interface PizzariaConfig {
@@ -1042,7 +1045,7 @@ export default function AdminConfigPage() {
             <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 p-5">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-green-100 rounded-lg">
-                  <Truck className="h-6 w-6 text-green-600" />
+                  <Bike className="h-6 w-6 text-green-600" />
                 </div>
                 <div>
                   <CardTitle className="text-lg font-semibold text-gray-900">
@@ -1139,7 +1142,10 @@ export default function AdminConfigPage() {
                       onChange={(e) => setConfig({ ...config, aceita_dinheiro: e.target.checked })}
                       className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
                     />
-                    <span className="text-sm font-medium text-gray-900">💵 Dinheiro</span>
+                    <span className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                      <Banknote className="h-4 w-4 text-green-600" />
+                      Dinheiro
+                    </span>
                   </label>
                   <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 transition-colors hover:bg-gray-100">
                     <input
@@ -1148,7 +1154,10 @@ export default function AdminConfigPage() {
                       onChange={(e) => setConfig({ ...config, aceita_cartao: e.target.checked })}
                       className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
                     />
-                    <span className="text-sm font-medium text-gray-900">💳 Cartão</span>
+                    <span className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                      <CreditCard className="h-4 w-4 text-purple-600" />
+                      Cartão
+                    </span>
                   </label>
                   <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 transition-colors hover:bg-gray-100">
                     <input
@@ -1157,7 +1166,10 @@ export default function AdminConfigPage() {
                       onChange={(e) => setConfig({ ...config, aceita_pix: e.target.checked })}
                       className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
                     />
-                    <span className="text-sm font-medium text-gray-900">🏦 Pix</span>
+                    <span className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                      <QrCode className="h-4 w-4 text-blue-600" />
+                      Pix
+                    </span>
                   </label>
                   <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 transition-colors hover:bg-gray-100">
                     <input
@@ -1166,7 +1178,10 @@ export default function AdminConfigPage() {
                       onChange={(e) => setConfig({ ...config, aceita_ticket_alimentacao: e.target.checked })}
                       className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
                     />
-                    <span className="text-sm font-medium text-gray-900">🍽️ Ticket Alimentação</span>
+                    <span className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                      <UtensilsCrossed className="h-4 w-4 text-amber-600" />
+                      Ticket Alimentação
+                    </span>
                   </label>
                 </div>
               </div>
