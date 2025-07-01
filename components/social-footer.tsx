@@ -90,32 +90,28 @@ export function SocialFooter({ hasCartItems = false }: SocialFooterProps) {
       icon: MessageCircle,
       active: config.whatsapp_ativo && config.whatsapp_link,
       url: config.whatsapp_link,
-      label: 'WhatsApp',
-      color: 'text-green-600 hover:text-green-700'
+      label: 'WhatsApp'
     },
     {
       id: 'instagram',
       icon: Instagram,
       active: config.instagram_ativo && config.instagram_link,
       url: config.instagram_link,
-      label: 'Instagram',
-      color: 'text-pink-600 hover:text-pink-700'
+      label: 'Instagram'
     },
     {
       id: 'facebook',
       icon: Facebook,
       active: config.facebook_ativo && config.facebook_link,
       url: config.facebook_link,
-      label: 'Facebook',
-      color: 'text-blue-600 hover:text-blue-700'
+      label: 'Facebook'
     },
     {
       id: 'maps',
       icon: MapPin,
       active: config.maps_ativo && config.maps_link,
       url: config.maps_link,
-      label: 'Localização',
-      color: 'text-red-600 hover:text-red-700'
+      label: 'Localização'
     },
     {
       id: 'share',
@@ -123,7 +119,6 @@ export function SocialFooter({ hasCartItems = false }: SocialFooterProps) {
       active: config.compartilhar_ativo,
       url: null,
       label: 'Compartilhar',
-      color: 'text-gray-600 hover:text-gray-700',
       action: handleShare
     }
   ]
@@ -138,7 +133,7 @@ export function SocialFooter({ hasCartItems = false }: SocialFooterProps) {
   return (
     <footer 
       className={`
-        w-full bg-white border-t border-gray-200 shadow-sm
+        w-full bg-red-600 shadow-sm
         transition-all duration-300 ease-in-out
         ${hasCartItems ? 'mb-20 md:mb-20' : 'mb-0'}
       `}
@@ -150,18 +145,17 @@ export function SocialFooter({ hasCartItems = false }: SocialFooterProps) {
     >
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex items-center justify-center">
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center gap-4">
             {activeItems.map((item) => {
               const IconComponent = item.icon
               return (
                 <button
                   key={item.id}
                   onClick={item.action || (() => handleSocialClick(item.url))}
-                  className={`
-                    p-3 rounded-full transition-all duration-200 
-                    hover:bg-gray-50 hover:scale-110 active:scale-95
-                    ${item.color}
-                  `}
+                  className="
+                    p-3 rounded-full transition-all duration-200 cursor-pointer
+                    hover:opacity-80 active:scale-95 text-white
+                  "
                   aria-label={item.label}
                   title={item.label}
                 >
