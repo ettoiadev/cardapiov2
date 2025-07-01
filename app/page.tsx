@@ -624,63 +624,65 @@ function HomePageContent() {
 
         {/* Menu horizontal com informações */}
         <div className="px-4 py-4 bg-white border-b">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-x-4 overflow-x-auto">
-              {/* Status da Pizzaria (dinâmico) - PRIMEIRO */}
-              <div className="flex items-center flex-shrink-0">
-                <div className={`
-                  px-3 py-1 rounded-full border transition-all duration-200 shadow-sm
-                  ${storeStatus.isOpen 
-                    ? "bg-green-100 border-green-300" 
-                    : "bg-red-100 border-red-300"
-                  }
-                `}>
-                  <div className="text-center min-w-0">
-                    <div className={`text-sm font-medium leading-tight ${
-                      storeStatus.isOpen 
-                        ? "text-green-700" 
-                        : "text-red-700"
-                    }`}>
-                      {storeStatus.status}
-                    </div>
-                    {storeStatus.nextInfo && (
-                      <div className={`text-xs leading-tight mt-0.5 ${
-                        storeStatus.isOpen 
-                          ? "text-green-700/70" 
-                          : "text-red-700/70"
-                      }`}>
-                        {storeStatus.nextInfo}
-                      </div>
-                    )}
+          <div className="flex items-center justify-between w-full flex-wrap gap-y-3">
+            {/* Status da Pizzaria (dinâmico) */}
+            <div className="w-auto mr-4 flex-shrink-0">
+              <div className={`
+                px-3 py-1 rounded-full border transition-all duration-200 shadow-sm font-medium text-sm
+                ${storeStatus.isOpen 
+                  ? "bg-green-100 border-green-300" 
+                  : "bg-red-100 border-red-300"
+                }
+              `}>
+                <div className="text-center min-w-0">
+                  <div className={`leading-tight ${
+                    storeStatus.isOpen 
+                      ? "text-green-700" 
+                      : "text-red-700"
+                  }`}>
+                    {storeStatus.status}
                   </div>
+                  {storeStatus.nextInfo && (
+                    <div className={`text-xs leading-tight mt-0.5 ${
+                      storeStatus.isOpen 
+                        ? "text-green-700/70" 
+                        : "text-red-700/70"
+                    }`}>
+                      {storeStatus.nextInfo}
+                    </div>
+                  )}
                 </div>
               </div>
+            </div>
 
+            {/* Grupos de informações centrais */}
+            <div className="flex items-center space-x-4 md:space-x-6 flex-1 justify-center min-w-0">
               {/* Tempo de Entrega */}
               <div className="flex flex-col items-center flex-shrink-0">
                 <div className="text-sm font-medium text-gray-900">
                   {config.tempo_entrega_min}–{config.tempo_entrega_max}
                 </div>
-                <div className="text-xs text-gray-500">minutos</div>
+                <div className="text-xs text-gray-600">minutos</div>
               </div>
 
               {/* Valor Mínimo */}
               <div className="flex flex-col items-center flex-shrink-0">
                 <div className="text-sm font-medium text-gray-900">{formatCurrency(config.valor_minimo)}</div>
-                <div className="text-xs text-gray-500">mínimo</div>
+                <div className="text-xs text-gray-600">mínimo</div>
               </div>
 
               {/* Formas de Pagamento */}
               <div className="flex flex-col items-center flex-shrink-0">
                 <div className="flex justify-center items-center gap-x-1 mb-1">
-                  {config.aceita_dinheiro && <Banknote className="w-4 h-4" />}
-                  {config.aceita_cartao && <CreditCard className="w-4 h-4" />}
+                  {config.aceita_dinheiro && <Banknote className="w-4 h-4 text-gray-700" />}
+                  {config.aceita_cartao && <CreditCard className="w-4 h-4 text-gray-700" />}
                 </div>
-                <div className="text-xs text-gray-500">pagamento</div>
+                <div className="text-xs text-gray-600">pagamento</div>
               </div>
             </div>
 
-            <Button variant="outline" size="sm" onClick={() => setShowStoreInfo(true)} className="flex-shrink-0">
+            {/* Botão de ação fixado à direita */}
+            <Button variant="outline" size="sm" onClick={() => setShowStoreInfo(true)} className="ml-auto flex-shrink-0">
               <Plus className="w-4 h-4" />
             </Button>
           </div>
