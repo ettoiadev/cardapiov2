@@ -625,31 +625,8 @@ function HomePageContent() {
         {/* Menu horizontal com informações */}
         <div className="px-4 py-4 bg-white border-b">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-x-4 md:gap-x-6 overflow-x-auto">
-              {/* Tempo de Entrega */}
-              <div className="flex flex-col items-center flex-shrink-0">
-                <div className="text-sm font-medium text-gray-900">
-                  {config.tempo_entrega_min}–{config.tempo_entrega_max}
-                </div>
-                <div className="text-xs text-gray-500">minutos</div>
-              </div>
-
-              {/* Valor Mínimo */}
-              <div className="flex flex-col items-center flex-shrink-0">
-                <div className="text-sm font-medium text-gray-900">{formatCurrency(config.valor_minimo)}</div>
-                <div className="text-xs text-gray-500">mínimo</div>
-              </div>
-
-              {/* Formas de Pagamento */}
-              <div className="flex flex-col items-center flex-shrink-0">
-                <div className="flex justify-center items-center gap-x-1 mb-1">
-                  {config.aceita_dinheiro && <Banknote className="w-4 h-4" />}
-                  {config.aceita_cartao && <CreditCard className="w-4 h-4" />}
-                </div>
-                <div className="text-xs text-gray-500">pagamento</div>
-              </div>
-
-              {/* Status da Pizzaria (dinâmico) */}
+            <div className="flex items-center gap-x-4 overflow-x-auto">
+              {/* Status da Pizzaria (dinâmico) - PRIMEIRO */}
               <div className="flex items-center flex-shrink-0">
                 <div className={`
                   px-3 py-1 rounded-full border transition-all duration-200 shadow-sm
@@ -677,6 +654,29 @@ function HomePageContent() {
                     )}
                   </div>
                 </div>
+              </div>
+
+              {/* Tempo de Entrega */}
+              <div className="flex flex-col items-center flex-shrink-0">
+                <div className="text-sm font-medium text-gray-900">
+                  {config.tempo_entrega_min}–{config.tempo_entrega_max}
+                </div>
+                <div className="text-xs text-gray-500">minutos</div>
+              </div>
+
+              {/* Valor Mínimo */}
+              <div className="flex flex-col items-center flex-shrink-0">
+                <div className="text-sm font-medium text-gray-900">{formatCurrency(config.valor_minimo)}</div>
+                <div className="text-xs text-gray-500">mínimo</div>
+              </div>
+
+              {/* Formas de Pagamento */}
+              <div className="flex flex-col items-center flex-shrink-0">
+                <div className="flex justify-center items-center gap-x-1 mb-1">
+                  {config.aceita_dinheiro && <Banknote className="w-4 h-4" />}
+                  {config.aceita_cartao && <CreditCard className="w-4 h-4" />}
+                </div>
+                <div className="text-xs text-gray-500">pagamento</div>
               </div>
             </div>
 
