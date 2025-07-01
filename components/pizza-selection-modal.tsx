@@ -1,15 +1,21 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
 import { useCart } from "@/lib/cart-context"
 import { useConfig } from "@/lib/config-context"
 import { formatCurrency } from "@/lib/currency-utils"
+
+interface Adicional {
+  nome: string
+  preco: number
+}
 
 interface Produto {
   id: string
@@ -19,6 +25,7 @@ interface Produto {
   preco_broto: number | null
   tipo: string
   ativo: boolean
+  adicionais?: Adicional[]
 }
 
 interface PizzaSelectionModalProps {
@@ -27,14 +34,25 @@ interface PizzaSelectionModalProps {
   onClose: () => void
   multiFlavorMode?: boolean
   availablePizzas?: Produto[]
+  onAddedToCart?: () => void
 }
 
-export function PizzaSelectionModal({ pizza, isOpen, onClose, multiFlavorMode = false, availablePizzas = [] }: PizzaSelectionModalProps) {
+interface SelectedAdicionais {
+  [saborNome: string]: { nome: string; preco: number }[]
+}
+
+export function PizzaSelectionModal({ pizza, isOpen, onClose, multiFlavorMode = false, availablePizzas = [], onAddedToCart }: PizzaSelectionModalProps) {
   const [selectedSize, setSelectedSize] = useState<"broto" | "tradicional">("tradicional")
   const [selectedFlavors, setSelectedFlavors] = useState<string[]>([])
+  const [selectedAdicionais, setSelectedAdicionais] = useState<SelectedAdicionais>({})
   const { dispatch } = useCart()
   const { config } = useConfig()
   const router = useRouter()
+
+  // Resetar adicionais quando os sabores mudarem
+  useEffect(() => {
+    setSelectedAdicionais({})
+  }, [selectedFlavors])
 
   const handleFlavorSelection = (flavorName: string) => {
     if (selectedFlavors.includes(flavorName)) {
@@ -46,20 +64,45 @@ export function PizzaSelectionModal({ pizza, isOpen, onClose, multiFlavorMode = 
     }
   }
 
+  const handleAdicionalToggle = (saborNome: string, adicional: { nome: string; preco: number }, checked: boolean) => {
+    setSelectedAdicionais(prev => {
+      const current = prev[saborNome] || []
+      
+      if (checked) {
+        return {
+          ...prev,
+          [saborNome]: [...current, adicional]
+        }
+      } else {
+        return {
+          ...prev,
+          [saborNome]: current.filter(item => item.nome !== adicional.nome)
+        }
+      }
+    })
+  }
+
   const calculatePrice = () => {
+    let basePrice = 0
+    
     if (!multiFlavorMode) {
-      return selectedSize === "broto" ? pizza.preco_broto : pizza.preco_tradicional
+      basePrice = selectedSize === "broto" ? (pizza.preco_broto || 0) : (pizza.preco_tradicional || 0)
+    } else {
+      // Para múltiplos sabores, usar o maior preço entre os sabores selecionados
+      if (selectedFlavors.length === 0) return 0
+
+      const prices = selectedFlavors.map(flavorName => {
+        const flavor = availablePizzas.find(p => p.nome === flavorName)
+        return selectedSize === "broto" ? flavor?.preco_broto || 0 : flavor?.preco_tradicional || 0
+      })
+
+      basePrice = Math.max(...prices)
     }
 
-    // Para múltiplos sabores, usar o maior preço entre os sabores selecionados
-    if (selectedFlavors.length === 0) return 0
+    // Calcular preço dos adicionais
+    const adicionaisPrice = Object.values(selectedAdicionais).flat().reduce((sum, adicional) => sum + adicional.preco, 0)
 
-    const prices = selectedFlavors.map(flavorName => {
-      const flavor = availablePizzas.find(p => p.nome === flavorName)
-      return selectedSize === "broto" ? flavor?.preco_broto || 0 : flavor?.preco_tradicional || 0
-    })
-
-    return Math.max(...prices)
+    return basePrice + adicionaisPrice
   }
 
   const canAddToCart = () => {
@@ -76,6 +119,12 @@ export function PizzaSelectionModal({ pizza, isOpen, onClose, multiFlavorMode = 
     const sabores = multiFlavorMode ? selectedFlavors : [pizza.nome]
     const nomeItem = multiFlavorMode ? `Pizza ${selectedFlavors.join(" + ")}` : pizza.nome
 
+    // Preparar adicionais para o carrinho
+    const adicionaisForCart = sabores.map(sabor => ({
+      sabor,
+      itens: selectedAdicionais[sabor] || []
+    })).filter(item => item.itens.length > 0)
+
     dispatch({
       type: "ADD_ITEM",
       payload: {
@@ -85,19 +134,41 @@ export function PizzaSelectionModal({ pizza, isOpen, onClose, multiFlavorMode = 
         sabores: sabores,
         preco: preco,
         tipo: pizza.tipo,
+        adicionais: adicionaisForCart.length > 0 ? adicionaisForCart : undefined,
       },
     })
 
     // Reset do estado
     setSelectedFlavors([])
+    setSelectedAdicionais({})
     onClose()
     
-    // Item adicionado ao carrinho - usuário deve usar botão "Fechar pedido" para finalizar
+    // Chamar callback se fornecido (para múltiplos sabores rolarem para próxima categoria)
+    if (onAddedToCart) {
+      setTimeout(() => {
+        onAddedToCart()
+      }, 300)
+    }
+  }
+
+  const getAvailableFlavors = () => {
+    return multiFlavorMode ? availablePizzas : [pizza]
+  }
+
+  const getFlavorsWithAdicionais = () => {
+    const flavors = multiFlavorMode ? selectedFlavors : [pizza.nome]
+    return flavors.map(flavorName => {
+      const flavor = getAvailableFlavors().find(p => p.nome === flavorName)
+      return {
+        nome: flavorName,
+        adicionais: flavor?.adicionais || []
+      }
+    })
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <span>{multiFlavorMode ? "Escolha 2 sabores" : pizza.nome}</span>
@@ -109,7 +180,7 @@ export function PizzaSelectionModal({ pizza, isOpen, onClose, multiFlavorMode = 
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           {!multiFlavorMode && pizza.descricao && (
             <p className="text-sm text-gray-600">{pizza.descricao}</p>
           )}
@@ -159,7 +230,45 @@ export function PizzaSelectionModal({ pizza, isOpen, onClose, multiFlavorMode = 
             </div>
           )}
 
-          <div className="space-y-3">
+          {/* Seção de Adicionais por Sabor */}
+          {getFlavorsWithAdicionais().length > 0 && getFlavorsWithAdicionais().some(f => f.adicionais.length > 0) && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Adicionais por Sabor</h3>
+              {getFlavorsWithAdicionais().map((flavor) => (
+                flavor.adicionais.length > 0 && (
+                  <div key={flavor.nome} className="border rounded-lg p-4 bg-gray-50">
+                    <h4 className="font-medium mb-3 text-red-600">{flavor.nome}</h4>
+                    <div className="space-y-2">
+                      {flavor.adicionais.map((adicional, index) => (
+                        <div key={index} className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`${flavor.nome}-${adicional.nome}`}
+                              checked={selectedAdicionais[flavor.nome]?.some(item => item.nome === adicional.nome) || false}
+                              onCheckedChange={(checked) => 
+                                handleAdicionalToggle(flavor.nome, adicional, checked as boolean)
+                              }
+                            />
+                            <Label 
+                              htmlFor={`${flavor.nome}-${adicional.nome}`}
+                              className="cursor-pointer flex-1"
+                            >
+                              {adicional.nome}
+                            </Label>
+                          </div>
+                          <span className="text-sm font-medium text-green-600">
+                            +{formatCurrency(adicional.preco)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              ))}
+            </div>
+          )}
+
+          <div className="space-y-4">
             <Label className="text-base font-medium">Escolha o tamanho:</Label>
 
             <RadioGroup
@@ -177,33 +286,27 @@ export function PizzaSelectionModal({ pizza, isOpen, onClose, multiFlavorMode = 
                         <div className="text-sm text-gray-500">4 fatias</div>
                       </div>
                       <div className="font-medium text-red-600">
-                        {multiFlavorMode && selectedFlavors.length > 0 
-                          ? formatCurrency(calculatePrice() || 0)
-                          : formatCurrency(pizza.preco_broto)}
+                        {formatCurrency(calculatePrice() || 0)}
                       </div>
                     </div>
                   </Label>
                 </div>
               )}
 
-              {(multiFlavorMode ? true : pizza.preco_tradicional) && (
-                <div className="flex items-center space-x-2 p-3 border rounded-lg">
-                  <RadioGroupItem value="tradicional" id="tradicional" />
-                  <Label htmlFor="tradicional" className="flex-1 cursor-pointer">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="font-medium">Tradicional</div>
-                        <div className="text-sm text-gray-500">8 fatias</div>
-                      </div>
-                      <div className="font-medium text-red-600">
-                        {multiFlavorMode && selectedFlavors.length > 0 
-                          ? formatCurrency(calculatePrice() || 0)
-                          : formatCurrency(pizza.preco_tradicional)}
-                      </div>
+              <div className="flex items-center space-x-2 p-3 border rounded-lg">
+                <RadioGroupItem value="tradicional" id="tradicional" />
+                <Label htmlFor="tradicional" className="flex-1 cursor-pointer">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div className="font-medium">Tradicional</div>
+                      <div className="text-sm text-gray-500">8 fatias</div>
                     </div>
-                  </Label>
-                </div>
-              )}
+                    <div className="font-medium text-red-600">
+                      {formatCurrency(calculatePrice() || 0)}
+                    </div>
+                  </div>
+                </Label>
+              </div>
             </RadioGroup>
           </div>
 

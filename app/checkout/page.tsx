@@ -239,6 +239,15 @@ export default function CheckoutPage() {
         }
       }
       
+      // Mostrar adicionais se existirem, organizados por sabor
+      if (item.adicionais && item.adicionais.length > 0) {
+        item.adicionais.forEach((adicionalGrupo) => {
+          if (adicionalGrupo.itens.length > 0) {
+            message += `   • Adicionais (${adicionalGrupo.sabor}): ${adicionalGrupo.itens.map(adic => `${adic.nome} (+${formatCurrency(adic.preco)})`).join(', ')}\n`
+          }
+        })
+      }
+      
       message += `   • Quantidade: ${item.quantidade}\n`
       message += `   • Valor: ${formatCurrency(item.preco * item.quantidade)}\n\n`
     })
@@ -512,6 +521,23 @@ export default function CheckoutPage() {
                         <p className="text-sm text-gray-600">
                           {item.quantidade}x {item.tamanho} • {formatCurrency(item.preco)}
                         </p>
+                        
+                        {/* Exibir adicionais se existirem */}
+                        {item.adicionais && item.adicionais.length > 0 && (
+                          <div className="mt-2 space-y-1">
+                            {item.adicionais.map((adicionalGrupo, grpIndex) => (
+                              <div key={grpIndex} className="text-xs text-gray-500">
+                                <span className="font-medium">{adicionalGrupo.sabor}:</span>
+                                {adicionalGrupo.itens.map((adicional, itemIndex) => (
+                                  <span key={itemIndex} className="ml-1">
+                                    +{adicional.nome} ({formatCurrency(adicional.preco)})
+                                    {itemIndex < adicionalGrupo.itens.length - 1 && ", "}
+                                  </span>
+                                ))}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                       <span className="font-semibold">{formatCurrency(item.preco * item.quantidade)}</span>
                     </div>
@@ -534,6 +560,23 @@ export default function CheckoutPage() {
                         <p className="text-sm text-gray-600">
                           {item.quantidade}x {item.tamanho} • {formatCurrency(item.preco)}
                         </p>
+                        
+                        {/* Exibir adicionais se existirem */}
+                        {item.adicionais && item.adicionais.length > 0 && (
+                          <div className="mt-2 space-y-1">
+                            {item.adicionais.map((adicionalGrupo, grpIndex) => (
+                              <div key={grpIndex} className="text-xs text-gray-500">
+                                <span className="font-medium">{adicionalGrupo.sabor}:</span>
+                                {adicionalGrupo.itens.map((adicional, itemIndex) => (
+                                  <span key={itemIndex} className="ml-1">
+                                    +{adicional.nome} ({formatCurrency(adicional.preco)})
+                                    {itemIndex < adicionalGrupo.itens.length - 1 && ", "}
+                                  </span>
+                                ))}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                       <span className="font-semibold">{formatCurrency(item.preco * item.quantidade)}</span>
                     </div>

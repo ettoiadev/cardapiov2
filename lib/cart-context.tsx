@@ -11,6 +11,10 @@ export interface CartItem {
   preco: number
   quantidade: number
   tipo: string
+  adicionais?: { 
+    sabor: string
+    itens: { nome: string; preco: number }[]
+  }[]
 }
 
 interface CartState {
@@ -37,7 +41,8 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         (item) =>
           item.id === action.payload.id &&
           item.tamanho === action.payload.tamanho &&
-          JSON.stringify(item.sabores.sort()) === JSON.stringify(action.payload.sabores.sort()),
+          JSON.stringify(item.sabores.sort()) === JSON.stringify(action.payload.sabores.sort()) &&
+          JSON.stringify(item.adicionais || []) === JSON.stringify(action.payload.adicionais || []),
       )
 
       let newItems: CartItem[]
