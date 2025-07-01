@@ -2,16 +2,17 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, ShoppingBag, MapPin, Phone, User, CreditCard, DollarSign, Smartphone, Loader2 } from "lucide-react"
+import { ArrowLeft, ShoppingBag, MapPin, Phone, User, CreditCard, DollarSign, Smartphone, Loader2, Plus, Minus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Checkbox } from "@/components/ui/checkbox"
 import { useCart } from "@/lib/cart-context"
 import { formatCurrency } from "@/lib/currency-utils"
-import { supabase } from "@/lib/supabase"
+import { supabase, isSupabaseConfigured } from "@/lib/supabase"
 
 interface StoreConfig {
   nome: string
@@ -31,13 +32,30 @@ interface AddressData {
   uf: string
 }
 
+interface Adicional {
+  nome: string
+  preco: number
+}
+
+interface Produto {
+  id: string
+  nome: string
+  descricao: string | null
+  preco_tradicional: number | null
+  preco_broto: number | null
+  tipo: string
+  ativo: boolean
+  adicionais?: Adicional[]
+}
+
 export default function CheckoutPage() {
   const router = useRouter()
-  const { state } = useCart()
+  const { state, dispatch } = useCart()
   
   // Estados principais
   const [loading, setLoading] = useState(true)
   const [storeConfig, setStoreConfig] = useState<StoreConfig | null>(null)
+  const [produtos, setProdutos] = useState<Produto[]>([])
   
   // Tipo de entrega
   const [deliveryType, setDeliveryType] = useState<"balcao" | "delivery">("balcao")
@@ -57,9 +75,12 @@ export default function CheckoutPage() {
   const [orderNotes, setOrderNotes] = useState("")
   const [paymentMethod, setPaymentMethod] = useState<"pix" | "dinheiro" | "debito" | "credito" | "ticket_alimentacao">("pix")
   
-    // Carregar configurações da loja
+    // Carregar configurações da loja e produtos
   useEffect(() => {
-    loadStoreConfig()
+    const loadData = async () => {
+      await Promise.all([loadStoreConfig(), loadProdutos()])
+    }
+    loadData()
   }, [])
 
   // Ajustar método de pagamento baseado nas configurações disponíveis
@@ -133,6 +154,24 @@ export default function CheckoutPage() {
         aceita_pix: true,
         aceita_ticket_alimentacao: false
       })
+    }
+  }
+
+  const loadProdutos = async () => {
+    try {
+      if (isSupabaseConfigured()) {
+        const { data } = await supabase
+          .from("produtos")
+          .select("*")
+          .eq("ativo", true)
+          .order("ordem")
+        
+        if (data) {
+          setProdutos(data)
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao carregar produtos:", error)
     } finally {
       setLoading(false)
     }
@@ -301,6 +340,56 @@ export default function CheckoutPage() {
     return message
   }
   
+  // Buscar adicionais de um sabor específico
+  const getAdicionaisForSabor = (saborNome: string): Adicional[] => {
+    const produto = produtos.find(p => p.nome === saborNome)
+    return produto?.adicionais || []
+  }
+
+  // Atualizar adicionais de um item do carrinho
+  const handleToggleAdicional = (itemId: string, sabor: string, adicional: Adicional, checked: boolean) => {
+    const item = state.items.find(i => i.id === itemId)
+    if (!item) return
+
+    let newAdicionais = item.adicionais || []
+
+    // Encontrar ou criar grupo de adicionais para este sabor
+    const saborIndex = newAdicionais.findIndex(a => a.sabor === sabor)
+
+    if (saborIndex >= 0) {
+      // Grupo existe, modificar lista de itens
+      const currentItens = newAdicionais[saborIndex].itens
+      
+      if (checked) {
+        // Adicionar se não existir
+        if (!currentItens.some(i => i.nome === adicional.nome)) {
+          newAdicionais[saborIndex].itens = [...currentItens, adicional]
+        }
+      } else {
+        // Remover se existir
+        newAdicionais[saborIndex].itens = currentItens.filter(i => i.nome !== adicional.nome)
+      }
+    } else if (checked) {
+      // Criar novo grupo se não existir e estamos adicionando
+      newAdicionais.push({
+        sabor,
+        itens: [adicional]
+      })
+    }
+
+    // Filtrar grupos vazios
+    newAdicionais = newAdicionais.filter(grupo => grupo.itens.length > 0)
+
+    // Atualizar item no carrinho (o contexto recalcula o preço automaticamente)
+    dispatch({
+      type: "UPDATE_ADICIONAIS",
+      payload: {
+        id: itemId,
+        adicionais: newAdicionais
+      }
+    })
+  }
+
   // Finalizar pedido
   const handleFinishOrder = () => {
     const message = generateWhatsAppMessage()
@@ -522,20 +611,43 @@ export default function CheckoutPage() {
                           {item.quantidade}x {item.tamanho} • {formatCurrency(item.preco)}
                         </p>
                         
-                        {/* Exibir adicionais se existirem */}
-                        {item.adicionais && item.adicionais.length > 0 && (
-                          <div className="mt-2 space-y-1">
-                            {item.adicionais.map((adicionalGrupo, grpIndex) => (
-                              <div key={grpIndex} className="text-xs text-gray-500">
-                                <span className="font-medium">{adicionalGrupo.sabor}:</span>
-                                {adicionalGrupo.itens.map((adicional, itemIndex) => (
-                                  <span key={itemIndex} className="ml-1">
-                                    +{adicional.nome} ({formatCurrency(adicional.preco)})
-                                    {itemIndex < adicionalGrupo.itens.length - 1 && ", "}
-                                  </span>
-                                ))}
-                              </div>
-                            ))}
+                        {/* Seção de Adicionais Editáveis por Sabor */}
+                        {item.sabores && item.sabores.length > 0 && (
+                          <div className="mt-3 space-y-3">
+                            {item.sabores.map((sabor, saborIndex) => {
+                              const adicionaisDisponiveis = getAdicionaisForSabor(sabor)
+                              if (adicionaisDisponiveis.length === 0) return null
+                              
+                              return (
+                                <div key={saborIndex} className="bg-gray-50 rounded-lg p-3">
+                                  <h4 className="text-sm font-medium text-gray-600 border-b border-gray-200 pb-1 mb-2">Opcionais:</h4>
+                                  <div className="space-y-2">
+                                    {adicionaisDisponiveis.map((adicional, adIndex) => (
+                                      <div key={adIndex} className="flex items-center justify-between">
+                                        <div className="flex items-center space-x-2">
+                                          <Checkbox
+                                            id={`${item.id}-${sabor}-${adicional.nome}`}
+                                            checked={item.adicionais?.find(a => a.sabor === sabor)?.itens.some(i => i.nome === adicional.nome) || false}
+                                            onCheckedChange={(checked) => 
+                                              handleToggleAdicional(item.id, sabor, adicional, checked as boolean)
+                                            }
+                                          />
+                                          <Label 
+                                            htmlFor={`${item.id}-${sabor}-${adicional.nome}`}
+                                            className="cursor-pointer text-sm flex-1"
+                                          >
+                                            {adicional.nome}
+                                          </Label>
+                                        </div>
+                                        <span className="text-sm font-medium text-green-600">
+                                          +{formatCurrency(adicional.preco)}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )
+                            })}
                           </div>
                         )}
                       </div>
@@ -561,20 +673,43 @@ export default function CheckoutPage() {
                           {item.quantidade}x {item.tamanho} • {formatCurrency(item.preco)}
                         </p>
                         
-                        {/* Exibir adicionais se existirem */}
-                        {item.adicionais && item.adicionais.length > 0 && (
-                          <div className="mt-2 space-y-1">
-                            {item.adicionais.map((adicionalGrupo, grpIndex) => (
-                              <div key={grpIndex} className="text-xs text-gray-500">
-                                <span className="font-medium">{adicionalGrupo.sabor}:</span>
-                                {adicionalGrupo.itens.map((adicional, itemIndex) => (
-                                  <span key={itemIndex} className="ml-1">
-                                    +{adicional.nome} ({formatCurrency(adicional.preco)})
-                                    {itemIndex < adicionalGrupo.itens.length - 1 && ", "}
-                                  </span>
-                                ))}
-                              </div>
-                            ))}
+                        {/* Seção de Adicionais Editáveis por Sabor */}
+                        {item.sabores && item.sabores.length > 0 && (
+                          <div className="mt-3 space-y-3">
+                            {item.sabores.map((sabor, saborIndex) => {
+                              const adicionaisDisponiveis = getAdicionaisForSabor(sabor)
+                              if (adicionaisDisponiveis.length === 0) return null
+                              
+                              return (
+                                <div key={saborIndex} className="bg-gray-50 rounded-lg p-3">
+                                  <h4 className="text-sm font-medium text-gray-600 border-b border-gray-200 pb-1 mb-2">Opcionais:</h4>
+                                  <div className="space-y-2">
+                                    {adicionaisDisponiveis.map((adicional, adIndex) => (
+                                      <div key={adIndex} className="flex items-center justify-between">
+                                        <div className="flex items-center space-x-2">
+                                          <Checkbox
+                                            id={`pickup-${item.id}-${sabor}-${adicional.nome}`}
+                                            checked={item.adicionais?.find(a => a.sabor === sabor)?.itens.some(i => i.nome === adicional.nome) || false}
+                                            onCheckedChange={(checked) => 
+                                              handleToggleAdicional(item.id, sabor, adicional, checked as boolean)
+                                            }
+                                          />
+                                          <Label 
+                                            htmlFor={`pickup-${item.id}-${sabor}-${adicional.nome}`}
+                                            className="cursor-pointer text-sm flex-1"
+                                          >
+                                            {adicional.nome}
+                                          </Label>
+                                        </div>
+                                        <span className="text-sm font-medium text-green-600">
+                                          +{formatCurrency(adicional.preco)}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )
+                            })}
                           </div>
                         )}
                       </div>

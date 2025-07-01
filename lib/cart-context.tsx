@@ -26,6 +26,7 @@ type CartAction =
   | { type: "ADD_ITEM"; payload: Omit<CartItem, "quantidade"> }
   | { type: "REMOVE_ITEM"; payload: string }
   | { type: "UPDATE_QUANTITY"; payload: { id: string; quantidade: number } }
+  | { type: "UPDATE_ADICIONAIS"; payload: { id: string; adicionais: { sabor: string; itens: { nome: string; preco: number }[] }[] } }
   | { type: "CLEAR_CART" }
 
 const CartContext = createContext<{
@@ -77,6 +78,38 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       const newItems = state.items
         .map((item) => (item.id === action.payload.id ? { ...item, quantidade: action.payload.quantidade } : item))
         .filter((item) => item.quantidade > 0)
+
+      const newTotal = newItems.reduce((sum, item) => sum + item.preco * item.quantidade, 0)
+
+      return {
+        items: newItems,
+        total: newTotal,
+      }
+    }
+
+    case "UPDATE_ADICIONAIS": {
+      const newItems = state.items.map((item) => {
+        if (item.id === action.payload.id) {
+          // Calcular novo preço incluindo adicionais
+          const adicionaisPrice = action.payload.adicionais.reduce((sum, grupo) => 
+            sum + grupo.itens.reduce((itemSum, adicional) => itemSum + adicional.preco, 0), 0
+          )
+          
+          // O preço base do item (sem adicionais anteriores)
+          const basePrice = item.preco - (item.adicionais?.reduce((sum, grupo) => 
+            sum + grupo.itens.reduce((itemSum, adicional) => itemSum + adicional.preco, 0), 0
+          ) || 0)
+          
+          const newPrice = basePrice + adicionaisPrice
+          
+          return {
+            ...item,
+            adicionais: action.payload.adicionais,
+            preco: newPrice
+          }
+        }
+        return item
+      })
 
       const newTotal = newItems.reduce((sum, item) => sum + item.preco * item.quantidade, 0)
 

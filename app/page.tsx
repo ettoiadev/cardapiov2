@@ -10,7 +10,6 @@ import { Plus, Minus, CreditCard, Banknote, Check } from "lucide-react"
 import { supabase, isSupabaseConfigured } from "@/lib/supabase"
 import { useCart } from "@/lib/cart-context"
 import { useConfig } from "@/lib/config-context"
-import { PizzaSelectionModal } from "@/components/pizza-selection-modal"
 import { StoreInfoModal } from "@/components/store-info-modal"
 import { CartFooter } from "@/components/cart-footer"
 import { SocialFooter } from "@/components/social-footer"
@@ -217,10 +216,6 @@ function HomePageContent() {
   const [flavorMode, setFlavorMode] = useState<1 | 2 | 3>(1)
   const [selectedFlavorsForMulti, setSelectedFlavorsForMulti] = useState<Produto[]>([])
   const [selectedSingleFlavor, setSelectedSingleFlavor] = useState<string | null>(null)
-  
-  // Estados para o modal de seleção de pizza com adicionais
-  const [selectedPizza, setSelectedPizza] = useState<Produto | null>(null)
-  const [modalOpen, setModalOpen] = useState(false)
 
   const { dispatch, state: cartState } = useCart()
   const { config: pizzariaConfig } = useConfig()
@@ -339,37 +334,31 @@ function HomePageContent() {
       const hasAdicionais = selectedFlavorsForMulti.some(pizza => pizza.adicionais && pizza.adicionais.length > 0)
       
       const timer = setTimeout(() => {
-        if (hasAdicionais) {
-          // Se algum sabor tem adicionais, abrir modal para seleção
-          setSelectedPizza(selectedFlavorsForMulti[0]) // Usar primeiro sabor como base para o modal
-          setModalOpen(true)
-        } else {
-          // Se nenhum sabor tem adicionais, adicionar diretamente ao carrinho
-          const tamanho = "tradicional"
-          const prices = selectedFlavorsForMulti.map(pizza => 
-            pizza.preco_tradicional || 0
-          )
-          const preco = Math.max(...prices)
-          const sabores = selectedFlavorsForMulti.map(p => p.nome)
-          const nomeItem = `Pizza ${sabores.join(" + ")}`
+        // Sempre adicionar diretamente ao carrinho sem adicionais (adicionais serão editados no checkout)
+        const tamanho = "tradicional"
+        const prices = selectedFlavorsForMulti.map(pizza => 
+          pizza.preco_tradicional || 0
+        )
+        const preco = Math.max(...prices)
+        const sabores = selectedFlavorsForMulti.map(p => p.nome)
+        const nomeItem = `Pizza ${sabores.join(" + ")}`
 
-          dispatch({
-            type: "ADD_ITEM",
-            payload: {
-              id: `multi-${sabores.sort().join("-")}-${tamanho}`,
-              nome: nomeItem,
-              tamanho: tamanho,
-              sabores: sabores,
-              preco: preco,
-              tipo: selectedFlavorsForMulti[0].tipo,
-            },
-          })
-          
-          // Rolar para a próxima categoria SEM resetar as seleções
-          setTimeout(() => {
-            scrollToNextCategory()
-          }, 500)
-        }
+        dispatch({
+          type: "ADD_ITEM",
+          payload: {
+            id: `multi-${sabores.sort().join("-")}-${tamanho}`,
+            nome: nomeItem,
+            tamanho: tamanho,
+            sabores: sabores,
+            preco: preco,
+            tipo: selectedFlavorsForMulti[0].tipo,
+          },
+        })
+        
+        // Rolar para a próxima categoria SEM resetar as seleções
+        setTimeout(() => {
+          scrollToNextCategory()
+        }, 500)
       }, 1000) // Aguardar 1 segundo para o usuário ver a seleção completa
       
       return () => clearTimeout(timer)
@@ -462,36 +451,30 @@ function HomePageContent() {
   }
 
   const handleSingleFlavorSelection = (pizza: Produto) => {
-    // Para 1 sabor: verificar se tem adicionais e abrir modal ou adicionar diretamente
+    // Para 1 sabor: sempre adicionar diretamente ao carrinho (adicionais serão editados no checkout)
     setSelectedSingleFlavor(pizza.id)
     setSelectedFlavorsForMulti([pizza])
     
-    // Se a pizza tem adicionais, abrir modal. Senão, adicionar diretamente ao carrinho
-    if (pizza.adicionais && pizza.adicionais.length > 0) {
-      setSelectedPizza(pizza)
-      setModalOpen(true)
-    } else {
-      // Adicionar diretamente ao carrinho sem adicionais
-      const tamanho = "tradicional"
-      dispatch({
-        type: "ADD_ITEM",
-        payload: {
-          id: `${pizza.id}-${tamanho}`,
-          nome: pizza.nome,
-          tamanho: tamanho,
-          sabores: [pizza.nome],
-          preco: pizza.preco_tradicional || 0,
-          tipo: pizza.tipo,
-        },
-      })
-      
-      // Scroll automático para a próxima categoria após um pequeno delay
-      setTimeout(() => {
-        scrollToNextCategory()
-        // Reset da seleção após adicionar ao carrinho
-        setSelectedFlavorsForMulti([])
-      }, 500)
-    }
+    // Adicionar diretamente ao carrinho sem adicionais
+    const tamanho = "tradicional"
+    dispatch({
+      type: "ADD_ITEM",
+      payload: {
+        id: `${pizza.id}-${tamanho}`,
+        nome: pizza.nome,
+        tamanho: tamanho,
+        sabores: [pizza.nome],
+        preco: pizza.preco_tradicional || 0,
+        tipo: pizza.tipo,
+      },
+    })
+    
+    // Scroll automático para a próxima categoria após um pequeno delay
+    setTimeout(() => {
+      scrollToNextCategory()
+      // Reset da seleção após adicionar ao carrinho
+      setSelectedFlavorsForMulti([])
+    }, 500)
   }
 
   const handleMultiFlavorSelection = (pizza: Produto) => {
@@ -936,36 +919,6 @@ function HomePageContent() {
         {/* Modals */}
 
         <StoreInfoModal isOpen={showStoreInfo} onClose={() => setShowStoreInfo(false)} config={config} />
-
-        {/* Pizza Selection Modal com Adicionais */}
-        {selectedPizza && (
-          <PizzaSelectionModal
-            pizza={selectedPizza}
-            isOpen={modalOpen}
-            onClose={() => {
-              setModalOpen(false)
-              setSelectedPizza(null)
-              // Reset das seleções se necessário
-              if (flavorMode === 1) {
-                setSelectedFlavorsForMulti([])
-                setSelectedSingleFlavor(null)
-              }
-            }}
-            multiFlavorMode={flavorMode > 1}
-            availablePizzas={selectedFlavorsForMulti}
-            onAddedToCart={() => {
-              // Para múltiplos sabores, rolar para próxima categoria após adicionar ao carrinho
-              if (flavorMode > 1) {
-                scrollToNextCategory()
-              } else {
-                // Para sabor único, também rolar e resetar seleções
-                scrollToNextCategory()
-                setSelectedFlavorsForMulti([])
-                setSelectedSingleFlavor(null)
-              }
-            }}
-          />
-        )}
 
         {/* Rodapé com redes sociais */}
         <SocialFooter hasCartItems={cartState.items.length > 0} />
