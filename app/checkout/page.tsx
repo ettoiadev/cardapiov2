@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, ShoppingBag, MapPin, Phone, User, CreditCard, DollarSign, Smartphone, Loader2, Plus, Minus, QrCode, Banknote, UtensilsCrossed, Bike, Pizza } from "lucide-react"
+import { ArrowLeft, ShoppingBag, MapPin, Phone, User, CreditCard, DollarSign, Smartphone, Loader2, Plus, Minus, QrCode, Banknote, UtensilsCrossed, Bike, Pizza, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -62,6 +62,7 @@ export default function CheckoutPage() {
   
   // Estados principais
   const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
   const [storeConfig, setStoreConfig] = useState<StoreConfig | null>(null)
   const [produtos, setProdutos] = useState<Produto[]>([])
   const [bordasRecheadas, setBordasRecheadas] = useState<BordaRecheada[]>([])
@@ -457,11 +458,16 @@ export default function CheckoutPage() {
 
   // Finalizar pedido
   const handleFinishOrder = () => {
+    setSubmitting(true)
     const message = generateWhatsAppMessage()
     const whatsappNumber = storeConfig?.whatsapp || "5511999999999"
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
     
-    window.open(whatsappUrl, "_blank")
+    // Simular um pequeno delay para mostrar o loading
+    setTimeout(() => {
+      window.open(whatsappUrl, "_blank")
+      setSubmitting(false)
+    }, 1000)
   }
   
   // Loading
@@ -498,75 +504,67 @@ export default function CheckoutPage() {
         <h1 className="text-lg font-semibold ml-2">Finalizar Pedido</h1>
       </div>
       
-      <div className="max-w-2xl mx-auto p-4 pb-24">
+      <div className="max-w-2xl mx-auto p-4 pb-24 space-y-4">
         {/* Tipo de Entrega */}
-        <Card className="mb-4">
+        <Card className="rounded-xl shadow-md">
           <div className="p-4">
-            <h2 className="text-xl font-semibold mb-6 text-foreground">Tipo de Entrega</h2>
-            <RadioGroup value={deliveryType} onValueChange={(value: "balcao" | "delivery") => setDeliveryType(value)}>
-              <div className="grid grid-cols-2 gap-4">
-                <div 
-                  className={`relative p-6 rounded-xl shadow-md transition-all duration-200 hover:shadow-lg cursor-pointer bg-white ${
-                    deliveryType === "balcao" 
-                      ? "border border-orange-400 bg-orange-50 ring-2 ring-orange-100" 
-                      : "border border-gray-200 hover:border-orange-300"
-                  }`}
-                  onClick={() => setDeliveryType("balcao")}
-                >
-                  <div className="flex flex-col items-center text-center space-y-4">
-                    <div className="bg-black text-white rounded-full p-2">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                      </svg>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-base text-gray-900 block">Retirada no Balcão</span>
-                      <p className="text-sm text-gray-500 mt-1">Retire seu pedido na loja</p>
-                    </div>
+            <h2 className="text-[15px] font-semibold mb-6 text-neutral-800">Tipo de Entrega</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div 
+                className={`relative p-6 rounded-xl border transition-all duration-200 hover:shadow-sm cursor-pointer ${
+                  deliveryType === "balcao" 
+                    ? "border-orange-300 bg-orange-50" 
+                    : "border-gray-200 bg-white hover:border-orange-200"
+                }`}
+                onClick={() => setDeliveryType("balcao")}
+              >
+                <div className="flex flex-col items-center text-center space-y-3">
+                  <div className="bg-orange-600 text-white rounded-full p-3">
+                    <UtensilsCrossed className="w-5 h-5" />
                   </div>
-                  <RadioGroupItem value="balcao" id="balcao" className="sr-only" />
-                </div>
-                <div 
-                  className={`relative p-6 rounded-xl shadow-md transition-all duration-200 hover:shadow-lg cursor-pointer bg-white ${
-                    deliveryType === "delivery" 
-                      ? "border border-blue-400 bg-blue-50 ring-2 ring-blue-100" 
-                      : "border border-gray-200 hover:border-blue-300"
-                  }`}
-                  onClick={() => setDeliveryType("delivery")}
-                >
-                  <div className="flex flex-col items-center text-center space-y-4">
-                    <div className="bg-black text-white rounded-full p-2">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
-                      </svg>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-base text-gray-900 block">Delivery</span>
-                      <p className="text-sm text-gray-500 mt-1">Receba em casa (+{formatCurrency(storeConfig?.taxa_entrega || 0)})</p>
-                    </div>
+                  <div>
+                    <span className="font-semibold text-[15px] text-neutral-800 block">Retirada</span>
+                    <p className="text-sm text-neutral-500 mt-1">Retire na loja</p>
                   </div>
-                  <RadioGroupItem value="delivery" id="delivery" className="sr-only" />
                 </div>
               </div>
-            </RadioGroup>
+              <div 
+                className={`relative p-6 rounded-xl border transition-all duration-200 hover:shadow-sm cursor-pointer ${
+                  deliveryType === "delivery" 
+                    ? "border-blue-300 bg-blue-50" 
+                    : "border-gray-200 bg-white hover:border-blue-200"
+                }`}
+                onClick={() => setDeliveryType("delivery")}
+              >
+                <div className="flex flex-col items-center text-center space-y-3">
+                  <div className="bg-blue-600 text-white rounded-full p-3">
+                    <Bike className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="font-semibold text-[15px] text-neutral-800 block">Delivery</span>
+                    <p className="text-sm text-neutral-500 mt-1">Taxa: {formatCurrency(storeConfig?.taxa_entrega || 0)}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </Card>
         
-        {/* Dados do Cliente sempre primeiro */}
-        <Card className="mb-4">
+        {/* Dados do Cliente */}
+        <Card className="rounded-xl shadow-md">
           <div className="p-4">
-            <h2 className="text-lg font-semibold mb-4">
+            <h2 className="text-[15px] font-semibold mb-4 text-neutral-800">
               {deliveryType === "delivery" ? "Dados para Entrega" : "Dados do Cliente"}
             </h2>
             <div className="space-y-4">
               {/* Nome */}
               <div>
-                <Label htmlFor="name">Nome Completo *</Label>
+                <Label htmlFor="name" className="text-[15px]">Nome Completo *</Label>
                 <div className="relative mt-1">
                   <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
                     id="name"
-                    placeholder="Seu nome completo"
+                    placeholder="Ex: João Silva"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     className="pl-10"
@@ -577,12 +575,12 @@ export default function CheckoutPage() {
               
               {/* Telefone */}
               <div>
-                <Label htmlFor="phone">Telefone *</Label>
+                <Label htmlFor="phone" className="text-[15px]">Telefone *</Label>
                 <div className="relative mt-1">
                   <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
                     id="phone"
-                    placeholder="(11) 99999-9999"
+                    placeholder="Ex: (11) 99999-9999"
                     value={customerPhone}
                     onChange={(e) => handlePhoneChange(e.target.value)}
                     className="pl-10"
@@ -667,71 +665,71 @@ export default function CheckoutPage() {
           </div>
         </Card>
         
-        {/* Resumo do Pedido sempre segundo */}
-        <Card className="mb-4">
+        {/* Resumo do Pedido */}
+        <Card className="rounded-xl shadow-md">
           <div className="p-4">
-            <h2 className="text-lg font-semibold mb-4">Resumo do Pedido</h2>
-            <div className="space-y-4">
+            <h2 className="text-[15px] font-semibold mb-4 text-neutral-800">Resumo do Pedido</h2>
+            <div className="space-y-2">
               {state.items?.map((item, index) => (
-                <div key={index} className="pb-4 border-b last:border-0">
+                <div key={index} className="bg-white rounded-lg shadow-sm p-3">
                   {/* Header do item com quantidade e controles */}
                   <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 flex-1">
                       {/* Controles de quantidade */}
-                      <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-1">
+                      <div className="flex items-center gap-1">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleUpdateQuantity(item.id, item.quantidade - 1)}
-                          className="h-8 w-8 p-0 hover:bg-white"
+                          className="h-6 w-6 p-0 rounded-full bg-neutral-200 hover:bg-neutral-300 text-sm"
                         >
-                          <Minus className="h-4 w-4" />
+                          <Minus className="h-3 w-3" />
                         </Button>
-                        <span className="w-7 text-center font-medium text-sm">
+                        <span className="w-8 text-center font-medium text-sm">
                           {item.quantidade}x
                         </span>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleUpdateQuantity(item.id, item.quantidade + 1)}
-                          className="h-8 w-8 p-0 hover:bg-white"
+                          className="h-6 w-6 p-0 rounded-full bg-neutral-200 hover:bg-neutral-300 text-sm"
                         >
-                          <Plus className="h-4 w-4" />
+                          <Plus className="h-3 w-3" />
                         </Button>
                       </div>
                       
                       {/* Nome do produto */}
                       <div className="flex-1">
                         {item.sabores && item.sabores.length === 2 ? (
-                          <div>
-                            <h3 className="font-medium text-gray-900">Pizza</h3>
-                            <div className="text-sm text-gray-600">
-                              1/2 {item.sabores[0]}<br />
-                              1/2 {item.sabores[1]}
-                            </div>
-                          </div>
+                          <span className="text-[15px] font-medium text-neutral-800">
+                            Pizza 1/2 {item.sabores[0]} + 1/2 {item.sabores[1]}
+                          </span>
+                        ) : item.sabores && item.sabores.length === 3 ? (
+                          <span className="text-[15px] font-medium text-neutral-800">
+                            Pizza {item.sabores.join(" + ")}
+                          </span>
                         ) : (
-                          <h3 className="font-medium text-gray-900">{item.nome}</h3>
+                          <span className="text-[15px] font-medium text-neutral-800">{item.nome}</span>
                         )}
                       </div>
                     </div>
                     
                     {/* Valor total do item */}
-                    <span className="font-semibold text-lg text-green-600">
+                    <span className="font-semibold text-green-600">
                       {formatCurrency(item.preco * item.quantidade)}
                     </span>
                   </div>
                     
                   {/* Seção de Adicionais Editáveis por Sabor */}
                   {item.sabores && item.sabores.length > 0 && (
-                    <div className="space-y-3">
+                    <div className="border-t border-gray-200 mt-2 pt-2 space-y-3">
                       {item.sabores.map((sabor, saborIndex) => {
                         const adicionaisDisponiveis = getAdicionaisForSabor(sabor)
                         if (adicionaisDisponiveis.length === 0) return null
                         
                         return (
                           <div key={saborIndex} className="bg-gray-50 rounded-lg p-3">
-                            <h4 className="text-sm font-medium text-gray-600 border-b border-gray-200 pb-1 mb-2">
+                            <h4 className="text-sm font-semibold text-gray-700 mb-2">
                               Opcionais para {sabor}:
                             </h4>
                             <div className="space-y-2">
@@ -766,11 +764,11 @@ export default function CheckoutPage() {
 
                   {/* Seção de Bordas Recheadas (apenas para pizzas) */}
                   {item.tipo !== "bebida" && bordasRecheadas.length > 0 && (
-                    <div className="mt-4 bg-yellow-50 rounded-lg p-4 border border-yellow-200">
-                      <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-                        <Pizza className="h-4 w-4 text-yellow-600" />
-                        Borda Recheada (Opcional):
-                      </h4>
+                    <div className="border-t border-gray-200 mt-2 pt-2">
+                      <div className="bg-[#fefaf0] border border-yellow-300 rounded-lg p-3">
+                        <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                          🧈 Borda Recheada (Opcional):
+                        </h4>
                       <div className="space-y-2">
                         {/* Opção "Sem borda" */}
                         <label className="flex items-center justify-between p-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 cursor-pointer">
@@ -809,6 +807,7 @@ export default function CheckoutPage() {
                           </label>
                         ))}
                       </div>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -817,87 +816,111 @@ export default function CheckoutPage() {
           </div>
         </Card>
         
-        {/* Observações do Pedido (sempre na mesma posição) */}
-        <Card className="mb-4">
+        {/* Observações do Pedido */}
+        <Card className="rounded-xl shadow-md">
           <div className="p-4">
-            <h2 className="text-lg font-semibold mb-4">Observações do Pedido</h2>
+            <h2 className="text-[15px] font-semibold mb-4 text-neutral-800">Observações do Pedido</h2>
             <Textarea
-              placeholder="Ex: Sem cebola, bem passado..."
+              placeholder="Ex: Sem cebola, bem passada..."
               value={orderNotes}
               onChange={(e) => setOrderNotes(e.target.value)}
-              rows={3}
+              className="h-[80px] rounded-lg bg-neutral-50 border"
             />
           </div>
         </Card>
         
         {/* Forma de Pagamento */}
-        <Card className="mb-4">
+        <Card className="rounded-xl shadow-md">
           <div className="p-4">
-            <h2 className="text-lg font-semibold mb-4">Forma de Pagamento</h2>
-            <RadioGroup value={paymentMethod} onValueChange={(value: any) => setPaymentMethod(value)}>
-              <div className="grid grid-cols-2 gap-3">
-                {storeConfig?.aceita_pix && (
-                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                    <RadioGroupItem value="pix" id="pix" />
-                    <Label htmlFor="pix" className="cursor-pointer flex items-center gap-2">
-                      <QrCode className="h-4 w-4 text-blue-600" />
-                      PIX
-                    </Label>
+            <h2 className="text-[15px] font-semibold mb-4 text-neutral-800">Forma de Pagamento</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {storeConfig?.aceita_pix && (
+                <div 
+                  className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                    paymentMethod === "pix" 
+                      ? "border-green-500 bg-green-50" 
+                      : "border-gray-200 hover:bg-gray-50"
+                  }`}
+                  onClick={() => setPaymentMethod("pix")}
+                >
+                  <div className="flex items-center gap-2">
+                    💸 <span className="text-[15px]">PIX</span>
                   </div>
-                )}
-                {storeConfig?.aceita_dinheiro && (
-                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                    <RadioGroupItem value="dinheiro" id="dinheiro" />
-                    <Label htmlFor="dinheiro" className="cursor-pointer flex items-center gap-2">
-                      <Banknote className="h-4 w-4 text-green-600" />
-                      Dinheiro
-                    </Label>
+                </div>
+              )}
+              {storeConfig?.aceita_dinheiro && (
+                <div 
+                  className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                    paymentMethod === "dinheiro" 
+                      ? "border-green-500 bg-green-50" 
+                      : "border-gray-200 hover:bg-gray-50"
+                  }`}
+                  onClick={() => setPaymentMethod("dinheiro")}
+                >
+                  <div className="flex items-center gap-2">
+                    💵 <span className="text-[15px]">Dinheiro</span>
                   </div>
-                )}
-                {storeConfig?.aceita_cartao && (
-                  <>
-                    <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                      <RadioGroupItem value="debito" id="debito" />
-                      <Label htmlFor="debito" className="cursor-pointer flex items-center gap-2">
-                        <CreditCard className="h-4 w-4 text-purple-600" />
-                        Cartão de Débito
-                      </Label>
+                </div>
+              )}
+              {storeConfig?.aceita_cartao && (
+                <>
+                  <div 
+                    className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                      paymentMethod === "debito" 
+                        ? "border-green-500 bg-green-50" 
+                        : "border-gray-200 hover:bg-gray-50"
+                    }`}
+                    onClick={() => setPaymentMethod("debito")}
+                  >
+                    <div className="flex items-center gap-2">
+                      🧾 <span className="text-[15px]">Débito</span>
                     </div>
-                    <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                      <RadioGroupItem value="credito" id="credito" />
-                      <Label htmlFor="credito" className="cursor-pointer flex items-center gap-2">
-                        <CreditCard className="h-4 w-4 text-orange-600" />
-                        Cartão de Crédito
-                      </Label>
-                    </div>
-                  </>
-                )}
-                {storeConfig?.aceita_ticket_alimentacao && (
-                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                    <RadioGroupItem value="ticket_alimentacao" id="ticket_alimentacao" />
-                    <Label htmlFor="ticket_alimentacao" className="cursor-pointer flex items-center gap-2">
-                      <UtensilsCrossed className="h-4 w-4 text-amber-600" />
-                      Ticket Alimentação
-                    </Label>
                   </div>
-                )}
-              </div>
-            </RadioGroup>
+                  <div 
+                    className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                      paymentMethod === "credito" 
+                        ? "border-green-500 bg-green-50" 
+                        : "border-gray-200 hover:bg-gray-50"
+                    }`}
+                    onClick={() => setPaymentMethod("credito")}
+                  >
+                    <div className="flex items-center gap-2">
+                      💳 <span className="text-[15px]">Crédito</span>
+                    </div>
+                  </div>
+                </>
+              )}
+              {storeConfig?.aceita_ticket_alimentacao && (
+                <div 
+                  className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                    paymentMethod === "ticket_alimentacao" 
+                      ? "border-green-500 bg-green-50" 
+                      : "border-gray-200 hover:bg-gray-50"
+                  }`}
+                  onClick={() => setPaymentMethod("ticket_alimentacao")}
+                >
+                  <div className="flex items-center gap-2">
+                    🍽️ <span className="text-[15px]">Ticket</span>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </Card>
         
         {/* Resumo de Valores */}
-        <Card className="mb-4">
+        <Card className="rounded-xl shadow-md">
           <div className="p-4">
+            <h2 className="text-[15px] font-semibold mb-4 text-neutral-800">Resumo de Valores</h2>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span>Subtotal</span>
-                <span className="font-medium">{formatCurrency(subtotal)}</span>
+                <span className="text-[15px]">Subtotal</span>
+                <span className="font-medium text-[15px]">{formatCurrency(subtotal)}</span>
               </div>
               {deliveryType === "delivery" && (
                 <div className="flex justify-between">
-                  <span>Taxa de entrega</span>
-                  <span className="font-medium">{formatCurrency(deliveryFee)}</span>
+                  <span className="text-[15px]">Taxa de entrega</span>
+                  <span className="font-medium text-[15px]">{formatCurrency(deliveryFee)}</span>
                 </div>
               )}
               <div className="flex justify-between pt-2 border-t font-semibold text-lg">
@@ -923,10 +946,17 @@ export default function CheckoutPage() {
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4">
         <Button
           onClick={handleFinishOrder}
-          disabled={!isMinimumMet || !isFormValid()}
-          className="w-full h-12 text-lg bg-green-600 hover:bg-green-700 disabled:bg-gray-300"
+          disabled={!isMinimumMet || !isFormValid() || submitting}
+          className="w-full h-12 text-lg rounded-full bg-red-600 hover:bg-red-700 disabled:bg-gray-300 font-bold py-3 flex items-center justify-center gap-2"
         >
-          Finalize seu Pedido
+          {submitting ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <>
+              <MessageCircle className="w-5 h-5" />
+              Finalizar Pedido
+            </>
+          )}
         </Button>
         <p className="text-xs text-gray-500 text-center mt-2">
           Você será redirecionado ao WhatsApp da pizzaria
