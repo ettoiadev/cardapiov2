@@ -508,6 +508,79 @@ export default function AdminConfigPage() {
     setLoading(false)
   }
 
+  // Funções específicas para salvar cada seção
+  const handleSaveBasicInfo = async () => {
+    setLoading(true)
+    try {
+      const { data, error } = await supabase.from("pizzaria_config").upsert(config).select().single()
+      if (error) {
+        console.error("Erro ao salvar informações básicas:", error)
+        setMessage("Erro ao salvar informações básicas")
+      } else {
+        setConfig(data)
+        setMessage("Informações básicas salvas com sucesso!")
+      }
+    } catch (error) {
+      console.error("Erro ao salvar:", error)
+      setMessage("Erro ao salvar informações básicas")
+    }
+    setLoading(false)
+  }
+
+  const handleSaveDeliverySettings = async () => {
+    setLoading(true)
+    try {
+      const { data, error } = await supabase.from("pizzaria_config").upsert(config).select().single()
+      if (error) {
+        console.error("Erro ao salvar configurações de entrega:", error)
+        setMessage("Erro ao salvar configurações de entrega")
+      } else {
+        setConfig(data)
+        setMessage("Configurações de entrega salvas com sucesso!")
+      }
+    } catch (error) {
+      console.error("Erro ao salvar:", error)
+      setMessage("Erro ao salvar configurações de entrega")
+    }
+    setLoading(false)
+  }
+
+  const handleSaveSchedule = async () => {
+    setLoading(true)
+    try {
+      const { data, error } = await supabase.from("pizzaria_config").upsert(config).select().single()
+      if (error) {
+        console.error("Erro ao salvar horários:", error)
+        setMessage("Erro ao salvar horários de funcionamento")
+      } else {
+        setConfig(data)
+        setMessage("Horários de funcionamento salvos com sucesso!")
+      }
+    } catch (error) {
+      console.error("Erro ao salvar:", error)
+      setMessage("Erro ao salvar horários de funcionamento")
+    }
+    setLoading(false)
+  }
+
+  const handleSaveImages = async () => {
+    setLoading(true)
+    try {
+      const { data, error } = await supabase.from("pizzaria_config").upsert(config).select().single()
+      if (error) {
+        console.error("Erro ao salvar imagens:", error)
+        setMessage("Erro ao salvar imagens")
+      } else {
+        setConfig(data)
+        setMessage("Imagens salvas com sucesso!")
+      }
+    } catch (error) {
+      console.error("Erro ao salvar:", error)
+      setMessage("Erro ao salvar imagens")
+    }
+    setLoading(false)
+  }
+
   const handleUpdateCredentials = async () => {
     setLoadingCredentials(true)
     setCredentialsMessage("")
@@ -565,28 +638,17 @@ export default function AdminConfigPage() {
 
   return (
     <AdminLayout>
-      <div className="max-w-7xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Header Section */}
-        <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-2xl p-8 border border-gray-100 shadow-sm">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="space-y-2">
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                <Settings className="h-8 w-8 text-gray-600" />
-                Configurações da Pizzaria
-              </h1>
-              <p className="text-gray-600 max-w-2xl">
-                Configure todas as informações da sua pizzaria, horários de funcionamento, entrega e formas de pagamento.
-              </p>
-            </div>
-            <Button 
-              onClick={handleSave} 
-              disabled={loading}
-              size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all"
-            >
-              <Save className="h-5 w-5 mr-2" />
-              {loading ? "Salvando..." : "Salvar Configurações"}
-            </Button>
+        <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-2xl p-5 border border-gray-100 shadow-sm">
+          <div className="space-y-2">
+            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <Settings className="h-7 w-7 lg:h-8 lg:w-8 text-gray-600" />
+              Configurações da Pizzaria
+            </h1>
+            <p className="text-sm text-gray-500 max-w-2xl">
+              Configure todas as informações da sua pizzaria, horários de funcionamento, entrega e formas de pagamento.
+            </p>
           </div>
         </div>
 
@@ -608,22 +670,22 @@ export default function AdminConfigPage() {
 
         {/* Seção de Alteração de Credenciais */}
         <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-red-50 to-pink-50 border-b border-red-100 p-6">
+          <CardHeader className="bg-gradient-to-r from-red-50 to-pink-50 border-b border-red-100 p-5">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-red-100 rounded-lg">
                 <Key className="h-6 w-6 text-red-600" />
               </div>
               <div>
-                <CardTitle className="text-xl font-semibold text-gray-900">
+                <CardTitle className="text-lg font-semibold text-gray-900">
                   Alterar Credenciais de Acesso
                 </CardTitle>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-gray-500 mt-1">
                   Atualize seu email e senha de acesso ao painel administrativo
                 </p>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="p-5">
             {/* Mensagem de credenciais */}
             {credentialsMessage && (
               <div className={`mb-6 p-4 rounded-lg ${credentialsMessage.includes("sucesso") ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
@@ -699,11 +761,11 @@ export default function AdminConfigPage() {
                 />
               </div>
 
-              <div className="pt-4">
+              <div className="pt-4 flex justify-end">
                 <Button
                   onClick={handleUpdateCredentials}
                   disabled={loadingCredentials || !novoEmail.trim() || !novaSenha.trim() || !confirmarSenha.trim()}
-                  className="w-full bg-red-600 hover:bg-red-700 text-white rounded-lg py-3 font-medium transition-colors"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
                 >
                   {loadingCredentials ? (
                     <>
@@ -712,8 +774,8 @@ export default function AdminConfigPage() {
                     </>
                   ) : (
                     <>
-                      <Key className="h-4 w-4 mr-2" />
-                      Atualizar Credenciais
+                      <Save className="h-4 w-4 mr-2" />
+                      Salvar Alterações
                     </>
                   )}
                 </Button>
@@ -723,25 +785,25 @@ export default function AdminConfigPage() {
         </Card>
 
         {/* Configuration Cards Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Basic Information */}
           <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100 p-6">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100 p-5">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-blue-100 rounded-lg">
                   <Store className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl font-semibold text-gray-900">
+                  <CardTitle className="text-lg font-semibold text-gray-900">
                     Informações Básicas
                   </CardTitle>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-gray-500 mt-1">
                     Nome, endereço e contatos da pizzaria
                   </p>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-6 space-y-6">
+            <CardContent className="p-5 space-y-4">
               <div>
                 <Label htmlFor="nome" className="text-sm font-medium text-gray-700 flex items-center gap-2">
                   <Store className="h-4 w-4" />
@@ -918,27 +980,48 @@ export default function AdminConfigPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Botão Salvar Informações Básicas */}
+              <div className="pt-4 flex justify-end">
+                <Button
+                  onClick={handleSaveBasicInfo}
+                  disabled={loading}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Salvando...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      Salvar Alterações
+                    </>
+                  )}
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
           {/* Delivery Settings */}
           <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 p-6">
+            <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 p-5">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-green-100 rounded-lg">
                   <Truck className="h-6 w-6 text-green-600" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl font-semibold text-gray-900">
+                  <CardTitle className="text-lg font-semibold text-gray-900">
                     Configurações de Entrega
                   </CardTitle>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-gray-500 mt-1">
                     Taxas, tempos e formas de pagamento
                   </p>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-6 space-y-6">
+            <CardContent className="p-5 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="taxa_entrega" className="text-sm font-medium text-gray-700 flex items-center gap-2">
@@ -1054,28 +1137,49 @@ export default function AdminConfigPage() {
                   </label>
                 </div>
               </div>
+
+              {/* Botão Salvar Configurações de Entrega */}
+              <div className="pt-4 flex justify-end">
+                <Button
+                  onClick={handleSaveDeliverySettings}
+                  disabled={loading}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Salvando...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      Salvar Alterações
+                    </>
+                  )}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Operating Hours */}
         <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-purple-50 to-violet-50 border-b border-purple-100 p-6">
+          <CardHeader className="bg-gradient-to-r from-purple-50 to-violet-50 border-b border-purple-100 p-5">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-purple-100 rounded-lg">
                 <Clock className="h-6 w-6 text-purple-600" />
               </div>
               <div>
-                <CardTitle className="text-xl font-semibold text-gray-900">
+                <CardTitle className="text-lg font-semibold text-gray-900">
                   Horários de Funcionamento
                 </CardTitle>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-gray-500 mt-1">
                   Configure os horários de abertura e fechamento para cada dia da semana
                 </p>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="p-5">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {daysOrder.map((dia) => {
                 const horario = config.horario_funcionamento?.[dia] || ""
@@ -1109,27 +1213,48 @@ export default function AdminConfigPage() {
                 💡 <strong>Dica:</strong> Use o formato "HH:MM-HH:MM" (ex: 18:00-23:00) ou digite "Fechado" para dias sem funcionamento.
               </p>
             </div>
+
+            {/* Botão Salvar Horários */}
+            <div className="pt-4 flex justify-end">
+              <Button
+                onClick={handleSaveSchedule}
+                disabled={loading}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Salvando...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    Salvar Alterações
+                  </>
+                )}
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
         {/* Images */}
         <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 border-b border-orange-100 p-6">
+          <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 border-b border-orange-100 p-5">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-orange-100 rounded-lg">
                 <Image className="h-6 w-6 text-orange-600" />
               </div>
               <div>
-                <CardTitle className="text-xl font-semibold text-gray-900">
+                <CardTitle className="text-lg font-semibold text-gray-900">
                   Imagens da Pizzaria
                 </CardTitle>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-gray-500 mt-1">
                   Faça upload das imagens que aparecerão no cardápio
                 </p>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="p-6 space-y-6">
+          <CardContent className="p-5 space-y-4">
             {/* Upload Foto de Capa */}
             <div>
               <Label className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-3">
@@ -1254,6 +1379,27 @@ export default function AdminConfigPage() {
                   Logo ou imagem de perfil da pizzaria. Tamanho ideal: 300x300px.
                 </p>
               </div>
+            </div>
+
+            {/* Botão Salvar Imagens */}
+            <div className="pt-4 flex justify-end">
+              <Button
+                onClick={handleSaveImages}
+                disabled={loading}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Salvando...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    Salvar Alterações
+                  </>
+                )}
+              </Button>
             </div>
           </CardContent>
         </Card>
