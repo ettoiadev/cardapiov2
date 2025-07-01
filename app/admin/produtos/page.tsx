@@ -998,6 +998,13 @@ function ProdutoForm({
 
   // Estado para controlar adicionais
   const [adicionais, setAdicionais] = useState<Adicional[]>(produto?.adicionais || [])
+  
+  // Estados para valores formatados dos adicionais
+  const [adicionaisFormatados, setAdicionaisFormatados] = useState<string[]>(
+    produto?.adicionais?.map(adicional => 
+      adicional.preco ? formatCurrencyInput((adicional.preco * 100).toString()) : ""
+    ) || []
+  )
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -1006,10 +1013,12 @@ function ProdutoForm({
 
   const adicionarAdicional = () => {
     setAdicionais([...adicionais, { nome: "", preco: 0 }])
+    setAdicionaisFormatados([...adicionaisFormatados, ""])
   }
 
   const removerAdicional = (index: number) => {
     setAdicionais(adicionais.filter((_, i) => i !== index))
+    setAdicionaisFormatados(adicionaisFormatados.filter((_, i) => i !== index))
   }
 
   const atualizarAdicional = (index: number, campo: keyof Adicional, valor: string | number) => {
@@ -1020,6 +1029,15 @@ function ProdutoForm({
       novosAdicionais[index][campo] = valor as string
     }
     setAdicionais(novosAdicionais)
+  }
+
+  const atualizarPrecoAdicional = (index: number, valorFormatado: string) => {
+    const novosFormatados = [...adicionaisFormatados]
+    novosFormatados[index] = valorFormatado
+    setAdicionaisFormatados(novosFormatados)
+    
+    const valorNumerico = parseCurrencyInput(valorFormatado)
+    atualizarAdicional(index, 'preco', valorNumerico)
   }
 
   return (
@@ -1168,11 +1186,10 @@ function ProdutoForm({
                   <Input
                     type="text"
                     placeholder="R$ 0,00"
-                    value={adicional.preco ? formatCurrencyInput((adicional.preco * 100).toString()) : ""}
+                    value={adicionaisFormatados[index] || ""}
                     onChange={(e) => {
                       const valorFormatado = formatCurrencyInput(e.target.value)
-                      const valorNumerico = parseCurrencyInput(valorFormatado)
-                      atualizarAdicional(index, 'preco', valorNumerico)
+                      atualizarPrecoAdicional(index, valorFormatado)
                     }}
                     className="border-gray-200 focus:border-blue-300 focus:ring-blue-200"
                   />
