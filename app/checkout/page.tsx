@@ -266,8 +266,7 @@ export default function CheckoutPage() {
     // Resumo dos itens
     message += `📋 *ITENS DO PEDIDO:*\n`
     state.items?.forEach((item, index) => {
-      message += `${index + 1}. ${item.nome}\n`
-      message += `   • Tamanho: ${item.tamanho}\n`
+      message += `${index + 1}. ${item.quantidade}x ${item.nome}\n`
       
       // Mostrar sabores se for pizza com múltiplos sabores
       if (item.sabores && item.sabores.length > 0) {
@@ -289,7 +288,6 @@ export default function CheckoutPage() {
         })
       }
       
-      message += `   • Quantidade: ${item.quantidade}\n`
       message += `   • Valor: ${formatCurrency(item.preco * item.quantidade)}\n\n`
     })
     
@@ -390,6 +388,24 @@ export default function CheckoutPage() {
         adicionais: newAdicionais
       }
     })
+  }
+
+  // Atualizar quantidade de um item
+  const handleUpdateQuantity = (itemId: string, novaQuantidade: number) => {
+    if (novaQuantidade <= 0) {
+      dispatch({
+        type: "REMOVE_ITEM",
+        payload: itemId
+      })
+    } else {
+      dispatch({
+        type: "UPDATE_QUANTITY",
+        payload: {
+          id: itemId,
+          quantidade: novaQuantidade
+        }
+      })
+    }
   }
 
   // Finalizar pedido
@@ -608,68 +624,98 @@ export default function CheckoutPage() {
         <Card className="mb-4">
           <div className="p-4">
             <h2 className="text-lg font-semibold mb-4">Resumo do Pedido</h2>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {state.items?.map((item, index) => (
-                <div key={index} className="flex justify-between items-start pb-3 border-b last:border-0">
-                  <div className="flex-1">
-                    <h3 className="font-medium">
-                      {item.sabores && item.sabores.length === 2 ? (
-                        <div>
-                          <div>Pizza</div>
-                          <div className="text-sm font-normal text-gray-600">
-                            1/2 {item.sabores[0]}<br />
-                            1/2 {item.sabores[1]}
-                          </div>
-                        </div>
-                      ) : (
-                        item.nome
-                      )}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      {item.quantidade}x {item.tamanho} • {formatCurrency(item.preco)}
-                    </p>
-                    
-                    {/* Seção de Adicionais Editáveis por Sabor */}
-                    {item.sabores && item.sabores.length > 0 && (
-                      <div className="mt-3 space-y-3">
-                        {item.sabores.map((sabor, saborIndex) => {
-                          const adicionaisDisponiveis = getAdicionaisForSabor(sabor)
-                          if (adicionaisDisponiveis.length === 0) return null
-                          
-                          return (
-                            <div key={saborIndex} className="bg-gray-50 rounded-lg p-3">
-                              <h4 className="text-sm font-medium text-gray-600 border-b border-gray-200 pb-1 mb-2">Opcionais:</h4>
-                              <div className="space-y-2">
-                                {adicionaisDisponiveis.map((adicional, adIndex) => (
-                                  <div key={adIndex} className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
-                                      <Checkbox
-                                        id={`${item.id}-${sabor}-${adicional.nome}`}
-                                        checked={item.adicionais?.find(a => a.sabor === sabor)?.itens.some(i => i.nome === adicional.nome) || false}
-                                        onCheckedChange={(checked) => 
-                                          handleToggleAdicional(item.id, sabor, adicional, checked as boolean)
-                                        }
-                                      />
-                                      <Label 
-                                        htmlFor={`${item.id}-${sabor}-${adicional.nome}`}
-                                        className="cursor-pointer text-sm flex-1"
-                                      >
-                                        {adicional.nome}
-                                      </Label>
-                                    </div>
-                                    <span className="text-sm font-medium text-green-600">
-                                      +{formatCurrency(adicional.preco)}
-                                    </span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )
-                        })}
+                <div key={index} className="pb-4 border-b last:border-0">
+                  {/* Header do item com quantidade e controles */}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      {/* Controles de quantidade */}
+                      <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleUpdateQuantity(item.id, item.quantidade - 1)}
+                          className="h-8 w-8 p-0 hover:bg-white"
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <span className="min-w-[2rem] text-center font-medium">
+                          {item.quantidade}x
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleUpdateQuantity(item.id, item.quantidade + 1)}
+                          className="h-8 w-8 p-0 hover:bg-white"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
                       </div>
-                    )}
+                      
+                      {/* Nome do produto */}
+                      <div className="flex-1">
+                        {item.sabores && item.sabores.length === 2 ? (
+                          <div>
+                            <h3 className="font-medium text-gray-900">Pizza</h3>
+                            <div className="text-sm text-gray-600">
+                              1/2 {item.sabores[0]}<br />
+                              1/2 {item.sabores[1]}
+                            </div>
+                          </div>
+                        ) : (
+                          <h3 className="font-medium text-gray-900">{item.nome}</h3>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Valor total do item */}
+                    <span className="font-semibold text-lg text-green-600">
+                      {formatCurrency(item.preco * item.quantidade)}
+                    </span>
                   </div>
-                  <span className="font-semibold">{formatCurrency(item.preco * item.quantidade)}</span>
+                    
+                  {/* Seção de Adicionais Editáveis por Sabor */}
+                  {item.sabores && item.sabores.length > 0 && (
+                    <div className="space-y-3">
+                      {item.sabores.map((sabor, saborIndex) => {
+                        const adicionaisDisponiveis = getAdicionaisForSabor(sabor)
+                        if (adicionaisDisponiveis.length === 0) return null
+                        
+                        return (
+                          <div key={saborIndex} className="bg-gray-50 rounded-lg p-3">
+                            <h4 className="text-sm font-medium text-gray-600 border-b border-gray-200 pb-1 mb-2">
+                              Opcionais para {sabor}:
+                            </h4>
+                            <div className="space-y-2">
+                              {adicionaisDisponiveis.map((adicional, adIndex) => (
+                                <div key={adIndex} className="flex items-center justify-between">
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={`${item.id}-${sabor}-${adicional.nome}`}
+                                      checked={item.adicionais?.find(a => a.sabor === sabor)?.itens.some(i => i.nome === adicional.nome) || false}
+                                      onCheckedChange={(checked) => 
+                                        handleToggleAdicional(item.id, sabor, adicional, checked as boolean)
+                                      }
+                                    />
+                                    <Label 
+                                      htmlFor={`${item.id}-${sabor}-${adicional.nome}`}
+                                      className="cursor-pointer text-sm flex-1"
+                                    >
+                                      {adicional.nome}
+                                    </Label>
+                                  </div>
+                                  <span className="text-sm font-medium text-green-600">
+                                    +{formatCurrency(adicional.preco)}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
