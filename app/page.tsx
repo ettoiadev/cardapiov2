@@ -205,6 +205,26 @@ const mockProdutos: Produto[] = [
   },
 ]
 
+// Função utilitária para formatar nome da pizza com sabores
+const formatPizzaName = (sabores: string[]): string => {
+  if (sabores.length === 1) {
+    return sabores[0]
+  } else {
+    return `Pizza ${sabores.join(" + ")}`
+  }
+}
+
+// Função para formatar sabores na exibição (checkout e WhatsApp)
+const formatSaboresDisplay = (sabores: string[]): string => {
+  if (sabores.length === 1) {
+    return sabores[0]
+  } else if (sabores.length === 2) {
+    return `1/2 ${sabores[0]}\n1/2 ${sabores[1]}`
+  } else {
+    return sabores.join(", ")
+  }
+}
+
 function HomePageContent() {
   const [config, setConfig] = useState<PizzariaConfig>(mockConfig)
   const [produtos, setProdutos] = useState<Produto[]>(mockProdutos)
@@ -341,7 +361,7 @@ function HomePageContent() {
         )
         const preco = Math.max(...prices)
         const sabores = selectedFlavorsForMulti.map(p => p.nome)
-        const nomeItem = `Pizza ${sabores.join(" + ")}`
+        const nomeItem = formatPizzaName(sabores)
 
         dispatch({
           type: "ADD_ITEM",
@@ -508,7 +528,7 @@ function HomePageContent() {
     const preco = Math.max(...prices)
 
     const sabores = selectedFlavorsForMulti.map(p => p.nome)
-    const nomeItem = flavorMode === 1 ? sabores[0] : `Pizza ${sabores.join(" + ")}`
+    const nomeItem = formatPizzaName(sabores)
 
     dispatch({
       type: "ADD_ITEM",

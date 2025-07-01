@@ -273,6 +273,8 @@ export default function CheckoutPage() {
       if (item.sabores && item.sabores.length > 0) {
         if (item.sabores.length === 1) {
           message += `   • Sabor: ${item.sabores[0]}\n`
+        } else if (item.sabores.length === 2) {
+          message += `   • Sabores:\n     1/2 ${item.sabores[0]}\n     1/2 ${item.sabores[1]}\n`
         } else {
           message += `   • Sabores: ${item.sabores.join(', ')}\n`
         }
@@ -610,7 +612,19 @@ export default function CheckoutPage() {
               {state.items?.map((item, index) => (
                 <div key={index} className="flex justify-between items-start pb-3 border-b last:border-0">
                   <div className="flex-1">
-                    <h3 className="font-medium">{item.nome}</h3>
+                    <h3 className="font-medium">
+                      {item.sabores && item.sabores.length === 2 ? (
+                        <div>
+                          <div>Pizza</div>
+                          <div className="text-sm font-normal text-gray-600">
+                            1/2 {item.sabores[0]}<br />
+                            1/2 {item.sabores[1]}
+                          </div>
+                        </div>
+                      ) : (
+                        item.nome
+                      )}
+                    </h3>
                     <p className="text-sm text-gray-600">
                       {item.quantidade}x {item.tamanho} • {formatCurrency(item.preco)}
                     </p>
