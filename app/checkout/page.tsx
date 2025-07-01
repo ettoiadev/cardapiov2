@@ -383,27 +383,162 @@ export default function CheckoutPage() {
           </div>
         </Card>
         
-        {/* Resumo do Pedido */}
-        <Card className="mb-4">
-          <div className="p-4">
-            <h2 className="text-lg font-semibold mb-4">Resumo do Pedido</h2>
-            <div className="space-y-3">
-              {state.items?.map((item, index) => (
-                <div key={index} className="flex justify-between items-start pb-3 border-b last:border-0">
-                  <div className="flex-1">
-                    <h3 className="font-medium">{item.nome}</h3>
-                    <p className="text-sm text-gray-600">
-                      {item.quantidade}x {item.tamanho} • {formatCurrency(item.preco)}
-                    </p>
+        {/* Reorganização dinâmica baseada no tipo de entrega */}
+        {deliveryType === "delivery" ? (
+          <>
+            {/* Para Delivery: Dados para Entrega primeiro */}
+            <Card className="mb-4">
+              <div className="p-4">
+                <h2 className="text-lg font-semibold mb-4">Dados para Entrega</h2>
+                <div className="space-y-4">
+                  {/* Nome */}
+                  <div>
+                    <Label htmlFor="name">Nome Completo *</Label>
+                    <div className="relative mt-1">
+                      <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        id="name"
+                        placeholder="Seu nome completo"
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
                   </div>
-                  <span className="font-semibold">{formatCurrency(item.preco * item.quantidade)}</span>
+                  
+                  {/* Telefone */}
+                  <div>
+                    <Label htmlFor="phone">Telefone *</Label>
+                    <div className="relative mt-1">
+                      <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        id="phone"
+                        placeholder="(11) 99999-9999"
+                        value={customerPhone}
+                        onChange={(e) => handlePhoneChange(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* CEP */}
+                  <div>
+                    <Label htmlFor="cep">CEP *</Label>
+                    <div className="relative mt-1">
+                      <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        id="cep"
+                        placeholder="00000-000"
+                        value={customerCep}
+                        onChange={(e) => handleCepChange(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                      {searchingCep && (
+                        <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-gray-400" />
+                      )}
+                    </div>
+                    {cepError && <p className="text-red-600 text-sm mt-1">{cepError}</p>}
+                    {addressData && (
+                      <div className="mt-2 p-3 bg-green-50 rounded-lg text-sm">
+                        <p className="font-medium text-green-800">Endereço encontrado:</p>
+                        <p className="text-green-700">
+                          {addressData.logradouro}, {addressData.bairro} - {addressData.localidade}/{addressData.uf}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Campos adicionais após CEP */}
+                  {addressData && (
+                    <>
+                      <div>
+                        <Label htmlFor="number">Número *</Label>
+                        <Input
+                          id="number"
+                          placeholder="123"
+                          value={addressNumber}
+                          onChange={(e) => setAddressNumber(e.target.value)}
+                          className="mt-1"
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="complement">Complemento</Label>
+                        <Input
+                          id="complement"
+                          placeholder="Apto 101, Bloco A..."
+                          value={addressComplement}
+                          onChange={(e) => setAddressComplement(e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="delivery-notes">Observações de Entrega</Label>
+                        <Textarea
+                          id="delivery-notes"
+                          placeholder="Ponto de referência, instruções..."
+                          value={deliveryNotes}
+                          onChange={(e) => setDeliveryNotes(e.target.value)}
+                          className="mt-1"
+                          rows={2}
+                        />
+                      </div>
+                    </>
+                  )}
                 </div>
-              ))}
-            </div>
-          </div>
-        </Card>
+              </div>
+            </Card>
+            
+            {/* Depois para Delivery: Resumo do Pedido */}
+            <Card className="mb-4">
+              <div className="p-4">
+                <h2 className="text-lg font-semibold mb-4">Resumo do Pedido</h2>
+                <div className="space-y-3">
+                  {state.items?.map((item, index) => (
+                    <div key={index} className="flex justify-between items-start pb-3 border-b last:border-0">
+                      <div className="flex-1">
+                        <h3 className="font-medium">{item.nome}</h3>
+                        <p className="text-sm text-gray-600">
+                          {item.quantidade}x {item.tamanho} • {formatCurrency(item.preco)}
+                        </p>
+                      </div>
+                      <span className="font-semibold">{formatCurrency(item.preco * item.quantidade)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Card>
+          </>
+        ) : (
+          <>
+            {/* Para Retirada no Balcão: ordem original - Resumo primeiro */}
+            <Card className="mb-4">
+              <div className="p-4">
+                <h2 className="text-lg font-semibold mb-4">Resumo do Pedido</h2>
+                <div className="space-y-3">
+                  {state.items?.map((item, index) => (
+                    <div key={index} className="flex justify-between items-start pb-3 border-b last:border-0">
+                      <div className="flex-1">
+                        <h3 className="font-medium">{item.nome}</h3>
+                        <p className="text-sm text-gray-600">
+                          {item.quantidade}x {item.tamanho} • {formatCurrency(item.preco)}
+                        </p>
+                      </div>
+                      <span className="font-semibold">{formatCurrency(item.preco * item.quantidade)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Card>
+          </>
+        )}
         
-        {/* Observações do Pedido */}
+        {/* Observações do Pedido (sempre na mesma posição) */}
         <Card className="mb-4">
           <div className="p-4">
             <h2 className="text-lg font-semibold mb-4">Observações do Pedido</h2>
@@ -415,116 +550,6 @@ export default function CheckoutPage() {
             />
           </div>
         </Card>
-        
-        {/* Dados para Delivery */}
-        {deliveryType === "delivery" && (
-          <Card className="mb-4">
-            <div className="p-4">
-              <h2 className="text-lg font-semibold mb-4">Dados para Entrega</h2>
-              <div className="space-y-4">
-                {/* Nome */}
-                <div>
-                  <Label htmlFor="name">Nome Completo *</Label>
-                  <div className="relative mt-1">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="name"
-                      placeholder="Seu nome completo"
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                {/* Telefone */}
-                <div>
-                  <Label htmlFor="phone">Telefone *</Label>
-                  <div className="relative mt-1">
-                    <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="phone"
-                      placeholder="(11) 99999-9999"
-                      value={customerPhone}
-                      onChange={(e) => handlePhoneChange(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                {/* CEP */}
-                <div>
-                  <Label htmlFor="cep">CEP *</Label>
-                  <div className="relative mt-1">
-                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="cep"
-                      placeholder="00000-000"
-                      value={customerCep}
-                      onChange={(e) => handleCepChange(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                    {searchingCep && (
-                      <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-gray-400" />
-                    )}
-                  </div>
-                  {cepError && <p className="text-red-600 text-sm mt-1">{cepError}</p>}
-                  {addressData && (
-                    <div className="mt-2 p-3 bg-green-50 rounded-lg text-sm">
-                      <p className="font-medium text-green-800">Endereço encontrado:</p>
-                      <p className="text-green-700">
-                        {addressData.logradouro}, {addressData.bairro} - {addressData.localidade}/{addressData.uf}
-                      </p>
-                    </div>
-                  )}
-                </div>
-                
-                {/* Campos adicionais após CEP */}
-                {addressData && (
-                  <>
-                    <div>
-                      <Label htmlFor="number">Número *</Label>
-                      <Input
-                        id="number"
-                        placeholder="123"
-                        value={addressNumber}
-                        onChange={(e) => setAddressNumber(e.target.value)}
-                        className="mt-1"
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="complement">Complemento</Label>
-                      <Input
-                        id="complement"
-                        placeholder="Apto 101, Bloco A..."
-                        value={addressComplement}
-                        onChange={(e) => setAddressComplement(e.target.value)}
-                        className="mt-1"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="delivery-notes">Observações de Entrega</Label>
-                      <Textarea
-                        id="delivery-notes"
-                        placeholder="Ponto de referência, instruções..."
-                        value={deliveryNotes}
-                        onChange={(e) => setDeliveryNotes(e.target.value)}
-                        className="mt-1"
-                        rows={2}
-                      />
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </Card>
-        )}
         
         {/* Forma de Pagamento */}
         <Card className="mb-4">
