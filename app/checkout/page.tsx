@@ -487,46 +487,48 @@ export default function CheckoutPage() {
           </div>
         </Card>
         
-        {/* Reorganização dinâmica baseada no tipo de entrega */}
-        {deliveryType === "delivery" ? (
-          <>
-            {/* Para Delivery: Dados para Entrega primeiro */}
-            <Card className="mb-4">
-              <div className="p-4">
-                <h2 className="text-lg font-semibold mb-4">Dados para Entrega</h2>
-                <div className="space-y-4">
-                  {/* Nome */}
-                  <div>
-                    <Label htmlFor="name">Nome Completo *</Label>
-                    <div className="relative mt-1">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="name"
-                        placeholder="Seu nome completo"
-                        value={customerName}
-                        onChange={(e) => setCustomerName(e.target.value)}
-                        className="pl-10"
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Telefone */}
-                  <div>
-                    <Label htmlFor="phone">Telefone *</Label>
-                    <div className="relative mt-1">
-                      <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="phone"
-                        placeholder="(11) 99999-9999"
-                        value={customerPhone}
-                        onChange={(e) => handlePhoneChange(e.target.value)}
-                        className="pl-10"
-                        required
-                      />
-                    </div>
-                  </div>
-                  
+        {/* Dados do Cliente sempre primeiro */}
+        <Card className="mb-4">
+          <div className="p-4">
+            <h2 className="text-lg font-semibold mb-4">
+              {deliveryType === "delivery" ? "Dados para Entrega" : "Dados do Cliente"}
+            </h2>
+            <div className="space-y-4">
+              {/* Nome */}
+              <div>
+                <Label htmlFor="name">Nome Completo *</Label>
+                <div className="relative mt-1">
+                  <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="name"
+                    placeholder="Seu nome completo"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+              
+              {/* Telefone */}
+              <div>
+                <Label htmlFor="phone">Telefone *</Label>
+                <div className="relative mt-1">
+                  <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="phone"
+                    placeholder="(11) 99999-9999"
+                    value={customerPhone}
+                    onChange={(e) => handlePhoneChange(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+              
+              {/* Campos específicos para Delivery */}
+              {deliveryType === "delivery" && (
+                <>
                   {/* CEP */}
                   <div>
                     <Label htmlFor="cep">CEP *</Label>
@@ -594,174 +596,71 @@ export default function CheckoutPage() {
                       </div>
                     </>
                   )}
-                </div>
-              </div>
-            </Card>
-            
-            {/* Depois para Delivery: Resumo do Pedido */}
-            <Card className="mb-4">
-              <div className="p-4">
-                <h2 className="text-lg font-semibold mb-4">Resumo do Pedido</h2>
-                <div className="space-y-3">
-                  {state.items?.map((item, index) => (
-                    <div key={index} className="flex justify-between items-start pb-3 border-b last:border-0">
-                      <div className="flex-1">
-                        <h3 className="font-medium">{item.nome}</h3>
-                        <p className="text-sm text-gray-600">
-                          {item.quantidade}x {item.tamanho} • {formatCurrency(item.preco)}
-                        </p>
-                        
-                        {/* Seção de Adicionais Editáveis por Sabor */}
-                        {item.sabores && item.sabores.length > 0 && (
-                          <div className="mt-3 space-y-3">
-                            {item.sabores.map((sabor, saborIndex) => {
-                              const adicionaisDisponiveis = getAdicionaisForSabor(sabor)
-                              if (adicionaisDisponiveis.length === 0) return null
-                              
-                              return (
-                                <div key={saborIndex} className="bg-gray-50 rounded-lg p-3">
-                                  <h4 className="text-sm font-medium text-gray-600 border-b border-gray-200 pb-1 mb-2">Opcionais:</h4>
-                                  <div className="space-y-2">
-                                    {adicionaisDisponiveis.map((adicional, adIndex) => (
-                                      <div key={adIndex} className="flex items-center justify-between">
-                                        <div className="flex items-center space-x-2">
-                                          <Checkbox
-                                            id={`${item.id}-${sabor}-${adicional.nome}`}
-                                            checked={item.adicionais?.find(a => a.sabor === sabor)?.itens.some(i => i.nome === adicional.nome) || false}
-                                            onCheckedChange={(checked) => 
-                                              handleToggleAdicional(item.id, sabor, adicional, checked as boolean)
-                                            }
-                                          />
-                                          <Label 
-                                            htmlFor={`${item.id}-${sabor}-${adicional.nome}`}
-                                            className="cursor-pointer text-sm flex-1"
-                                          >
-                                            {adicional.nome}
-                                          </Label>
-                                        </div>
-                                        <span className="text-sm font-medium text-green-600">
-                                          +{formatCurrency(adicional.preco)}
-                                        </span>
-                                      </div>
-                                    ))}
+                </>
+              )}
+            </div>
+          </div>
+        </Card>
+        
+        {/* Resumo do Pedido sempre segundo */}
+        <Card className="mb-4">
+          <div className="p-4">
+            <h2 className="text-lg font-semibold mb-4">Resumo do Pedido</h2>
+            <div className="space-y-3">
+              {state.items?.map((item, index) => (
+                <div key={index} className="flex justify-between items-start pb-3 border-b last:border-0">
+                  <div className="flex-1">
+                    <h3 className="font-medium">{item.nome}</h3>
+                    <p className="text-sm text-gray-600">
+                      {item.quantidade}x {item.tamanho} • {formatCurrency(item.preco)}
+                    </p>
+                    
+                    {/* Seção de Adicionais Editáveis por Sabor */}
+                    {item.sabores && item.sabores.length > 0 && (
+                      <div className="mt-3 space-y-3">
+                        {item.sabores.map((sabor, saborIndex) => {
+                          const adicionaisDisponiveis = getAdicionaisForSabor(sabor)
+                          if (adicionaisDisponiveis.length === 0) return null
+                          
+                          return (
+                            <div key={saborIndex} className="bg-gray-50 rounded-lg p-3">
+                              <h4 className="text-sm font-medium text-gray-600 border-b border-gray-200 pb-1 mb-2">Opcionais:</h4>
+                              <div className="space-y-2">
+                                {adicionaisDisponiveis.map((adicional, adIndex) => (
+                                  <div key={adIndex} className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-2">
+                                      <Checkbox
+                                        id={`${item.id}-${sabor}-${adicional.nome}`}
+                                        checked={item.adicionais?.find(a => a.sabor === sabor)?.itens.some(i => i.nome === adicional.nome) || false}
+                                        onCheckedChange={(checked) => 
+                                          handleToggleAdicional(item.id, sabor, adicional, checked as boolean)
+                                        }
+                                      />
+                                      <Label 
+                                        htmlFor={`${item.id}-${sabor}-${adicional.nome}`}
+                                        className="cursor-pointer text-sm flex-1"
+                                      >
+                                        {adicional.nome}
+                                      </Label>
+                                    </div>
+                                    <span className="text-sm font-medium text-green-600">
+                                      +{formatCurrency(adicional.preco)}
+                                    </span>
                                   </div>
-                                </div>
-                              )
-                            })}
-                          </div>
-                        )}
+                                ))}
+                              </div>
+                            </div>
+                          )
+                        })}
                       </div>
-                      <span className="font-semibold">{formatCurrency(item.preco * item.quantidade)}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Card>
-          </>
-        ) : (
-          <>
-            {/* Para Retirada no Balcão: ordem original - Resumo primeiro */}
-            <Card className="mb-4">
-              <div className="p-4">
-                <h2 className="text-lg font-semibold mb-4">Resumo do Pedido</h2>
-                <div className="space-y-3">
-                  {state.items?.map((item, index) => (
-                    <div key={index} className="flex justify-between items-start pb-3 border-b last:border-0">
-                      <div className="flex-1">
-                        <h3 className="font-medium">{item.nome}</h3>
-                        <p className="text-sm text-gray-600">
-                          {item.quantidade}x {item.tamanho} • {formatCurrency(item.preco)}
-                        </p>
-                        
-                        {/* Seção de Adicionais Editáveis por Sabor */}
-                        {item.sabores && item.sabores.length > 0 && (
-                          <div className="mt-3 space-y-3">
-                            {item.sabores.map((sabor, saborIndex) => {
-                              const adicionaisDisponiveis = getAdicionaisForSabor(sabor)
-                              if (adicionaisDisponiveis.length === 0) return null
-                              
-                              return (
-                                <div key={saborIndex} className="bg-gray-50 rounded-lg p-3">
-                                  <h4 className="text-sm font-medium text-gray-600 border-b border-gray-200 pb-1 mb-2">Opcionais:</h4>
-                                  <div className="space-y-2">
-                                    {adicionaisDisponiveis.map((adicional, adIndex) => (
-                                      <div key={adIndex} className="flex items-center justify-between">
-                                        <div className="flex items-center space-x-2">
-                                          <Checkbox
-                                            id={`pickup-${item.id}-${sabor}-${adicional.nome}`}
-                                            checked={item.adicionais?.find(a => a.sabor === sabor)?.itens.some(i => i.nome === adicional.nome) || false}
-                                            onCheckedChange={(checked) => 
-                                              handleToggleAdicional(item.id, sabor, adicional, checked as boolean)
-                                            }
-                                          />
-                                          <Label 
-                                            htmlFor={`pickup-${item.id}-${sabor}-${adicional.nome}`}
-                                            className="cursor-pointer text-sm flex-1"
-                                          >
-                                            {adicional.nome}
-                                          </Label>
-                                        </div>
-                                        <span className="text-sm font-medium text-green-600">
-                                          +{formatCurrency(adicional.preco)}
-                                        </span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              )
-                            })}
-                          </div>
-                        )}
-                      </div>
-                      <span className="font-semibold">{formatCurrency(item.preco * item.quantidade)}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Card>
-            
-            {/* Dados do Cliente para Retirada no Balcão */}
-            <Card className="mb-4">
-              <div className="p-4">
-                <h2 className="text-lg font-semibold mb-4">Dados do Cliente</h2>
-                <div className="space-y-4">
-                  {/* Nome */}
-                  <div>
-                    <Label htmlFor="pickup-name">Nome Completo *</Label>
-                    <div className="relative mt-1">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="pickup-name"
-                        placeholder="Seu nome completo"
-                        value={customerName}
-                        onChange={(e) => setCustomerName(e.target.value)}
-                        className="pl-10"
-                        required
-                      />
-                    </div>
+                    )}
                   </div>
-                  
-                  {/* Telefone */}
-                  <div>
-                    <Label htmlFor="pickup-phone">Telefone *</Label>
-                    <div className="relative mt-1">
-                      <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="pickup-phone"
-                        type="tel"
-                        placeholder="(11) 99999-9999"
-                        value={customerPhone}
-                        onChange={(e) => handlePhoneChange(e.target.value)}
-                        className="pl-10"
-                        required
-                      />
-                    </div>
-                  </div>
+                  <span className="font-semibold">{formatCurrency(item.preco * item.quantidade)}</span>
                 </div>
-              </div>
-            </Card>
-          </>
-        )}
+              ))}
+            </div>
+          </div>
+        </Card>
         
         {/* Observações do Pedido (sempre na mesma posição) */}
         <Card className="mb-4">
