@@ -15,6 +15,11 @@ export interface CartItem {
     sabor: string
     itens: { nome: string; preco: number }[]
   }[]
+  bordaRecheada?: {
+    id: string
+    nome: string
+    preco: number
+  }
 }
 
 interface CartState {
@@ -27,6 +32,7 @@ type CartAction =
   | { type: "REMOVE_ITEM"; payload: string }
   | { type: "UPDATE_QUANTITY"; payload: { id: string; quantidade: number } }
   | { type: "UPDATE_ADICIONAIS"; payload: { id: string; adicionais: { sabor: string; itens: { nome: string; preco: number }[] }[] } }
+  | { type: "UPDATE_BORDA"; payload: { id: string; bordaRecheada?: { id: string; nome: string; preco: number } } }
   | { type: "CLEAR_CART" }
 
 const CartContext = createContext<{
@@ -43,7 +49,8 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
           item.id === action.payload.id &&
           item.tamanho === action.payload.tamanho &&
           JSON.stringify(item.sabores.sort()) === JSON.stringify(action.payload.sabores.sort()) &&
-          JSON.stringify(item.adicionais || []) === JSON.stringify(action.payload.adicionais || []),
+          JSON.stringify(item.adicionais || []) === JSON.stringify(action.payload.adicionais || []) &&
+          JSON.stringify(item.bordaRecheada || null) === JSON.stringify(action.payload.bordaRecheada || null),
       )
 
       let newItems: CartItem[]
@@ -105,6 +112,32 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
           return {
             ...item,
             adicionais: action.payload.adicionais,
+            preco: newPrice
+          }
+        }
+        return item
+      })
+
+      const newTotal = newItems.reduce((sum, item) => sum + item.preco * item.quantidade, 0)
+
+      return {
+        items: newItems,
+        total: newTotal,
+      }
+    }
+
+    case "UPDATE_BORDA": {
+      const newItems = state.items.map((item) => {
+        if (item.id === action.payload.id) {
+          // Calcular preço base (sem borda anterior)
+          const basePrice = item.preco - (item.bordaRecheada?.preco || 0)
+          
+          // Calcular novo preço com nova borda
+          const newPrice = basePrice + (action.payload.bordaRecheada?.preco || 0)
+          
+          return {
+            ...item,
+            bordaRecheada: action.payload.bordaRecheada,
             preco: newPrice
           }
         }

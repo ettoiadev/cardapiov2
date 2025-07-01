@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, ShoppingBag, MapPin, Phone, User, CreditCard, DollarSign, Smartphone, Loader2, Plus, Minus, QrCode, Banknote, UtensilsCrossed, Bike } from "lucide-react"
+import { ArrowLeft, ShoppingBag, MapPin, Phone, User, CreditCard, DollarSign, Smartphone, Loader2, Plus, Minus, QrCode, Banknote, UtensilsCrossed, Bike, Pizza } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -48,6 +48,14 @@ interface Produto {
   adicionais?: Adicional[]
 }
 
+interface BordaRecheada {
+  id: string
+  nome: string
+  preco: number
+  ativo: boolean
+  ordem: number
+}
+
 export default function CheckoutPage() {
   const router = useRouter()
   const { state, dispatch } = useCart()
@@ -56,6 +64,7 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(true)
   const [storeConfig, setStoreConfig] = useState<StoreConfig | null>(null)
   const [produtos, setProdutos] = useState<Produto[]>([])
+  const [bordasRecheadas, setBordasRecheadas] = useState<BordaRecheada[]>([])
   
   // Tipo de entrega
   const [deliveryType, setDeliveryType] = useState<"balcao" | "delivery">("balcao")
@@ -78,7 +87,7 @@ export default function CheckoutPage() {
     // Carregar configurações da loja e produtos
   useEffect(() => {
     const loadData = async () => {
-      await Promise.all([loadStoreConfig(), loadProdutos()])
+      await Promise.all([loadStoreConfig(), loadProdutos(), loadBordasRecheadas()])
     }
     loadData()
   }, [])
@@ -174,6 +183,24 @@ export default function CheckoutPage() {
       console.error("Erro ao carregar produtos:", error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadBordasRecheadas = async () => {
+    try {
+      if (isSupabaseConfigured()) {
+        const { data } = await supabase
+          .from("bordas_recheadas")
+          .select("*")
+          .eq("ativo", true)
+          .order("ordem")
+        
+        if (data) {
+          setBordasRecheadas(data)
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao carregar bordas recheadas:", error)
     }
   }
   
@@ -286,6 +313,11 @@ export default function CheckoutPage() {
             message += `   • Adicionais (${adicionalGrupo.sabor}): ${adicionalGrupo.itens.map(adic => `${adic.nome} (+${formatCurrency(adic.preco)})`).join(', ')}\n`
           }
         })
+      }
+      
+      // Mostrar borda recheada se existir
+      if (item.bordaRecheada) {
+        message += `   • Borda Recheada: ${item.bordaRecheada.nome} (+${formatCurrency(item.bordaRecheada.preco)})\n`
       }
       
       message += `   • Valor: ${formatCurrency(item.preco * item.quantidade)}\n\n`
@@ -406,6 +438,21 @@ export default function CheckoutPage() {
         }
       })
     }
+  }
+
+  // Atualizar borda recheada de um item
+  const handleUpdateBorda = (itemId: string, borda: BordaRecheada | null) => {
+    dispatch({
+      type: "UPDATE_BORDA",
+      payload: {
+        id: itemId,
+        bordaRecheada: borda ? {
+          id: borda.id,
+          nome: borda.nome,
+          preco: borda.preco
+        } : undefined
+      }
+    })
   }
 
   // Finalizar pedido
@@ -640,7 +687,7 @@ export default function CheckoutPage() {
                         >
                           <Minus className="h-4 w-4" />
                         </Button>
-                        <span className="min-w-[2rem] text-center font-medium">
+                        <span className="w-7 text-center font-medium text-sm">
                           {item.quantidade}x
                         </span>
                         <Button
@@ -714,6 +761,54 @@ export default function CheckoutPage() {
                           </div>
                         )
                       })}
+                    </div>
+                  )}
+
+                  {/* Seção de Bordas Recheadas (apenas para pizzas) */}
+                  {item.tipo !== "bebida" && bordasRecheadas.length > 0 && (
+                    <div className="mt-4 bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                      <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                        <Pizza className="h-4 w-4 text-yellow-600" />
+                        Borda Recheada (Opcional):
+                      </h4>
+                      <div className="space-y-2">
+                        {/* Opção "Sem borda" */}
+                        <label className="flex items-center justify-between p-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 cursor-pointer">
+                          <div className="flex items-center space-x-3">
+                            <input
+                              type="radio"
+                              name={`borda-${item.id}`}
+                              checked={!item.bordaRecheada}
+                              onChange={() => handleUpdateBorda(item.id, null)}
+                              className="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
+                            />
+                            <span className="text-sm text-gray-700">Sem borda recheada</span>
+                          </div>
+                          <span className="text-sm text-gray-500">R$ 0,00</span>
+                        </label>
+
+                        {/* Opções de bordas disponíveis */}
+                        {bordasRecheadas.map((borda) => (
+                          <label 
+                            key={borda.id} 
+                            className="flex items-center justify-between p-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 cursor-pointer"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <input
+                                type="radio"
+                                name={`borda-${item.id}`}
+                                checked={item.bordaRecheada?.id === borda.id}
+                                onChange={() => handleUpdateBorda(item.id, borda)}
+                                className="w-4 h-4 text-yellow-600 border-gray-300 focus:ring-yellow-500"
+                              />
+                              <span className="text-sm text-gray-700">{borda.nome}</span>
+                            </div>
+                            <span className="text-sm font-medium text-green-600">
+                              +{formatCurrency(borda.preco)}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
