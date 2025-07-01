@@ -207,8 +207,13 @@ export default function CheckoutPage() {
         addressData !== null &&
         addressNumber.trim() !== ""
       )
+    } else {
+      // Para retirada no balcão: apenas nome e telefone são obrigatórios
+      return (
+        customerName.trim() !== "" &&
+        customerPhone.replace(/\D/g, "").length >= 10
+      )
     }
-    return true
   }
   
   // Gerar mensagem para WhatsApp
@@ -241,12 +246,13 @@ export default function CheckoutPage() {
     // Tipo de entrega
     message += `🚚 *ENTREGA:* ${deliveryType === "delivery" ? "Delivery" : "Retirada no Balcão"}\n\n`
     
+    // Dados do cliente
+    message += `👤 *DADOS DO CLIENTE:*\n`
+    message += `Nome: ${customerName}\n`
+    message += `Telefone: ${customerPhone}\n\n`
+    
     // Dados do cliente (se delivery)
     if (deliveryType === "delivery") {
-      message += `👤 *DADOS DO CLIENTE:*\n`
-      message += `Nome: ${customerName}\n`
-      message += `Telefone: ${customerPhone}\n\n`
-      
       message += `📍 *ENDEREÇO DE ENTREGA:*\n`
       if (addressData) {
         message += `${addressData.logradouro}, ${addressNumber}\n`
@@ -532,6 +538,47 @@ export default function CheckoutPage() {
                       <span className="font-semibold">{formatCurrency(item.preco * item.quantidade)}</span>
                     </div>
                   ))}
+                </div>
+              </div>
+            </Card>
+            
+            {/* Dados do Cliente para Retirada no Balcão */}
+            <Card className="mb-4">
+              <div className="p-4">
+                <h2 className="text-lg font-semibold mb-4">Dados do Cliente</h2>
+                <div className="space-y-4">
+                  {/* Nome */}
+                  <div>
+                    <Label htmlFor="pickup-name">Nome Completo *</Label>
+                    <div className="relative mt-1">
+                      <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        id="pickup-name"
+                        placeholder="Seu nome completo"
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Telefone */}
+                  <div>
+                    <Label htmlFor="pickup-phone">Telefone *</Label>
+                    <div className="relative mt-1">
+                      <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Input
+                        id="pickup-phone"
+                        type="tel"
+                        placeholder="(11) 99999-9999"
+                        value={customerPhone}
+                        onChange={(e) => handlePhoneChange(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </Card>
