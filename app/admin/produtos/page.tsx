@@ -335,7 +335,7 @@ export default function AdminProdutosPage() {
           </div>
         </div>
 
-        {/* Management Sections Grid */}
+        {/* Management Sections Grid - MOVIDO PARA CIMA */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
           {/* Categories Management */}
           <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
@@ -525,7 +525,7 @@ export default function AdminProdutosPage() {
           </Card>
         </div>
 
-        {/* Products List Section */}
+        {/* Products List Section - MOVIDO PARA BAIXO */}
         <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
           <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 border-b border-orange-100 p-6">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
