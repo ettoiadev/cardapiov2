@@ -133,13 +133,11 @@ export function SocialFooter({ hasCartItems = false }: SocialFooterProps) {
   return (
     <footer 
       className={`
-        w-full bg-red-600 shadow-sm
+        w-full bg-red-600 shadow-sm flex-shrink-0
         transition-all duration-300 ease-in-out
         ${hasCartItems ? 'mb-20 md:mb-20' : 'mb-0'}
       `}
       style={{ 
-        position: 'sticky',
-        top: '100vh',
         zIndex: 40
       }}
     >

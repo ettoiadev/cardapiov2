@@ -528,9 +528,9 @@ function HomePageContent() {
   }
 
   return (
-      <div className="relative min-h-screen bg-gray-50 scroll-smooth">
+      <div className="flex flex-col homepage-container bg-gray-50 scroll-smooth">
         {/* Header com foto de capa e perfil */}
-        <div className="relative">
+        <div className="relative flex-shrink-0">
           <div
             className="h-48 bg-cover bg-center"
             style={{ backgroundImage: `url(${config?.foto_capa || "/placeholder.jpg"})` }}
@@ -544,12 +544,12 @@ function HomePageContent() {
           </div>
         </div>
 
-        <div className="relative px-4 pt-6 pb-4">
+        <div className="relative px-4 pt-6 pb-4 flex-shrink-0">
           <h1 className="text-2xl font-bold text-gray-900 ml-32">{config?.nome}</h1>
         </div>
 
         {/* Menu horizontal com informações */}
-        <div className="px-4 py-4 bg-white border-b">
+        <div className="px-4 py-4 bg-white border-b flex-shrink-0">
           <div className="flex items-center justify-between w-full flex-wrap gap-y-3">
             {/* Status da Pizzaria (dinâmico) */}
             <div className="w-auto mr-4 flex-shrink-0">
@@ -614,8 +614,10 @@ function HomePageContent() {
           </div>
         </div>
 
-        {/* Cardápio */}
-        <div className="px-4 py-4 space-y-4 pb-24 md:pb-20 overflow-y-auto">
+        {/* Container principal flexível */}
+        <div className="homepage-content-area">
+          {/* Cardápio - área de conteúdo principal */}
+          <div className="flex-1 px-4 py-4 space-y-4 content-scroll-container">
           {/* Seção Pizzas */}
           <Card>
             <CardContent className="p-4">
@@ -828,14 +830,16 @@ function HomePageContent() {
               </Card>
             )
           })}
+          </div>
+
+          {/* Modals */}
+          {config && <StoreInfoModal isOpen={showStoreInfo} onClose={() => setShowStoreInfo(false)} config={config} />}
+
+          {/* Rodapé com redes sociais - sticky ao final do conteúdo */}
+          <div className="social-footer-responsive">
+            <SocialFooter hasCartItems={cartState.items.length > 0} />
+          </div>
         </div>
-
-        {/* Modals */}
-
-        {config && <StoreInfoModal isOpen={showStoreInfo} onClose={() => setShowStoreInfo(false)} config={config} />}
-
-        {/* Rodapé com redes sociais */}
-        <SocialFooter hasCartItems={cartState.items.length > 0} />
 
         {/* Carrinho fixo no rodapé */}
         <CartFooter />
