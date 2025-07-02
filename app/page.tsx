@@ -528,7 +528,7 @@ function HomePageContent() {
   }
 
   return (
-      <div className="flex flex-col homepage-container bg-gray-50 scroll-smooth">
+      <div className="min-h-screen flex flex-col bg-gray-50 scroll-smooth">
         {/* Header com foto de capa e perfil */}
         <div className="relative flex-shrink-0">
           <div
@@ -615,9 +615,9 @@ function HomePageContent() {
         </div>
 
         {/* Container principal flexível */}
-        <div className="homepage-content-area">
+        <div className="flex-1 flex flex-col">
           {/* Cardápio - área de conteúdo principal */}
-          <div className="flex-1 px-4 py-4 space-y-4 content-scroll-container">
+          <div className="flex-1 px-4 py-4 space-y-4">
           {/* Seção Pizzas */}
           <Card>
             <CardContent className="p-4">
@@ -836,7 +836,7 @@ function HomePageContent() {
           {config && <StoreInfoModal isOpen={showStoreInfo} onClose={() => setShowStoreInfo(false)} config={config} />}
 
           {/* Rodapé com redes sociais - sticky ao final do conteúdo */}
-          <div className="social-footer-responsive">
+          <div className="mt-auto">
             <SocialFooter hasCartItems={cartState.items.length > 0} />
           </div>
         </div>

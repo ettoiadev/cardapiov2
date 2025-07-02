@@ -170,78 +170,16 @@ body {
     height: var(--cart-footer-height-desktop);
   }
   
-  /* Homepage responsive layout improvements */
-  .homepage-container {
-    /* Ensure proper viewport height calculation on mobile */
-    min-height: 100vh;
-    min-height: 100dvh; /* Dynamic viewport height for better mobile support */
-  }
-  
-  .homepage-content-area {
-    /* Responsive content area that grows to fill available space */
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  /* Mobile-first responsive breakpoints for different device sizes */
-  @media screen and (max-width: 480px) {
-    /* iPhone SE, small Android phones */
-    .homepage-container {
-      min-height: calc(100vh - env(safe-area-inset-bottom));
-      min-height: calc(100dvh - env(safe-area-inset-bottom));
-    }
-    
-    /* Ensure proper spacing on very small screens */
-    .homepage-content-area {
-      min-height: calc(100vh - 400px); /* Account for header + info bar */
-    }
-  }
-  
-  @media screen and (min-width: 481px) and (max-width: 768px) {
-    /* iPhone 13, Galaxy S21, medium phones */
-    .homepage-container {
-      min-height: 100vh;
-      min-height: 100dvh;
-    }
-    
-    .homepage-content-area {
-      min-height: calc(100vh - 380px); /* Account for header + info bar */
-    }
-  }
-  
-  @media screen and (min-width: 769px) {
-    /* Tablets and desktop */
-    .homepage-container {
-      min-height: 100vh;
-    }
-    
-    .homepage-content-area {
-      min-height: calc(100vh - 360px); /* Account for header + info bar */
-    }
-  }
-  
-  /* Prevent content jumping and ensure smooth scrolling */
-  .content-scroll-container {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-    scroll-behavior: smooth;
-    /* Improve performance on mobile browsers */
-    transform: translateZ(0);
-    will-change: scroll-position;
-  }
-  
-  /* Chrome mobile viewport fix */
+  /* Mobile viewport optimizations */
   @supports (-webkit-touch-callout: none) {
-    .homepage-container {
+    .min-h-screen {
       min-height: -webkit-fill-available;
     }
   }
   
-  /* Social footer positioning improvements */
-  .social-footer-responsive {
-    /* Stick to bottom when content is short, flow naturally when content is long */
-    margin-top: auto;
-    flex-shrink: 0;
+  /* Improve scroll performance on mobile browsers */
+  .scroll-smooth {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
   }
 }
