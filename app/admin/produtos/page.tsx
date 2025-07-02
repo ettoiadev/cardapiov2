@@ -573,8 +573,8 @@ export default function AdminProdutosPage() {
 
           {/* Bordas Recheadas Management */}
           <Card className="border-muted/30 shadow-sm rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-yellow-50/50 to-orange-50/30 border-b border-muted/20 p-6">
-              <div className="flex items-center justify-between">
+            <CardHeader className="bg-gradient-to-r from-yellow-50/50 to-orange-50/30 border-b border-muted/20 px-4 py-3">
+              <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-yellow-100/80 rounded-xl">
                     <Pizza className="h-5 w-5 text-yellow-600" />
@@ -588,9 +588,9 @@ export default function AdminProdutosPage() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   {/* Toggle Global para Bordas Recheadas */}
-                  <div className="flex items-center gap-3 bg-card/50 rounded-xl p-3 border border-muted/30">
+                  <div className="flex items-center gap-2 bg-card/50 rounded-xl px-4 py-3 border border-muted/30">
                     <div className="flex items-center gap-2">
                       <Pizza className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm font-medium text-foreground">Habilitar Bordas</span>
@@ -635,8 +635,8 @@ export default function AdminProdutosPage() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-6">
-              <div className="space-y-4">
+            <CardContent className="px-4 py-3">
+              <div className="space-y-3">
                 {bordasRecheadas.length > 0 ? (
                   <div className="space-y-3">
                     {bordasRecheadas.map((borda) => (
@@ -644,8 +644,8 @@ export default function AdminProdutosPage() {
                         key={borda.id} 
                         className="group bg-card/50 border border-muted/30 rounded-xl p-4 hover:shadow-md hover:border-muted/50 transition-all duration-200"
                       >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1 space-y-3">
                             <div className="flex items-center gap-3">
                               <h3 className="font-semibold text-foreground">{borda.nome}</h3>
                               <Badge variant={borda.ativo ? "default" : "secondary"} className="text-xs rounded-full">
@@ -655,35 +655,37 @@ export default function AdminProdutosPage() {
                                 +{formatCurrency(borda.preco)}
                               </span>
                             </div>
-                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                              <span className="flex items-center gap-1">
-                                <ArrowUpDown className="h-3 w-3" />
-                                Ordem: {borda.ordem}
-                              </span>
-                              <div className="flex items-center gap-3">
-                                <div className="flex items-center gap-2">
-                                  {borda.ativo ? (
-                                    <CheckCircle2 className="h-4 w-4 text-green-500" />
-                                  ) : (
-                                    <XCircle className="h-4 w-4 text-muted-foreground" />
-                                  )}
-                                  <span className="text-sm text-muted-foreground">
-                                    {borda.ativo ? "Disponível" : "Indisponível"}
-                                  </span>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-6">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                  <ArrowUpDown className="h-4 w-4" />
+                                  Ordem: {borda.ordem}
+                                </span>
+                                <div className="flex items-center gap-3">
+                                  <div className="flex items-center gap-2">
+                                    {borda.ativo ? (
+                                      <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                    ) : (
+                                      <XCircle className="h-4 w-4 text-muted-foreground" />
+                                    )}
+                                    <span className="text-sm text-muted-foreground">
+                                      {borda.ativo ? "Disponível" : "Indisponível"}
+                                    </span>
+                                  </div>
+                                  <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                      type="checkbox"
+                                      checked={borda.ativo}
+                                      onChange={(e) => handleToggleBorda(borda.id, e.target.checked)}
+                                      className="sr-only peer"
+                                    />
+                                    <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-muted after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                  </label>
                                 </div>
-                                <label className="relative inline-flex items-center cursor-pointer">
-                                  <input
-                                    type="checkbox"
-                                    checked={borda.ativo}
-                                    onChange={(e) => handleToggleBorda(borda.id, e.target.checked)}
-                                    className="sr-only peer"
-                                  />
-                                  <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-muted after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                                </label>
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity ml-3">
                             <Button
                               variant="ghost"
                               size="sm"
@@ -709,12 +711,12 @@ export default function AdminProdutosPage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-muted/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-muted/20 rounded-full flex items-center justify-center mx-auto mb-3">
                       <Pizza className="h-8 w-8 text-muted-foreground" />
                     </div>
                     <h3 className="text-lg font-medium text-foreground mb-2">Nenhuma borda recheada</h3>
-                    <p className="text-muted-foreground mb-4">Crie sua primeira borda recheada para disponibilizar aos clientes</p>
+                    <p className="text-muted-foreground mb-3">Crie sua primeira borda recheada para disponibilizar aos clientes</p>
                   </div>
                 )}
               </div>
