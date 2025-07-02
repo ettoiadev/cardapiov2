@@ -45,6 +45,7 @@ interface Produto {
   preco_broto: number | null
   tipo: string
   ativo: boolean
+  ordem: number
   adicionais?: Adicional[]
 }
 
@@ -692,10 +693,13 @@ function HomePageContent() {
 
                   {/* Lista de pizzas */}
                   <div className="space-y-3">
-                    {[...pizzasSalgadas, ...pizzasDoces].map((pizza) => {
+                    {[...pizzasSalgadas, ...pizzasDoces]
+                      .sort((a, b) => a.ordem - b.ordem) // Garantir ordenação por ordem
+                      .map((pizza, index) => {
                       const isSelected = selectedFlavorsForMulti.find(p => p.id === pizza.id)
                       const isDisabled = selectedFlavorsForMulti.length >= flavorMode && !isSelected
                       const isSingleFlavorSelected = flavorMode === 1 && selectedSingleFlavor === pizza.id
+                      const pizzaNumber = index + 1 // Numeração sequencial baseada na posição ordenada
                       
                       return (
                         <div
@@ -721,7 +725,7 @@ function HomePageContent() {
                         >
                         <div className="flex-1">
                           <div className="flex items-center space-x-2">
-                            <h3 className="font-medium">{pizza.nome}</h3>
+                            <h3 className="font-medium">{pizzaNumber}. {pizza.nome}</h3>
                             {pizza.tipo === "doce" && (
                               <Badge variant="secondary" className="text-xs">
                                 Doce
