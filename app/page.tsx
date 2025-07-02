@@ -48,170 +48,6 @@ interface Produto {
   adicionais?: Adicional[]
 }
 
-// Mock data for when Supabase is not configured
-const mockConfig: PizzariaConfig = {
-  id: "1",
-  nome: "Pizzaria Bella Vista",
-  foto_capa: "/placeholder.jpg",
-  foto_perfil: "/placeholder-logo.png",
-  taxa_entrega: 5.0,
-  tempo_entrega_min: 60,
-  tempo_entrega_max: 90,
-  valor_minimo: 20.0,
-  aceita_dinheiro: true,
-  aceita_cartao: true,
-  endereco: "Rua das Flores, 123 - Centro",
-  telefone: "(11) 99999-9999",
-  whatsapp: "5511999999999",
-  horario_funcionamento: {
-    segunda: "18:00-23:00",
-    terca: "18:00-23:00",
-    quarta: "18:00-23:00",
-    quinta: "18:00-23:00",
-    sexta: "18:00-00:00",
-    sabado: "18:00-00:00",
-    domingo: "18:00-23:00",
-  },
-}
-
-// Aviso: Estes são dados de exemplo para desenvolvimento
-// Em produção, todos os dados devem vir do Supabase
-console.warn("⚠️ DADOS MOCKADOS: Configuração de exemplo está sendo usada")
-
-const mockProdutos: Produto[] = [
-  // Aviso: Estes são dados de exemplo para desenvolvimento  
-  // Em produção, todos os produtos devem vir do Supabase
-  
-  // Pizzas Salgadas
-  {
-    id: "1",
-    nome: "Margherita",
-    descricao: "Molho de tomate, mussarela, manjericão",
-    preco_tradicional: 35.0,
-    preco_broto: 25.0,
-    tipo: "salgada",
-    ativo: true,
-    adicionais: [
-      { nome: "Queijo Extra", preco: 3.50 },
-      { nome: "Azeitona", preco: 2.00 },
-      { nome: "Orégano", preco: 1.00 }
-    ]
-  },
-  {
-    id: "2",
-    nome: "Calabresa",
-    descricao: "Molho de tomate, mussarela, calabresa, cebola",
-    preco_tradicional: 38.0,
-    preco_broto: 28.0,
-    tipo: "salgada",
-    ativo: true,
-    adicionais: [
-      { nome: "Calabresa Extra", preco: 4.00 },
-      { nome: "Cebola Roxa", preco: 1.50 },
-      { nome: "Pimenta", preco: 1.00 }
-    ]
-  },
-  {
-    id: "3",
-    nome: "Portuguesa",
-    descricao: "Molho de tomate, mussarela, presunto, ovos, cebola, azeitona",
-    preco_tradicional: 42.0,
-    preco_broto: 32.0,
-    tipo: "salgada",
-    ativo: true,
-  },
-  {
-    id: "4",
-    nome: "Frango Catupiry",
-    descricao: "Molho de tomate, mussarela, frango desfiado, catupiry",
-    preco_tradicional: 40.0,
-    preco_broto: 30.0,
-    tipo: "salgada",
-    ativo: true,
-    adicionais: [
-      { nome: "Frango Extra", preco: 5.00 },
-      { nome: "Catupiry Extra", preco: 3.00 },
-      { nome: "Milho", preco: 2.00 }
-    ]
-  },
-  {
-    id: "5",
-    nome: "Quatro Queijos",
-    descricao: "Molho de tomate, mussarela, provolone, parmesão, gorgonzola",
-    preco_tradicional: 45.0,
-    preco_broto: 35.0,
-    tipo: "salgada",
-    ativo: true,
-  },
-
-  // Pizzas Doces
-  {
-    id: "6",
-    nome: "Chocolate",
-    descricao: "Chocolate ao leite derretido",
-    preco_tradicional: 32.0,
-    preco_broto: 22.0,
-    tipo: "doce",
-    ativo: true,
-  },
-  {
-    id: "7",
-    nome: "Brigadeiro",
-    descricao: "Chocolate, leite condensado, granulado",
-    preco_tradicional: 35.0,
-    preco_broto: 25.0,
-    tipo: "doce",
-    ativo: true,
-  },
-  {
-    id: "8",
-    nome: "Romeu e Julieta",
-    descricao: "Queijo minas, goiabada",
-    preco_tradicional: 38.0,
-    preco_broto: 28.0,
-    tipo: "doce",
-    ativo: true,
-  },
-
-  // Bebidas
-  {
-    id: "9",
-    nome: "Coca-Cola 2L",
-    descricao: "Refrigerante Coca-Cola 2 litros",
-    preco_tradicional: 8.0,
-    preco_broto: null,
-    tipo: "bebida",
-    ativo: true,
-  },
-  {
-    id: "10",
-    nome: "Guaraná Antarctica 2L",
-    descricao: "Refrigerante Guaraná Antarctica 2 litros",
-    preco_tradicional: 7.0,
-    preco_broto: null,
-    tipo: "bebida",
-    ativo: true,
-  },
-  {
-    id: "11",
-    nome: "Água Mineral",
-    descricao: "Água mineral 500ml",
-    preco_tradicional: 3.0,
-    preco_broto: null,
-    tipo: "bebida",
-    ativo: true,
-  },
-  {
-    id: "12",
-    nome: "Suco de Laranja",
-    descricao: "Suco natural de laranja 500ml",
-    preco_tradicional: 6.0,
-    preco_broto: null,
-    tipo: "bebida",
-    ativo: true,
-  },
-]
-
 // Função utilitária para formatar nome da pizza com sabores
 const formatPizzaName = (sabores: string[]): string => {
   if (sabores.length === 1) {
@@ -233,13 +69,14 @@ const formatSaboresDisplay = (sabores: string[]): string => {
 }
 
 function HomePageContent() {
-  const [config, setConfig] = useState<PizzariaConfig>(mockConfig)
-  const [produtos, setProdutos] = useState<Produto[]>(mockProdutos)
+  const [loading, setLoading] = useState(true)
+  const [config, setConfig] = useState<PizzariaConfig | null>(null)
+  const [produtos, setProdutos] = useState<Produto[]>([])
   const [opcoesSabores, setOpcoesSabores] = useState<any[]>([])
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({})
+  const [hasError, setHasError] = useState(false)
 
   const [showStoreInfo, setShowStoreInfo] = useState(false)
-  const [loading, setLoading] = useState(true)
   const [flavorMode, setFlavorMode] = useState<1 | 2 | 3>(1)
   const [selectedFlavorsForMulti, setSelectedFlavorsForMulti] = useState<Produto[]>([])
   const [selectedSingleFlavor, setSelectedSingleFlavor] = useState<string | null>(null)
@@ -266,7 +103,7 @@ function HomePageContent() {
     }
     
     const dayKey = dayMap[currentDay as keyof typeof dayMap]
-    const todaySchedule = config.horario_funcionamento?.[dayKey]
+    const todaySchedule = config?.horario_funcionamento?.[dayKey]
     
     if (!todaySchedule || todaySchedule.toLowerCase() === 'fechado') {
       return {
@@ -352,7 +189,7 @@ function HomePageContent() {
     const interval = setInterval(updateStatus, 60000)
     
     return () => clearInterval(interval)
-  }, [config.horario_funcionamento])
+  }, [config?.horario_funcionamento])
 
   // Processamento automático APENAS para múltiplos sabores (2 ou 3)
   useEffect(() => {
@@ -394,72 +231,73 @@ function HomePageContent() {
 
   const loadData = async () => {
     try {
-      if (isSupabaseConfigured()) {
-        console.log("✅ Supabase configurado - Carregando dados reais...")
+      if (!isSupabaseConfigured()) {
+        console.error("❌ Aplicação não configurada para produção")
+        console.error("   Configure as variáveis de ambiente:")
+        console.error("   NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY")
+        setHasError(true)
+        setLoading(false)
+        return
+      }
+
+      console.log("🔄 Carregando dados de produção...")
+      
+      // Carregar dados do Supabase
+      const [configResult, produtosResult, opcoesResult] = await Promise.all([
+        supabase.from("pizzaria_config").select("*").single(),
+        supabase.from("produtos").select("*").eq("ativo", true).order("ordem"),
+        supabase.from("opcoes_sabores").select("*").eq("ativo", true).order("ordem"),
+      ])
+
+      // Configuração da pizzaria é obrigatória
+      if (configResult.error || !configResult.data) {
+        console.error("❌ Erro: Configuração da pizzaria não encontrada")
+        setHasError(true)
+        setLoading(false)
+        return
+      }
+      
+      setConfig(configResult.data)
+      console.log("✅ Configuração da pizzaria carregada")
+
+      // Produtos são obrigatórios
+      if (produtosResult.error || !produtosResult.data || produtosResult.data.length === 0) {
+        console.error("❌ Erro: Nenhum produto encontrado no cardápio")
+        setHasError(true)
+        setLoading(false)
+        return
+      }
+      
+      setProdutos(produtosResult.data)
+      console.log(`✅ ${produtosResult.data.length} produtos carregados`)
+
+      // Opções de sabores - usar padrão se não existir
+      if (opcoesResult.data && opcoesResult.data.length > 0) {
+        setOpcoesSabores(opcoesResult.data)
+        console.log(`✅ ${opcoesResult.data.length} opções de sabores carregadas`)
         
-        // Try to load from Supabase
-        const [configResult, produtosResult, opcoesResult] = await Promise.all([
-          supabase.from("pizzaria_config").select("*").single(),
-          supabase.from("produtos").select("*").eq("ativo", true).order("ordem"),
-          supabase.from("opcoes_sabores").select("*").eq("ativo", true).order("ordem"),
-        ])
-
-        if (configResult.data) {
-          setConfig(configResult.data)
-          console.log("✅ Configuração da pizzaria carregada do Supabase")
-        } else {
-          console.warn("⚠️ Configuração da pizzaria não encontrada no Supabase - Usando dados mockados")
-        }
-
-        if (produtosResult.data && produtosResult.data.length > 0) {
-          setProdutos(produtosResult.data)
-          console.log(`✅ ${produtosResult.data.length} produtos carregados do Supabase`)
-        } else {
-          console.warn("⚠️ Nenhum produto encontrado no Supabase - Mantendo dados mockados")
-        }
-
-        if (opcoesResult.data && opcoesResult.data.length > 0) {
-          setOpcoesSabores(opcoesResult.data)
-          console.log(`✅ ${opcoesResult.data.length} opções de sabores carregadas do Supabase`)
-          
-          // Verificar se o modo atual ainda está ativo
-          const opcaoAtual = opcoesResult.data.find(o => o.maximo_sabores === flavorMode && o.ativo)
-          if (!opcaoAtual) {
-            // Se o modo atual não está ativo, voltar para 1 sabor
-            setFlavorMode(1)
-            setSelectedFlavorsForMulti([])
-          }
-        } else {
-          console.warn("⚠️ Opções de sabores não encontradas no Supabase - Usando configuração padrão")
-          // Fallback para opções padrão
-          setOpcoesSabores([
-            { id: "1", nome: "1 Sabor", maximo_sabores: 1, ordem: 1, ativo: true },
-            { id: "2", nome: "2 Sabores", maximo_sabores: 2, ordem: 2, ativo: true },
-            { id: "3", nome: "3 Sabores", maximo_sabores: 3, ordem: 3, ativo: true }
-          ])
+        // Verificar se o modo atual ainda está ativo
+        const opcaoAtual = opcoesResult.data.find(o => o.maximo_sabores === flavorMode && o.ativo)
+        if (!opcaoAtual) {
+          // Se o modo atual não está ativo, voltar para 1 sabor
+          setFlavorMode(1)
+          setSelectedFlavorsForMulti([])
         }
       } else {
-        console.warn("⚠️ SUPABASE NÃO CONFIGURADO - Usando todos os dados mockados para desenvolvimento")
-        console.warn("   Para usar dados reais, configure as variáveis de ambiente:")
-        console.warn("   NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY")
-        
-        // Usar opções padrão quando Supabase não estiver configurado
+        console.warn("⚠️ Usando opções de sabores padrão")
+        // Configuração padrão de sabores
         setOpcoesSabores([
           { id: "1", nome: "1 Sabor", maximo_sabores: 1, ordem: 1, ativo: true },
           { id: "2", nome: "2 Sabores", maximo_sabores: 2, ordem: 2, ativo: true },
           { id: "3", nome: "3 Sabores", maximo_sabores: 3, ordem: 3, ativo: true }
         ])
       }
+
+      console.log("✅ Aplicação carregada com dados reais")
     } catch (error) {
-      console.error("❌ Erro ao carregar dados do Supabase:", error)
-      console.warn("⚠️ Usando configuração padrão devido ao erro")
-      
-      // Usar opções padrão em caso de erro
-      setOpcoesSabores([
-        { id: "1", nome: "1 Sabor", maximo_sabores: 1, ordem: 1, ativo: true },
-        { id: "2", nome: "2 Sabores", maximo_sabores: 2, ordem: 2, ativo: true },
-        { id: "3", nome: "3 Sabores", maximo_sabores: 3, ordem: 3, ativo: true }
-      ])
+      console.error("❌ Erro crítico ao carregar dados:", error)
+      console.error("   Verifique a configuração do Supabase")
+      setHasError(true)
     } finally {
       setLoading(false)
     }
@@ -648,12 +486,41 @@ function HomePageContent() {
     return acc
   }, {} as Record<string, Produto[]>)
 
+  // Tela de carregamento
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando cardápio...</p>
+      <div className="max-w-md mx-auto bg-white min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto"></div>
+          <p className="text-gray-600">Carregando cardápio...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Tela de erro
+  if (hasError || !config || produtos.length === 0) {
+    return (
+      <div className="max-w-md mx-auto bg-white min-h-screen flex items-center justify-center p-6">
+        <div className="text-center space-y-4">
+          <div className="text-6xl mb-4">🍕</div>
+          <h2 className="text-xl font-semibold text-gray-900">Cardápio Indisponível</h2>
+          <p className="text-gray-600 text-sm">
+            Não foi possível carregar os dados da pizzaria.
+          </p>
+          <p className="text-gray-500 text-xs">
+            Entre em contato pelo telefone ou tente novamente mais tarde.
+          </p>
+          <button 
+            onClick={() => {
+              setHasError(false)
+              setLoading(true)
+              loadData()
+            }}
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Tentar Novamente
+          </button>
         </div>
       </div>
     )
@@ -665,11 +532,11 @@ function HomePageContent() {
         <div className="relative">
           <div
             className="h-48 bg-cover bg-center"
-            style={{ backgroundImage: `url(${config.foto_capa || "/placeholder.jpg"})` }}
+            style={{ backgroundImage: `url(${config?.foto_capa || "/placeholder.jpg"})` }}
           />
           <div className="absolute -bottom-12 left-4">
             <img
-              src={config.foto_perfil || "/placeholder-logo.png"}
+              src={config?.foto_perfil || "/placeholder-logo.png"}
               alt="Logo da pizzaria"
               className="w-24 h-24 rounded-lg border-4 border-white shadow-lg object-cover"
             />
@@ -677,7 +544,7 @@ function HomePageContent() {
         </div>
 
         <div className="relative px-4 pt-6 pb-4">
-          <h1 className="text-2xl font-bold text-gray-900 ml-32">{config.nome}</h1>
+          <h1 className="text-2xl font-bold text-gray-900 ml-32">{config?.nome}</h1>
         </div>
 
         {/* Menu horizontal com informações */}
@@ -718,22 +585,22 @@ function HomePageContent() {
               {/* Tempo de Entrega */}
               <div className="flex flex-col items-center flex-shrink-0">
                 <div className="text-sm font-medium text-gray-900">
-                  {config.tempo_entrega_min}–{config.tempo_entrega_max}
+                  {config?.tempo_entrega_min}–{config?.tempo_entrega_max}
                 </div>
                 <div className="text-xs text-gray-600">minutos</div>
               </div>
 
               {/* Valor Mínimo */}
               <div className="flex flex-col items-center flex-shrink-0">
-                <div className="text-sm font-medium text-gray-900">{formatCurrency(config.valor_minimo)}</div>
+                <div className="text-sm font-medium text-gray-900">{formatCurrency(config?.valor_minimo)}</div>
                 <div className="text-xs text-gray-600">mínimo</div>
               </div>
 
               {/* Formas de Pagamento */}
               <div className="flex flex-col items-center flex-shrink-0">
                 <div className="flex justify-center items-center gap-x-1 mb-1">
-                  {config.aceita_dinheiro && <Banknote className="w-4 h-4 text-gray-700" />}
-                  {config.aceita_cartao && <CreditCard className="w-4 h-4 text-gray-700" />}
+                  {config?.aceita_dinheiro && <Banknote className="w-4 h-4 text-gray-700" />}
+                  {config?.aceita_cartao && <CreditCard className="w-4 h-4 text-gray-700" />}
                 </div>
                 <div className="text-xs text-gray-600">pagamento</div>
               </div>
@@ -961,7 +828,7 @@ function HomePageContent() {
 
         {/* Modals */}
 
-        <StoreInfoModal isOpen={showStoreInfo} onClose={() => setShowStoreInfo(false)} config={config} />
+        {config && <StoreInfoModal isOpen={showStoreInfo} onClose={() => setShowStoreInfo(false)} config={config} />}
 
         {/* Rodapé com redes sociais */}
         <SocialFooter hasCartItems={cartState.items.length > 0} />

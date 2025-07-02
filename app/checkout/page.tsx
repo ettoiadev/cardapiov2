@@ -135,40 +135,27 @@ export default function CheckoutPage() {
 
   const loadStoreConfig = async () => {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("pizzaria_config")
         .select("nome, whatsapp, taxa_entrega, valor_minimo, aceita_dinheiro, aceita_cartao, aceita_pix, aceita_ticket_alimentacao, habilitar_bordas_recheadas")
         .single()
       
-      if (data) {
-        setStoreConfig(data)
-      } else {
-        // Valores padrão se não conseguir carregar
-        setStoreConfig({
-          nome: "Pizzaria",
-          whatsapp: "5511999999999",
-          taxa_entrega: 5,
-          valor_minimo: 20,
-          aceita_dinheiro: true,
-          aceita_cartao: true,
-          aceita_pix: true,
-          aceita_ticket_alimentacao: false,
-          habilitar_bordas_recheadas: true
-        })
+      if (error || !data) {
+        console.error("❌ Erro: Configuração da loja não encontrada")
+        console.error("   Configure os dados da pizzaria no painel administrativo")
+        return
       }
+
+      // Validar dados obrigatórios
+      if (!data.nome || !data.whatsapp) {
+        console.error("❌ Erro: Dados básicos da pizzaria (nome/WhatsApp) não configurados")
+        return
+      }
+
+      setStoreConfig(data)
+      console.log("✅ Configuração da loja carregada")
     } catch (error) {
-      // Valores padrão em caso de erro
-      setStoreConfig({
-        nome: "Pizzaria",
-        whatsapp: "5511999999999",
-        taxa_entrega: 5,
-        valor_minimo: 20,
-        aceita_dinheiro: true,
-        aceita_cartao: true,
-        aceita_pix: true,
-        aceita_ticket_alimentacao: false,
-        habilitar_bordas_recheadas: true
-      })
+      console.error("❌ Erro ao conectar com o banco de dados:", error)
     }
   }
 
@@ -468,28 +455,45 @@ export default function CheckoutPage() {
 
   // Sanitizar número do WhatsApp para formato internacional
   const sanitizeWhatsappNumber = (number: string): string => {
-    if (!number) return "5511999999999"
+    // Se não tiver número configurado, retornar erro
+    if (!number) return ""
     
     // Remove todos os caracteres não numéricos
-    const cleaned = number.replace(/\D/g, '')
+    let cleaned = number.replace(/\D/g, '')
     
-    // Se começar com 0, remove o 0 inicial
-    const withoutLeadingZero = cleaned.startsWith('0') ? cleaned.substring(1) : cleaned
-    
-    // Se não começar com 55 (código do Brasil), adiciona
-    if (!withoutLeadingZero.startsWith('55')) {
-      return `55${withoutLeadingZero}`
+    // Remove zero inicial se houver
+    if (cleaned.startsWith('0')) {
+      cleaned = cleaned.substring(1)
     }
     
-    return withoutLeadingZero
+    // Se não começar com 55 (código do Brasil), adicionar
+    if (!cleaned.startsWith('55')) {
+      cleaned = '55' + cleaned
+    }
+    
+    return cleaned
   }
 
   // Finalizar pedido
   const handleFinishOrder = () => {
+    if (!storeConfig?.whatsapp) {
+      console.error("❌ Erro: WhatsApp da pizzaria não configurado")
+      alert("Erro: WhatsApp da pizzaria não configurado. Entre em contato com o administrador.")
+      return
+    }
+
     setSubmitting(true)
     const message = generateWhatsAppMessage()
-    const rawWhatsappNumber = storeConfig?.whatsapp || "5511999999999"
+    const rawWhatsappNumber = storeConfig.whatsapp
     const whatsappNumber = sanitizeWhatsappNumber(rawWhatsappNumber)
+    
+    if (!whatsappNumber) {
+      console.error("❌ Erro: Número WhatsApp inválido")
+      alert("Erro: Número WhatsApp inválido. Entre em contato com o administrador.")
+      setSubmitting(false)
+      return
+    }
+    
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
     
     // Simular um pequeno delay para mostrar o loading

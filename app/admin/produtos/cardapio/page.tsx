@@ -79,21 +79,9 @@ export default function AdminCardapioPage() {
       if (tamanhosRes.data) setTamanhosPizza(tamanhosRes.data)
       if (opcoesRes.data) setOpcoesSabores(opcoesRes.data)
     } catch (error) {
-      console.error("Erro ao carregar dados:", error)
-      // Usar dados mock quando Supabase nao estiver disponivel
-      setCategorias([
-        { id: "1", nome: "Pizzas", descricao: "Pizzas doces e salgadas", ordem: 1, ativo: true },
-        { id: "2", nome: "Bebidas", descricao: "Refrigerantes, sucos e aguas", ordem: 2, ativo: true }
-      ])
-      setTamanhosPizza([
-        { id: "1", nome: "Tradicional", fatias: 8, descricao: "Pizza tradicional com 8 fatias", ordem: 1, ativo: true },
-        { id: "2", nome: "Broto", fatias: 4, descricao: "Pizza broto com 4 fatias", ordem: 2, ativo: true }
-      ])
-      setOpcoesSabores([
-        { id: "1", nome: "1 Sabor", maximo_sabores: 1, descricao: "Pizza com apenas um sabor", ordem: 1, ativo: true },
-        { id: "2", nome: "2 Sabores", maximo_sabores: 2, descricao: "Pizza dividida com dois sabores", ordem: 2, ativo: true },
-        { id: "3", nome: "3 Sabores", maximo_sabores: 3, descricao: "Pizza dividida com tres sabores", ordem: 3, ativo: true }
-      ])
+      console.error("❌ Erro ao carregar dados de configuração:", error)
+      console.error("   Verifique a conexão com o banco de dados")
+      // Manter arrays vazios - funcionalidade será limitada até resolver conexão
     }
   }
 

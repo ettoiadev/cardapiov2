@@ -46,9 +46,10 @@ export default function AdminLoginPage() {
               <Input
                 id="email"
                 type="email"
+                placeholder="Email do administrador"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@pizzaria.com"
+                className="rounded-xl"
                 required
               />
             </div>
@@ -73,10 +74,10 @@ export default function AdminLoginPage() {
               {loading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
-          <div className="mt-4 text-sm text-gray-600 text-center">
-            <p>Credenciais de teste:</p>
-            <p>Email: admin@pizzaria.com</p>
-            <p>Senha: admin123</p>
+          <div className="text-center">
+            <p className="text-sm text-gray-600 mb-4">
+              Acesse com suas credenciais de administrador
+            </p>
           </div>
         </CardContent>
       </Card>

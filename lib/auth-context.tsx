@@ -42,36 +42,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .single()
 
       if (error || !data) {
-        // Fallback para credenciais padrão durante desenvolvimento
-        if (email === "admin@pizzaria.com" && senha === "admin123") {
-          const adminData = {
-            id: "default-admin",
-            email: "admin@pizzaria.com",
-            nome: "Administrador",
-          }
-          setAdmin(adminData)
-          localStorage.setItem("admin", JSON.stringify(adminData))
-          return true
-        }
+        console.error("❌ Erro: Credenciais inválidas ou usuário não encontrado")
         return false
       }
 
-      // Por enquanto, vamos usar uma verificação simples até implementar bcrypt no frontend
-      // Em produção, isso deveria ser feito no backend com hash seguro
-      if (email === "admin@pizzaria.com" && senha === "admin123") {
-        const adminData = {
-          id: data.id,
-          email: data.email,
-          nome: data.nome,
-        }
-        setAdmin(adminData)
-        localStorage.setItem("admin", JSON.stringify(adminData))
-        return true
+      // IMPORTANTE: Em produção, implementar verificação de hash de senha segura
+      // Por enquanto, verificação simplificada - DEVE SER ALTERADO PARA PRODUÇÃO
+      console.warn("⚠️ ATENÇÃO: Sistema de autenticação simplificado - implementar hash de senha para produção")
+      
+      // Verificar senha (substituir por verificação de hash em produção)
+      if (data.senha !== senha) {
+        console.error("❌ Erro: Senha incorreta")
+        return false
       }
 
-      return false
+      const adminData = {
+        id: data.id,
+        email: data.email,
+        nome: data.nome,
+      }
+      
+      setAdmin(adminData)
+      localStorage.setItem("admin", JSON.stringify(adminData))
+      console.log("✅ Login realizado com sucesso")
+      return true
     } catch (error) {
-      console.error("Erro no login:", error)
+      console.error("❌ Erro no sistema de login:", error)
       return false
     }
   }

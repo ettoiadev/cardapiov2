@@ -110,7 +110,7 @@ export default function AdminProdutosPage() {
       if (bordasRes.data) setBordasRecheadas(bordasRes.data)
     } catch (error) {
       console.error("Erro ao carregar dados:", error)
-      // Fallback para opcoes mock
+      // Fallback para opções padrão
       setOpcoesSabores([
         { id: "1", nome: "1 Sabor", maximo_sabores: 1, ativo: true },
         { id: "2", nome: "2 Sabores", maximo_sabores: 2, ativo: true },
