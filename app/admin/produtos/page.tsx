@@ -1191,8 +1191,8 @@ function ProdutoForm({
     descricao: produto?.descricao || "",
     categoria_id: produto?.categoria_id || "",
     tipo: produto?.tipo || "salgada",
-    preco_tradicional: produto?.preco_tradicional || 0,
-    preco_broto: produto?.preco_broto || 0,
+    preco_tradicional: produto?.preco_tradicional || null,
+    preco_broto: produto?.preco_broto || null,
     ativo: produto?.ativo ?? true,
     ordem: produto?.ordem || 0,
     adicionais: produto?.adicionais || []
@@ -1218,7 +1218,53 @@ function ProdutoForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSave({ ...formData, adicionais })
+    
+    // Validação do nome (obrigatório)
+    if (!formData.nome.trim()) {
+      alert("Nome do produto é obrigatório")
+      return
+    }
+    
+    // Validação do preço tradicional (obrigatório)
+    if (formData.preco_tradicional === null || formData.preco_tradicional === undefined || formData.preco_tradicional <= 0) {
+      alert("Preço tradicional deve ser maior que zero")
+      return
+    }
+    
+    // Validação do preço broto (quando habilitado)
+    if (brotoHabilitado && (formData.preco_broto === null || formData.preco_broto === undefined || formData.preco_broto <= 0)) {
+      alert("Quando o broto está habilitado, o preço broto deve ser maior que zero")
+      return
+    }
+    
+    // Validação da categoria (obrigatória)
+    if (!formData.categoria_id) {
+      alert("Categoria é obrigatória")
+      return
+    }
+    
+    // Validação dos adicionais (se houver, devem ter nome e preço válidos)
+    for (let i = 0; i < adicionais.length; i++) {
+      const adicional = adicionais[i]
+      if (!adicional.nome.trim()) {
+        alert(`Nome do adicional ${i + 1} é obrigatório`)
+        return
+      }
+      if (adicional.preco === null || adicional.preco === undefined || adicional.preco <= 0) {
+        alert(`Preço do adicional "${adicional.nome}" deve ser maior que zero`)
+        return
+      }
+    }
+    
+    // Preparar dados para envio
+    const dadosParaEnvio = { 
+      ...formData, 
+      adicionais,
+      // Se broto não está habilitado, garantir que preco_broto seja null
+      preco_broto: brotoHabilitado ? formData.preco_broto : null
+    }
+    
+    onSave(dadosParaEnvio)
   }
 
   const adicionarAdicional = () => {
@@ -1234,7 +1280,8 @@ function ProdutoForm({
   const atualizarAdicional = (index: number, campo: keyof Adicional, valor: string | number) => {
     const novosAdicionais = [...adicionais]
     if (campo === 'preco') {
-      novosAdicionais[index][campo] = typeof valor === 'string' ? parseFloat(valor) || 0 : valor
+      const precoNumerico = typeof valor === 'string' ? parseFloat(valor) : valor
+      novosAdicionais[index][campo] = isNaN(precoNumerico) ? 0 : precoNumerico
     } else {
       novosAdicionais[index][campo] = valor as string
     }
@@ -1247,14 +1294,14 @@ function ProdutoForm({
     setAdicionaisFormatados(novosFormatados)
     
     const valorNumerico = parseCurrencyInput(valorFormatado)
-    atualizarAdicional(index, 'preco', valorNumerico)
+    atualizarAdicional(index, 'preco', valorNumerico > 0 ? valorNumerico : 0)
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="nome" className="text-sm font-medium text-foreground">Nome</Label>
+          <Label htmlFor="nome" className="text-sm font-medium text-foreground">Nome *</Label>
           <Input
             id="nome"
             value={formData.nome}
@@ -1264,10 +1311,11 @@ function ProdutoForm({
           />
         </div>
         <div>
-          <Label htmlFor="categoria" className="text-sm font-medium text-foreground">Categoria</Label>
+          <Label htmlFor="categoria" className="text-sm font-medium text-foreground">Categoria *</Label>
           <Select
             value={formData.categoria_id}
             onValueChange={(value) => setFormData({ ...formData, categoria_id: value })}
+            required
           >
             <SelectTrigger className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20">
               <SelectValue placeholder="Selecione uma categoria" />
@@ -1309,7 +1357,7 @@ function ProdutoForm({
           </Select>
         </div>
         <div>
-          <Label htmlFor="preco_tradicional" className="text-sm font-medium text-foreground">Preço Tradicional</Label>
+          <Label htmlFor="preco_tradicional" className="text-sm font-medium text-foreground">Preço Tradicional *</Label>
           <Input
             id="preco_tradicional"
             type="text"
@@ -1318,15 +1366,16 @@ function ProdutoForm({
               const valorFormatado = formatCurrencyInput(e.target.value)
               setPrecoTradicionalFormatado(valorFormatado)
               const valorNumerico = parseCurrencyInput(valorFormatado)
-              setFormData({ ...formData, preco_tradicional: valorNumerico })
+              setFormData({ ...formData, preco_tradicional: valorNumerico > 0 ? valorNumerico : null })
             }}
             placeholder="R$ 0,00"
+            required
             className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
           />
         </div>
         {brotoHabilitado && (
           <div>
-            <Label htmlFor="preco_broto" className="text-sm font-medium text-foreground">Preço Broto</Label>
+            <Label htmlFor="preco_broto" className="text-sm font-medium text-foreground">Preço Broto *</Label>
             <Input
               id="preco_broto"
               type="text"
@@ -1335,9 +1384,10 @@ function ProdutoForm({
                 const valorFormatado = formatCurrencyInput(e.target.value)
                 setPrecoBrotoFormatado(valorFormatado)
                 const valorNumerico = parseCurrencyInput(valorFormatado)
-                setFormData({ ...formData, preco_broto: valorNumerico })
+                setFormData({ ...formData, preco_broto: valorNumerico > 0 ? valorNumerico : null })
               }}
               placeholder="R$ 0,00"
+              required
               className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
             />
           </div>
