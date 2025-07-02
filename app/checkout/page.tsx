@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, ShoppingBag, MapPin, Phone, User, CreditCard, DollarSign, Smartphone, Loader2, Plus, Minus, QrCode, Banknote, UtensilsCrossed, Bike, Pizza, MessageCircle } from "lucide-react"
+import { ArrowLeft, ShoppingBag, MapPin, Phone, User, CreditCard, DollarSign, Smartphone, Loader2, Plus, Minus, QrCode, Banknote, UtensilsCrossed, Bike, Pizza, MessageCircle, ScanLine, Wallet, ArrowDownToLine } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -504,7 +504,7 @@ export default function CheckoutPage() {
         <h1 className="text-lg font-semibold ml-2">Finalizar Pedido</h1>
       </div>
       
-      <div className="max-w-2xl mx-auto p-4 pb-24 space-y-4">
+      <div className="max-w-2xl mx-auto p-4 pb-32 space-y-4">
         {/* Tipo de Entrega */}
         <Card className="rounded-xl shadow-md">
           <div className="p-4">
@@ -523,8 +523,8 @@ export default function CheckoutPage() {
                     <UtensilsCrossed className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="font-semibold text-[15px] text-neutral-800 block">Retirada</span>
-                    <p className="text-sm text-neutral-500 mt-1">Retire na loja</p>
+                    <span className="font-semibold text-[15px] text-neutral-800 block">Balcão</span>
+                    <p className="text-sm text-neutral-500 mt-1">Retire seu pedido na loja</p>
                   </div>
                 </div>
               </div>
@@ -844,7 +844,8 @@ export default function CheckoutPage() {
                   onClick={() => setPaymentMethod("pix")}
                 >
                   <div className="flex items-center gap-2">
-                    💸 <span className="text-[15px]">PIX</span>
+                    <ScanLine className="w-4 h-4 text-green-600" />
+                    <span className="text-[15px]">PIX</span>
                   </div>
                 </div>
               )}
@@ -858,7 +859,8 @@ export default function CheckoutPage() {
                   onClick={() => setPaymentMethod("dinheiro")}
                 >
                   <div className="flex items-center gap-2">
-                    💵 <span className="text-[15px]">Dinheiro</span>
+                    <Banknote className="w-4 h-4 text-green-600" />
+                    <span className="text-[15px]">Dinheiro</span>
                   </div>
                 </div>
               )}
@@ -873,7 +875,8 @@ export default function CheckoutPage() {
                     onClick={() => setPaymentMethod("debito")}
                   >
                     <div className="flex items-center gap-2">
-                      🧾 <span className="text-[15px]">Débito</span>
+                      <ArrowDownToLine className="w-4 h-4 text-blue-600" />
+                      <span className="text-[15px]">Débito</span>
                     </div>
                   </div>
                   <div 
@@ -885,7 +888,8 @@ export default function CheckoutPage() {
                     onClick={() => setPaymentMethod("credito")}
                   >
                     <div className="flex items-center gap-2">
-                      💳 <span className="text-[15px]">Crédito</span>
+                      <CreditCard className="w-4 h-4 text-purple-600" />
+                      <span className="text-[15px]">Crédito</span>
                     </div>
                   </div>
                 </>
@@ -900,7 +904,8 @@ export default function CheckoutPage() {
                   onClick={() => setPaymentMethod("ticket_alimentacao")}
                 >
                   <div className="flex items-center gap-2">
-                    🍽️ <span className="text-[15px]">Ticket</span>
+                    <Wallet className="w-4 h-4 text-orange-600" />
+                    <span className="text-[15px]">Ticket</span>
                   </div>
                 </div>
               )}
@@ -909,7 +914,7 @@ export default function CheckoutPage() {
         </Card>
         
         {/* Resumo de Valores */}
-        <Card className="rounded-xl shadow-md">
+        <Card className="rounded-xl shadow-md mb-4">
           <div className="p-4">
             <h2 className="text-[15px] font-semibold mb-4 text-neutral-800">Resumo de Valores</h2>
             <div className="space-y-2">
@@ -947,7 +952,7 @@ export default function CheckoutPage() {
         <Button
           onClick={handleFinishOrder}
           disabled={!isMinimumMet || !isFormValid() || submitting}
-          className="w-full h-12 text-lg rounded-full bg-red-600 hover:bg-red-700 disabled:bg-gray-300 font-bold py-3 flex items-center justify-center gap-2"
+          className="w-full h-12 text-lg rounded-full bg-green-600 hover:bg-green-700 disabled:bg-gray-300 font-bold py-3 flex items-center justify-center gap-2"
         >
           {submitting ? (
             <Loader2 className="w-5 h-5 animate-spin" />
