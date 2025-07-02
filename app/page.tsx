@@ -727,7 +727,7 @@ function HomePageContent() {
                         >
                         <div className="flex-1">
                           <div className="flex items-center space-x-2">
-                            <h3 className="font-medium">{pizzaNumber}. {pizza.nome}</h3>
+                            <h3 className="font-medium text-red-600">{pizzaNumber}. {pizza.nome}</h3>
                             {pizza.tipo === "doce" && (
                               <Badge variant="secondary" className="text-xs">
                                 Doce
@@ -737,10 +737,10 @@ function HomePageContent() {
                           {pizza.descricao && <p className="text-sm text-gray-600 mt-1">{pizza.descricao}</p>}
                           <div className="flex items-center space-x-4 mt-2">
                             {pizzariaConfig.habilitar_broto && pizza.preco_broto && (
-                              <span className="text-sm">Broto: {formatCurrency(pizza.preco_broto)}</span>
+                              <span className="text-sm text-red-600 font-medium">Broto: {formatCurrency(pizza.preco_broto)}</span>
                             )}
                             {pizza.preco_tradicional && (
-                              <span className="text-sm font-medium">
+                              <span className="text-sm font-medium text-red-600">
                                 Tradicional: {formatCurrency(pizza.preco_tradicional)}
                               </span>
                             )}
@@ -771,7 +771,7 @@ function HomePageContent() {
                   {flavorMode > 1 && selectedFlavorsForMulti.length === flavorMode && (
                     <div className="space-y-3 pt-4 border-t bg-green-50 rounded-lg p-4 mx-2">
                       <div className="text-center">
-                        <div className="text-sm text-gray-700 mb-2 font-medium">
+                        <div className="text-sm text-red-600 mb-2 font-medium">
                           Sabores selecionados: {selectedFlavorsForMulti.map(p => p.nome).join(" + ")}
                         </div>
                         <div className="text-sm text-green-600 font-bold">
