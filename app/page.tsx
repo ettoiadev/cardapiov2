@@ -74,7 +74,14 @@ const mockConfig: PizzariaConfig = {
   },
 }
 
+// Aviso: Estes são dados de exemplo para desenvolvimento
+// Em produção, todos os dados devem vir do Supabase
+console.warn("⚠️ DADOS MOCKADOS: Configuração de exemplo está sendo usada")
+
 const mockProdutos: Produto[] = [
+  // Aviso: Estes são dados de exemplo para desenvolvimento  
+  // Em produção, todos os produtos devem vir do Supabase
+  
   // Pizzas Salgadas
   {
     id: "1",
@@ -388,6 +395,8 @@ function HomePageContent() {
   const loadData = async () => {
     try {
       if (isSupabaseConfigured()) {
+        console.log("✅ Supabase configurado - Carregando dados reais...")
+        
         // Try to load from Supabase
         const [configResult, produtosResult, opcoesResult] = await Promise.all([
           supabase.from("pizzaria_config").select("*").single(),
@@ -397,14 +406,21 @@ function HomePageContent() {
 
         if (configResult.data) {
           setConfig(configResult.data)
+          console.log("✅ Configuração da pizzaria carregada do Supabase")
+        } else {
+          console.warn("⚠️ Configuração da pizzaria não encontrada no Supabase - Usando dados mockados")
         }
 
         if (produtosResult.data && produtosResult.data.length > 0) {
           setProdutos(produtosResult.data)
+          console.log(`✅ ${produtosResult.data.length} produtos carregados do Supabase`)
+        } else {
+          console.warn("⚠️ Nenhum produto encontrado no Supabase - Mantendo dados mockados")
         }
 
         if (opcoesResult.data && opcoesResult.data.length > 0) {
           setOpcoesSabores(opcoesResult.data)
+          console.log(`✅ ${opcoesResult.data.length} opções de sabores carregadas do Supabase`)
           
           // Verificar se o modo atual ainda está ativo
           const opcaoAtual = opcoesResult.data.find(o => o.maximo_sabores === flavorMode && o.ativo)
@@ -414,6 +430,7 @@ function HomePageContent() {
             setSelectedFlavorsForMulti([])
           }
         } else {
+          console.warn("⚠️ Opções de sabores não encontradas no Supabase - Usando configuração padrão")
           // Fallback para opções padrão
           setOpcoesSabores([
             { id: "1", nome: "1 Sabor", maximo_sabores: 1, ordem: 1, ativo: true },
@@ -422,6 +439,10 @@ function HomePageContent() {
           ])
         }
       } else {
+        console.warn("⚠️ SUPABASE NÃO CONFIGURADO - Usando todos os dados mockados para desenvolvimento")
+        console.warn("   Para usar dados reais, configure as variáveis de ambiente:")
+        console.warn("   NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY")
+        
         // Usar opções padrão quando Supabase não estiver configurado
         setOpcoesSabores([
           { id: "1", nome: "1 Sabor", maximo_sabores: 1, ordem: 1, ativo: true },
@@ -430,7 +451,9 @@ function HomePageContent() {
         ])
       }
     } catch (error) {
-      console.error("Error loading data:", error)
+      console.error("❌ Erro ao carregar dados do Supabase:", error)
+      console.warn("⚠️ Usando configuração padrão devido ao erro")
+      
       // Usar opções padrão em caso de erro
       setOpcoesSabores([
         { id: "1", nome: "1 Sabor", maximo_sabores: 1, ordem: 1, ativo: true },
