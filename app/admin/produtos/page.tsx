@@ -88,6 +88,7 @@ export default function AdminProdutosPage() {
   const [editingBorda, setEditingBorda] = useState<BordaRecheada | null>(null)
   const [isBordaDialogOpen, setIsBordaDialogOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
+  const [proximaOrdem, setProximaOrdem] = useState<number>(0)
   
   const { config, updateConfig } = useConfig()
 
@@ -104,7 +105,14 @@ export default function AdminProdutosPage() {
         supabase.from("bordas_recheadas").select("*").order("ordem"),
       ])
 
-      if (produtosRes.data) setProdutos(produtosRes.data)
+      if (produtosRes.data) {
+        setProdutos(produtosRes.data)
+        // Calcular próxima ordem disponível
+        const maiorOrdem = produtosRes.data.reduce((max, produto) => 
+          Math.max(max, produto.ordem || 0), 0
+        )
+        setProximaOrdem(maiorOrdem + 1)
+      }
       if (categoriasRes.data) setCategorias(categoriasRes.data)
       if (opcoesRes.data) setOpcoesSabores(opcoesRes.data)
       if (bordasRes.data) setBordasRecheadas(bordasRes.data)
@@ -117,6 +125,7 @@ export default function AdminProdutosPage() {
         { id: "3", nome: "3 Sabores", maximo_sabores: 3, ativo: true }
       ])
       setBordasRecheadas([])
+      setProximaOrdem(1) // Se não há produtos, começar com ordem 1
     }
   }
 
@@ -130,6 +139,9 @@ export default function AdminProdutosPage() {
         // Criar novo
         const { error } = await supabase.from("produtos").insert(produto)
         if (error) throw error
+        
+        // Atualizar próxima ordem disponível após criar um produto
+        setProximaOrdem(prev => prev + 1)
       }
 
       loadData()
@@ -432,6 +444,7 @@ export default function AdminProdutosPage() {
                       produto={editingProduto}
                       categorias={categorias}
                       brotoHabilitado={config.habilitar_broto}
+                      proximaOrdem={proximaOrdem}
                       onSave={handleSave}
                       onCancel={() => setIsDialogOpen(false)}
                     />
@@ -1177,12 +1190,14 @@ function ProdutoForm({
   produto,
   categorias,
   brotoHabilitado,
+  proximaOrdem,
   onSave,
   onCancel,
 }: {
   produto: Produto | null
   categorias: Categoria[]
   brotoHabilitado: boolean
+  proximaOrdem: number
   onSave: (produto: Partial<Produto>) => void
   onCancel: () => void
 }) {
@@ -1194,7 +1209,7 @@ function ProdutoForm({
     preco_tradicional: produto?.preco_tradicional || null,
     preco_broto: produto?.preco_broto || null,
     ativo: produto?.ativo ?? true,
-    ordem: produto?.ordem || 0,
+    ordem: produto?.ordem || proximaOrdem,
     adicionais: produto?.adicionais || []
   })
 
@@ -1215,6 +1230,13 @@ function ProdutoForm({
       adicional.preco ? formatCurrencyInput((adicional.preco * 100).toString()) : ""
     ) || []
   )
+
+  // Atualizar ordem quando proximaOrdem mudar para novos produtos
+  useEffect(() => {
+    if (!produto) {
+      setFormData(prev => ({ ...prev, ordem: proximaOrdem }))
+    }
+  }, [proximaOrdem, produto])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
