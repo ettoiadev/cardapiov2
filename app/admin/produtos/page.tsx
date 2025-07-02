@@ -364,37 +364,39 @@ export default function AdminProdutosPage() {
 
   return (
     <AdminLayout>
-      <div className="max-w-7xl mx-auto space-y-8">
+      <div className="container mx-auto p-6 space-y-8">
         {/* Header Section */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100 shadow-sm">
+        <div className="bg-gradient-to-r from-slate-50 to-blue-50/30 rounded-2xl p-8 border border-muted/30 shadow-sm">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                <Package className="h-8 w-8 text-blue-600" />
+              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-xl">
+                  <Package className="h-8 w-8 text-primary" />
+                </div>
                 Gerenciamento de Produtos
               </h1>
-              <p className="text-gray-600 max-w-2xl">
-                Gerencie produtos, categorias e configurações de sabores do seu cardápio digital.
+              <p className="text-muted-foreground max-w-2xl text-lg">
+                Gerencie produtos, categorias e configurações do seu cardápio digital.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Management Sections Grid - MOVIDO PARA CIMA */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        {/* Management Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Categories Management */}
-          <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 p-6">
+          <Card className="border-muted/30 shadow-sm rounded-2xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-green-50/50 to-emerald-50/30 border-b border-muted/20 p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <Tag className="h-6 w-6 text-green-600" />
+                  <div className="p-2 bg-green-100/80 rounded-xl">
+                    <Tag className="h-5 w-5 text-green-600" />
                   </div>
                   <div>
-                    <CardTitle className="text-xl font-semibold text-gray-900">
+                    <CardTitle className="text-xl font-semibold text-foreground">
                       Categorias
                     </CardTitle>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm text-muted-foreground mt-1">
                       Organize seus produtos por categorias
                     </p>
                   </div>
@@ -403,7 +405,7 @@ export default function AdminProdutosPage() {
                   <DialogTrigger asChild>
                     <Button
                       variant="outline"
-                      className="border-green-200 text-green-700 hover:bg-green-50 rounded-lg"
+                      className="border-muted/40 hover:bg-green-50/50 rounded-xl"
                       onClick={() => {
                         setEditingCategoria(null)
                         setIsCategoriaDialogOpen(true)
@@ -413,7 +415,7 @@ export default function AdminProdutosPage() {
                       Nova Categoria
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-md">
+                  <DialogContent className="max-w-md rounded-2xl">
                     <DialogHeader>
                       <DialogTitle className="text-xl font-semibold">
                         {editingCategoria ? "Editar Categoria" : "Nova Categoria"}
@@ -431,26 +433,26 @@ export default function AdminProdutosPage() {
             <CardContent className="p-6">
               <div className="space-y-4">
                 {categorias.length > 0 ? (
-                  <div className="grid gap-4">
+                  <div className="space-y-3">
                     {categorias.map((categoria) => (
                       <div 
                         key={categoria.id} 
-                        className="group bg-gradient-to-r from-gray-50 to-white border border-gray-100 rounded-xl p-4 hover:shadow-md transition-all duration-200"
+                        className="group bg-card/50 border border-muted/30 rounded-xl p-4 hover:shadow-md hover:border-muted/50 transition-all duration-200"
                       >
                         <div className="flex items-start justify-between">
-                          <div className="flex-1 space-y-3">
+                          <div className="flex-1 space-y-2">
                             <div className="flex items-center gap-3">
-                              <h3 className="font-semibold text-gray-900">{categoria.nome}</h3>
-                              <Badge variant={categoria.ativo ? "default" : "secondary"} className="text-xs">
+                              <h3 className="font-semibold text-foreground">{categoria.nome}</h3>
+                              <Badge variant={categoria.ativo ? "default" : "secondary"} className="text-xs rounded-full">
                                 {categoria.ativo ? "Ativo" : "Inativo"}
                               </Badge>
                             </div>
                             {categoria.descricao && (
-                              <p className="text-sm text-gray-600 leading-relaxed">
+                              <p className="text-sm text-muted-foreground leading-relaxed">
                                 {categoria.descricao}
                               </p>
                             )}
-                            <div className="flex items-center gap-6 text-xs text-gray-500">
+                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
                               <span className="flex items-center gap-1">
                                 <ArrowUpDown className="h-3 w-3" />
                                 Ordem: {categoria.ordem || 0}
@@ -465,7 +467,7 @@ export default function AdminProdutosPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600"
+                              className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 rounded-lg"
                               onClick={() => {
                                 setEditingCategoria(categoria)
                                 setIsCategoriaDialogOpen(true)
@@ -476,7 +478,7 @@ export default function AdminProdutosPage() {
                             <Button 
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0 hover:bg-red-50 text-red-600"
+                              className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
                               onClick={() => handleDeleteCategoria(categoria.id)}
                             >
                               <Trash2 className="h-4 w-4" />
@@ -488,11 +490,11 @@ export default function AdminProdutosPage() {
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Tag className="h-8 w-8 text-gray-400" />
+                    <div className="w-16 h-16 bg-muted/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Tag className="h-8 w-8 text-muted-foreground" />
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhuma categoria</h3>
-                    <p className="text-gray-500 mb-4">Crie sua primeira categoria para organizar os produtos</p>
+                    <h3 className="text-lg font-medium text-foreground mb-2">Nenhuma categoria</h3>
+                    <p className="text-muted-foreground mb-4">Crie sua primeira categoria para organizar os produtos</p>
                   </div>
                 )}
               </div>
@@ -500,43 +502,43 @@ export default function AdminProdutosPage() {
           </Card>
 
           {/* Flavor Options Management */}
-          <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-purple-50 to-violet-50 border-b border-purple-100 p-6">
+          <Card className="border-muted/30 shadow-sm rounded-2xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-purple-50/50 to-violet-50/30 border-b border-muted/20 p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <Settings2 className="h-6 w-6 text-purple-600" />
+                <div className="p-2 bg-purple-100/80 rounded-xl">
+                  <Settings2 className="h-5 w-5 text-purple-600" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl font-semibold text-gray-900">
+                  <CardTitle className="text-xl font-semibold text-foreground">
                     Configurações de Sabores
                   </CardTitle>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Controle as opções de sabores disponíveis
                   </p>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="p-6">
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {opcoesSabores.map((opcao) => (
                   <div 
                     key={opcao.id} 
-                    className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white border border-gray-100 rounded-xl hover:shadow-sm transition-all"
+                    className="flex items-center justify-between p-4 bg-card/50 border border-muted/30 rounded-xl hover:shadow-sm hover:border-muted/50 transition-all"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="p-2 bg-orange-100 rounded-lg">
-                        <Pizza className="h-5 w-5 text-orange-600" />
+                      <div className="p-2 bg-orange-100/80 rounded-xl">
+                        <Pizza className="h-4 w-4 text-orange-600" />
                       </div>
                       <div>
                         <div className="flex items-center gap-3">
-                          <span className="font-medium text-gray-900">{opcao.nome}</span>
+                          <span className="font-medium text-foreground">{opcao.nome}</span>
                           {opcao.maximo_sabores === 1 && (
-                            <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">
+                            <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 border-blue-200 rounded-full">
                               Obrigatório
                             </Badge>
                           )}
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-muted-foreground mt-1">
                           Até {opcao.maximo_sabores} sabor{opcao.maximo_sabores > 1 ? 'es' : ''}
                         </p>
                       </div>
@@ -546,9 +548,9 @@ export default function AdminProdutosPage() {
                         {opcao.ativo ? (
                           <CheckCircle2 className="h-4 w-4 text-green-500" />
                         ) : (
-                          <XCircle className="h-4 w-4 text-gray-400" />
+                          <XCircle className="h-4 w-4 text-muted-foreground" />
                         )}
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-muted-foreground">
                           {opcao.ativo ? "Habilitado" : "Desabilitado"}
                         </span>
                       </div>
@@ -556,11 +558,11 @@ export default function AdminProdutosPage() {
                         <input
                           type="checkbox"
                           checked={opcao.ativo}
-                          disabled={opcao.maximo_sabores === 1} // 1 sabor sempre habilitado
+                          disabled={opcao.maximo_sabores === 1}
                           onChange={(e) => handleToggleOpcaoSabor(opcao.id, e.target.checked)}
                           className="sr-only peer"
                         />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                        <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-muted after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
                       </label>
                     </div>
                   </div>
@@ -571,28 +573,28 @@ export default function AdminProdutosPage() {
         </div>
 
         {/* Bordas Recheadas Management */}
-        <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-yellow-50 to-orange-50 border-b border-yellow-100 p-6">
+        <Card className="border-muted/30 shadow-sm rounded-2xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-yellow-50/50 to-orange-50/30 border-b border-muted/20 p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-yellow-100 rounded-lg">
-                  <Pizza className="h-6 w-6 text-yellow-600" />
+                <div className="p-2 bg-yellow-100/80 rounded-xl">
+                  <Pizza className="h-5 w-5 text-yellow-600" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl font-semibold text-gray-900">
+                  <CardTitle className="text-xl font-semibold text-foreground">
                     Bordas Recheadas
                   </CardTitle>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Gerencie as opções de bordas recheadas disponíveis
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 {/* Toggle Global para Bordas Recheadas */}
-                <div className="flex items-center gap-3 bg-white/70 rounded-lg p-3 border border-yellow-200">
+                <div className="flex items-center gap-3 bg-card/50 rounded-xl p-3 border border-muted/30">
                   <div className="flex items-center gap-2">
-                    <Pizza className="h-4 w-4 text-yellow-700" />
-                    <span className="text-sm font-medium text-yellow-900">Habilitar Bordas Recheadas</span>
+                    <Pizza className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium text-foreground">Habilitar Bordas</span>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -601,14 +603,14 @@ export default function AdminProdutosPage() {
                       onChange={(e) => handleToggleBordasRecheadas(e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-600"></div>
+                    <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-muted after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                   </label>
                 </div>
                 <Dialog open={isBordaDialogOpen} onOpenChange={setIsBordaDialogOpen}>
                   <DialogTrigger asChild>
                     <Button
                       variant="outline"
-                      className="border-yellow-200 text-yellow-700 hover:bg-yellow-50 rounded-lg"
+                      className="border-muted/40 hover:bg-yellow-50/50 rounded-xl"
                       onClick={() => {
                         setEditingBorda(null)
                         setIsBordaDialogOpen(true)
@@ -618,7 +620,7 @@ export default function AdminProdutosPage() {
                       Nova Borda
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-md">
+                  <DialogContent className="max-w-md rounded-2xl">
                     <DialogHeader>
                       <DialogTitle className="text-xl font-semibold">
                         {editingBorda ? "Editar Borda Recheada" : "Nova Borda Recheada"}
@@ -637,24 +639,24 @@ export default function AdminProdutosPage() {
           <CardContent className="p-6">
             <div className="space-y-4">
               {bordasRecheadas.length > 0 ? (
-                <div className="grid gap-4">
+                <div className="space-y-3">
                   {bordasRecheadas.map((borda) => (
                     <div 
                       key={borda.id} 
-                      className="group bg-gradient-to-r from-gray-50 to-white border border-gray-100 rounded-xl p-4 hover:shadow-md transition-all duration-200"
+                      className="group bg-card/50 border border-muted/30 rounded-xl p-4 hover:shadow-md hover:border-muted/50 transition-all duration-200"
                     >
                       <div className="flex items-start justify-between">
-                        <div className="flex-1 space-y-3">
+                        <div className="flex-1 space-y-2">
                           <div className="flex items-center gap-3">
-                            <h3 className="font-semibold text-gray-900">{borda.nome}</h3>
-                            <Badge variant={borda.ativo ? "default" : "secondary"} className="text-xs">
+                            <h3 className="font-semibold text-foreground">{borda.nome}</h3>
+                            <Badge variant={borda.ativo ? "default" : "secondary"} className="text-xs rounded-full">
                               {borda.ativo ? "Ativo" : "Inativo"}
                             </Badge>
                             <span className="text-sm font-medium text-green-600">
                               +{formatCurrency(borda.preco)}
                             </span>
                           </div>
-                          <div className="flex items-center gap-6 text-xs text-gray-500">
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
                             <span className="flex items-center gap-1">
                               <ArrowUpDown className="h-3 w-3" />
                               Ordem: {borda.ordem}
@@ -664,9 +666,9 @@ export default function AdminProdutosPage() {
                                 {borda.ativo ? (
                                   <CheckCircle2 className="h-4 w-4 text-green-500" />
                                 ) : (
-                                  <XCircle className="h-4 w-4 text-gray-400" />
+                                  <XCircle className="h-4 w-4 text-muted-foreground" />
                                 )}
-                                <span className="text-sm text-gray-600">
+                                <span className="text-sm text-muted-foreground">
                                   {borda.ativo ? "Disponível" : "Indisponível"}
                                 </span>
                               </div>
@@ -677,7 +679,7 @@ export default function AdminProdutosPage() {
                                   onChange={(e) => handleToggleBorda(borda.id, e.target.checked)}
                                   className="sr-only peer"
                                 />
-                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-600"></div>
+                                <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-muted after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                               </label>
                             </div>
                           </div>
@@ -686,7 +688,7 @@ export default function AdminProdutosPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600"
+                            className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 rounded-lg"
                             onClick={() => {
                               setEditingBorda(borda)
                               setIsBordaDialogOpen(true)
@@ -697,7 +699,7 @@ export default function AdminProdutosPage() {
                           <Button 
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 hover:bg-red-50 text-red-600"
+                            className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
                             onClick={() => handleDeleteBorda(borda.id)}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -709,59 +711,58 @@ export default function AdminProdutosPage() {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Pizza className="h-8 w-8 text-yellow-500" />
+                  <div className="w-16 h-16 bg-muted/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Pizza className="h-8 w-8 text-muted-foreground" />
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhuma borda recheada</h3>
-                  <p className="text-gray-500 mb-4">Crie sua primeira borda recheada para disponibilizar aos clientes</p>
+                  <h3 className="text-lg font-medium text-foreground mb-2">Nenhuma borda recheada</h3>
+                  <p className="text-muted-foreground mb-4">Crie sua primeira borda recheada para disponibilizar aos clientes</p>
                 </div>
               )}
             </div>
           </CardContent>
         </Card>
 
-        {/* Products List Section - MOVIDO PARA BAIXO */}
-        <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 border-b border-orange-100 p-6">
+        {/* Products List Section */}
+        <Card className="border-muted/30 shadow-sm rounded-2xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-slate-50/50 to-blue-50/30 border-b border-muted/20 p-6">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-orange-100 rounded-lg">
-                  <Package className="h-6 w-6 text-orange-600" />
+                <div className="p-2 bg-blue-100/80 rounded-xl">
+                  <Package className="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl font-semibold text-gray-900">
+                  <CardTitle className="text-xl font-semibold text-foreground">
                     Lista de Produtos
                   </CardTitle>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     {filteredProdutos.length} produto{filteredProdutos.length !== 1 ? 's' : ''} encontrado{filteredProdutos.length !== 1 ? 's' : ''}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
                   <Input
                     placeholder="Buscar produtos..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 w-64 rounded-lg border-gray-200 focus:border-orange-300 focus:ring-orange-200"
+                    className="pl-10 w-64 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
                   />
                 </div>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
                     <Button
-                      size="lg"
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl shadow-sm hover:shadow-md transition-all"
                       onClick={() => {
                         setEditingProduto(null)
                         setIsDialogOpen(true)
                       }}
                     >
-                      <Plus className="h-5 w-5 mr-2" />
+                      <Plus className="h-4 w-4 mr-2" />
                       Novo Produto
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
+                  <DialogContent className="max-w-2xl rounded-2xl">
                     <DialogHeader>
                       <DialogTitle className="text-xl font-semibold">
                         {editingProduto ? "Editar Produto" : "Novo Produto"}
@@ -785,21 +786,21 @@ export default function AdminProdutosPage() {
                 {/* Seção de Pizzas */}
                 {pizzas.length > 0 && (
                   <div>
-                    <div className="bg-gradient-to-r from-orange-100 to-amber-100 rounded-xl p-4 mb-6 border border-orange-200">
+                    <div className="bg-gradient-to-r from-orange-50/50 to-amber-50/30 rounded-xl p-4 mb-6 border border-muted/30">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-orange-200 rounded-lg">
-                            <Pizza className="h-6 w-6 text-orange-700" />
+                          <div className="p-2 bg-orange-100/80 rounded-xl">
+                            <Pizza className="h-5 w-5 text-orange-600" />
                           </div>
                           <div>
-                            <h2 className="text-xl font-bold text-orange-900">Pizzas</h2>
-                            <p className="text-sm text-orange-700">{pizzas.length} pizza{pizzas.length !== 1 ? 's' : ''} cadastrada{pizzas.length !== 1 ? 's' : ''}</p>
+                            <h2 className="text-xl font-bold text-foreground">Pizzas</h2>
+                            <p className="text-sm text-muted-foreground">{pizzas.length} pizza{pizzas.length !== 1 ? 's' : ''} cadastrada{pizzas.length !== 1 ? 's' : ''}</p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3 bg-white/70 rounded-lg p-3 border border-orange-200">
+                        <div className="flex items-center gap-3 bg-card/50 rounded-xl p-3 border border-muted/30">
                           <div className="flex items-center gap-2">
-                            <Pizza className="h-4 w-4 text-orange-700" />
-                            <span className="text-sm font-medium text-orange-900">Habilitar Pizza Broto</span>
+                            <Pizza className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm font-medium text-foreground">Habilitar Pizza Broto</span>
                           </div>
                           <label className="relative inline-flex items-center cursor-pointer">
                             <input
@@ -808,7 +809,7 @@ export default function AdminProdutosPage() {
                               onChange={(e) => handleToggleBroto(e.target.checked)}
                               className="sr-only peer"
                             />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+                            <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-muted after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                           </label>
                         </div>
                       </div>
@@ -817,13 +818,13 @@ export default function AdminProdutosPage() {
                       {pizzas.map((produto) => (
                         <div
                           key={produto.id}
-                          className="group bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-100 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-orange-200"
+                          className="group bg-gradient-to-br from-orange-50 to-amber-50 border border-muted/30 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-muted/50"
                         >
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
                               {getProductIcon(produto.tipo)}
                               <div>
-                                <h3 className="font-semibold text-gray-900 text-lg leading-tight">
+                                <h3 className="font-semibold text-foreground text-lg leading-tight">
                                   <span className="inline-block bg-orange-200 text-orange-800 text-sm font-bold px-2 py-1 rounded-md mr-2">
                                     {produto.numeroSequencial}
                                   </span>
@@ -836,7 +837,7 @@ export default function AdminProdutosPage() {
                                   >
                                     {produto.ativo ? "Ativo" : "Inativo"}
                                   </Badge>
-                                  <span className="text-xs text-gray-500 capitalize">
+                                  <span className="text-xs text-muted-foreground capitalize">
                                     {produto.tipo}
                                   </span>
                                 </div>
@@ -846,7 +847,7 @@ export default function AdminProdutosPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600"
+                                className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 rounded-lg"
                                 onClick={() => {
                                   setEditingProduto(produto)
                                   setIsDialogOpen(true)
@@ -857,7 +858,7 @@ export default function AdminProdutosPage() {
                               <Button 
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 hover:bg-red-50 text-red-600"
+                                className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
                                 onClick={() => handleDelete(produto.id)}
                               >
                                 <Trash2 className="h-4 w-4" />
@@ -866,7 +867,7 @@ export default function AdminProdutosPage() {
                           </div>
 
                           {produto.descricao && (
-                            <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
                               {produto.descricao}
                             </p>
                           )}
@@ -874,10 +875,10 @@ export default function AdminProdutosPage() {
                           {/* Exibir adicionais se existirem */}
                           {produto.adicionais && produto.adicionais.length > 0 && (
                             <div className="mb-4">
-                              <div className="text-xs text-gray-500 mb-2 font-medium">Adicionais:</div>
+                              <div className="text-xs text-muted-foreground mb-2 font-medium">Adicionais:</div>
                               <div className="space-y-1">
                                 {produto.adicionais.map((adicional, index) => (
-                                  <div key={index} className="flex justify-between items-center text-xs text-gray-600 bg-orange-50 px-2 py-1 rounded">
+                                  <div key={index} className="flex justify-between items-center text-xs text-muted-foreground bg-orange-50 px-2 py-1 rounded">
                                     <span>{adicional.nome}</span>
                                     <span className="font-medium text-green-600">
                                       +{formatCurrency(adicional.preco)}
@@ -891,7 +892,7 @@ export default function AdminProdutosPage() {
                           <div className="space-y-3">
                             <div className="bg-white rounded-lg p-3 border border-orange-100">
                               <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-600 flex items-center gap-2">
+                                <span className="text-sm text-muted-foreground flex items-center gap-2">
                                   <Pizza className="h-4 w-4" />
                                   Tradicional
                                 </span>
@@ -901,7 +902,7 @@ export default function AdminProdutosPage() {
                               </div>
                               {config.habilitar_broto && produto.preco_broto && (
                                 <div className="flex justify-between items-center mt-2 pt-2 border-t border-orange-100">
-                                  <span className="text-sm text-gray-600 flex items-center gap-2">
+                                  <span className="text-sm text-muted-foreground flex items-center gap-2">
                                     <Pizza className="h-3 w-3" />
                                     Broto
                                   </span>
@@ -914,7 +915,7 @@ export default function AdminProdutosPage() {
 
                             {/* Toggle de disponibilidade no card */}
                             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-orange-100">
-                              <span className="text-xs text-gray-600 font-medium">
+                              <span className="text-xs text-muted-foreground font-medium">
                                 {produto.ativo ? "Disponível" : "Indisponível"}
                               </span>
                               <label className="relative inline-flex items-center cursor-pointer">
@@ -928,7 +929,7 @@ export default function AdminProdutosPage() {
                               </label>
                             </div>
 
-                            <div className="flex items-center justify-between text-xs text-gray-500">
+                            <div className="flex items-center justify-between text-xs text-muted-foreground">
                               <span className="flex items-center gap-1">
                                 <ArrowUpDown className="h-3 w-3" />
                                 Ordem: {produto.ordem}
@@ -971,7 +972,7 @@ export default function AdminProdutosPage() {
                             <div className="flex items-center gap-3">
                               {getProductIcon(produto.tipo)}
                               <div>
-                                <h3 className="font-semibold text-gray-900 text-lg leading-tight">
+                                <h3 className="font-semibold text-foreground text-lg leading-tight">
                                   {produto.nome}
                                 </h3>
                                 <div className="flex items-center gap-2 mt-1">
@@ -981,7 +982,7 @@ export default function AdminProdutosPage() {
                                   >
                                     {produto.ativo ? "Ativo" : "Inativo"}
                                   </Badge>
-                                  <span className="text-xs text-gray-500 capitalize">
+                                  <span className="text-xs text-muted-foreground capitalize">
                                     {produto.tipo}
                                   </span>
                                 </div>
@@ -991,7 +992,7 @@ export default function AdminProdutosPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600"
+                                className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 rounded-lg"
                                 onClick={() => {
                                   setEditingProduto(produto)
                                   setIsDialogOpen(true)
@@ -1002,7 +1003,7 @@ export default function AdminProdutosPage() {
                               <Button 
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 hover:bg-red-50 text-red-600"
+                                className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
                                 onClick={() => handleDelete(produto.id)}
                               >
                                 <Trash2 className="h-4 w-4" />
@@ -1011,7 +1012,7 @@ export default function AdminProdutosPage() {
                           </div>
 
                           {produto.descricao && (
-                            <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
                               {produto.descricao}
                             </p>
                           )}
@@ -1019,7 +1020,7 @@ export default function AdminProdutosPage() {
                           <div className="space-y-3">
                             <div className="bg-white rounded-lg p-3 border border-blue-100">
                               <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-600 flex items-center gap-2">
+                                <span className="text-sm text-muted-foreground flex items-center gap-2">
                                   <Coffee className="h-4 w-4" />
                                   Preço
                                 </span>
@@ -1029,7 +1030,7 @@ export default function AdminProdutosPage() {
                               </div>
                             </div>
 
-                            <div className="flex items-center justify-between text-xs text-gray-500">
+                            <div className="flex items-center justify-between text-xs text-muted-foreground">
                               <span className="flex items-center gap-1">
                                 <ArrowUpDown className="h-3 w-3" />
                                 Ordem: {produto.ordem}
@@ -1072,7 +1073,7 @@ export default function AdminProdutosPage() {
                             <div className="flex items-center gap-3">
                               {getProductIcon(produto.tipo)}
                               <div>
-                                <h3 className="font-semibold text-gray-900 text-lg leading-tight">
+                                <h3 className="font-semibold text-foreground text-lg leading-tight">
                                   {produto.nome}
                                 </h3>
                                 <div className="flex items-center gap-2 mt-1">
@@ -1082,7 +1083,7 @@ export default function AdminProdutosPage() {
                                   >
                                     {produto.ativo ? "Ativo" : "Inativo"}
                                   </Badge>
-                                  <span className="text-xs text-gray-500 capitalize">
+                                  <span className="text-xs text-muted-foreground capitalize">
                                     {produto.tipo}
                                   </span>
                                 </div>
@@ -1092,7 +1093,7 @@ export default function AdminProdutosPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600"
+                                className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 rounded-lg"
                                 onClick={() => {
                                   setEditingProduto(produto)
                                   setIsDialogOpen(true)
@@ -1103,7 +1104,7 @@ export default function AdminProdutosPage() {
                               <Button 
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 hover:bg-red-50 text-red-600"
+                                className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
                                 onClick={() => handleDelete(produto.id)}
                               >
                                 <Trash2 className="h-4 w-4" />
@@ -1112,7 +1113,7 @@ export default function AdminProdutosPage() {
                           </div>
 
                           {produto.descricao && (
-                            <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
                               {produto.descricao}
                             </p>
                           )}
@@ -1120,7 +1121,7 @@ export default function AdminProdutosPage() {
                           <div className="space-y-3">
                             <div className="bg-white rounded-lg p-3 border border-purple-100">
                               <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-600 flex items-center gap-2">
+                                <span className="text-sm text-muted-foreground flex items-center gap-2">
                                   <Package className="h-4 w-4" />
                                   Preço
                                 </span>
@@ -1130,7 +1131,7 @@ export default function AdminProdutosPage() {
                               </div>
                             </div>
 
-                            <div className="flex items-center justify-between text-xs text-gray-500">
+                            <div className="flex items-center justify-between text-xs text-muted-foreground">
                               <span className="flex items-center gap-1">
                                 <ArrowUpDown className="h-3 w-3" />
                                 Ordem: {produto.ordem}
@@ -1150,36 +1151,12 @@ export default function AdminProdutosPage() {
                 )}
               </div>
             ) : (
-              <div className="text-center py-16">
-                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  {searchTerm ? (
-                    <Search className="h-10 w-10 text-gray-400" />
-                  ) : (
-                    <Package className="h-10 w-10 text-gray-400" />
-                  )}
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-muted/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Package className="h-8 w-8 text-muted-foreground" />
                 </div>
-                <h3 className="text-xl font-medium text-gray-900 mb-2">
-                  {searchTerm ? 'Nenhum produto encontrado' : 'Nenhum produto cadastrado'}
-                </h3>
-                <p className="text-gray-500 mb-6 max-w-md mx-auto">
-                  {searchTerm 
-                    ? `Não encontramos produtos com "${searchTerm}". Tente uma busca diferente.`
-                    : 'Comece criando seu primeiro produto para construir o cardápio.'
-                  }
-                </p>
-                {!searchTerm && (
-                  <Button
-                    size="lg"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl"
-                    onClick={() => {
-                      setEditingProduto(null)
-                      setIsDialogOpen(true)
-                    }}
-                  >
-                    <Plus className="h-5 w-5 mr-2" />
-                    Criar Primeiro Produto
-                  </Button>
-                )}
+                <h3 className="text-lg font-medium text-foreground mb-2">Nenhum produto encontrado</h3>
+                <p className="text-muted-foreground mb-4">Ajuste os filtros ou adicione novos produtos</p>
               </div>
             )}
           </CardContent>
@@ -1270,25 +1247,25 @@ function ProdutoForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="nome" className="text-sm font-medium text-gray-700">Nome</Label>
+          <Label htmlFor="nome" className="text-sm font-medium text-foreground">Nome</Label>
           <Input
             id="nome"
             value={formData.nome}
             onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
             required
-            className="mt-1 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200"
+            className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
           />
         </div>
         <div>
-          <Label htmlFor="categoria" className="text-sm font-medium text-gray-700">Categoria</Label>
+          <Label htmlFor="categoria" className="text-sm font-medium text-foreground">Categoria</Label>
           <Select
             value={formData.categoria_id}
             onValueChange={(value) => setFormData({ ...formData, categoria_id: value })}
           >
-            <SelectTrigger className="mt-1 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200">
+            <SelectTrigger className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20">
               <SelectValue placeholder="Selecione uma categoria" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded-xl">
               {categorias.map((categoria) => (
                 <SelectItem key={categoria.id} value={categoria.id}>
                   {categoria.nome}
@@ -1300,24 +1277,24 @@ function ProdutoForm({
       </div>
 
       <div>
-        <Label htmlFor="descricao" className="text-sm font-medium text-gray-700">Descrição</Label>
+        <Label htmlFor="descricao" className="text-sm font-medium text-foreground">Descrição</Label>
         <Textarea
           id="descricao"
           value={formData.descricao}
           onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-          className="mt-1 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200"
+          className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
           rows={3}
         />
       </div>
 
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <Label htmlFor="tipo" className="text-sm font-medium text-gray-700">Tipo</Label>
+          <Label htmlFor="tipo" className="text-sm font-medium text-foreground">Tipo</Label>
           <Select value={formData.tipo} onValueChange={(value) => setFormData({ ...formData, tipo: value })}>
-            <SelectTrigger className="mt-1 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200">
+            <SelectTrigger className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded-xl">
               <SelectItem value="salgada">Salgada</SelectItem>
               <SelectItem value="doce">Doce</SelectItem>
               <SelectItem value="bebida">Bebida</SelectItem>
@@ -1325,7 +1302,7 @@ function ProdutoForm({
           </Select>
         </div>
         <div>
-          <Label htmlFor="preco_tradicional" className="text-sm font-medium text-gray-700">Preço Tradicional</Label>
+          <Label htmlFor="preco_tradicional" className="text-sm font-medium text-foreground">Preço Tradicional</Label>
           <Input
             id="preco_tradicional"
             type="text"
@@ -1337,12 +1314,12 @@ function ProdutoForm({
               setFormData({ ...formData, preco_tradicional: valorNumerico })
             }}
             placeholder="R$ 0,00"
-            className="mt-1 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200"
+            className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
           />
         </div>
         {brotoHabilitado && (
           <div>
-            <Label htmlFor="preco_broto" className="text-sm font-medium text-gray-700">Preço Broto</Label>
+            <Label htmlFor="preco_broto" className="text-sm font-medium text-foreground">Preço Broto</Label>
             <Input
               id="preco_broto"
               type="text"
@@ -1354,17 +1331,17 @@ function ProdutoForm({
                 setFormData({ ...formData, preco_broto: valorNumerico })
               }}
               placeholder="R$ 0,00"
-              className="mt-1 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200"
+              className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
             />
           </div>
         )}
       </div>
 
       {/* Toggle Produto Disponível */}
-      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+      <div className="flex items-center justify-between p-4 bg-card/50 rounded-xl border border-muted/30">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-foreground">
               {formData.ativo ? "Produto disponível" : "Produto indisponível"}
             </span>
           </div>
@@ -1376,20 +1353,20 @@ function ProdutoForm({
             onChange={(e) => setFormData({ ...formData, ativo: e.target.checked })}
             className="sr-only peer"
           />
-          <div className={`w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all ${formData.ativo ? 'peer-checked:bg-red-600' : ''}`}></div>
+          <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-muted after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
         </label>
       </div>
 
       {/* Seção de Adicionais */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <Label className="text-sm font-medium text-gray-700">Adicionais (Opcional)</Label>
+          <Label className="text-sm font-medium text-foreground">Adicionais (Opcional)</Label>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={adicionarAdicional}
-            className="text-blue-600 border-blue-200 hover:bg-blue-50"
+            className="border-muted/40 hover:bg-primary/5 rounded-xl"
           >
             <Plus className="h-4 w-4 mr-1" />
             Adicionar Adicional
@@ -1399,13 +1376,13 @@ function ProdutoForm({
         {adicionais.length > 0 && (
           <div className="space-y-3">
             {adicionais.map((adicional, index) => (
-              <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border">
+              <div key={index} className="flex items-center gap-3 p-3 bg-card/50 rounded-xl border border-muted/30">
                 <div className="flex-1">
                   <Input
                     placeholder="Ex: Queijo Extra, Azeitona"
                     value={adicional.nome}
                     onChange={(e) => atualizarAdicional(index, 'nome', e.target.value)}
-                    className="border-gray-200 focus:border-blue-300 focus:ring-blue-200"
+                    className="border-muted/40 focus:border-primary/50 focus:ring-primary/20 rounded-xl"
                   />
                 </div>
                 <div className="w-32">
@@ -1417,7 +1394,7 @@ function ProdutoForm({
                       const valorFormatado = formatCurrencyInput(e.target.value)
                       atualizarPrecoAdicional(index, valorFormatado)
                     }}
-                    className="border-gray-200 focus:border-blue-300 focus:ring-blue-200"
+                    className="border-muted/40 focus:border-primary/50 focus:ring-primary/20 rounded-xl"
                   />
                 </div>
                 <Button
@@ -1425,7 +1402,7 @@ function ProdutoForm({
                   variant="ghost"
                   size="sm"
                   onClick={() => removerAdicional(index)}
-                  className="h-8 w-8 p-0 hover:bg-red-50 text-red-600"
+                  className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -1437,29 +1414,29 @@ function ProdutoForm({
 
       <div className="flex items-center justify-end">
         <div className="flex items-center gap-2">
-          <Label htmlFor="ordem" className="text-sm font-medium text-gray-700">Ordem</Label>
+          <Label htmlFor="ordem" className="text-sm font-medium text-foreground">Ordem</Label>
           <Input
             id="ordem"
             type="number"
             value={formData.ordem}
             onChange={(e) => setFormData({ ...formData, ordem: Number.parseInt(e.target.value) || 0 })}
-            className="w-20 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200"
+            className="w-20 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
           />
         </div>
       </div>
 
-      <div className="flex justify-end space-x-3 pt-6 border-t border-gray-100">
+      <div className="flex justify-end space-x-3 pt-6 border-t border-muted/30">
         <Button 
           type="button" 
           variant="outline" 
           onClick={onCancel}
-          className="px-6 py-2 rounded-lg border-gray-200 hover:bg-gray-50"
+          className="px-6 py-2 rounded-xl border-muted/40 hover:bg-muted/10"
         >
           Cancelar
         </Button>
         <Button 
           type="submit"
-          className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+          className="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl"
         >
           Salvar
         </Button>
@@ -1496,39 +1473,39 @@ function CategoriaForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <Label htmlFor="nome" className="text-sm font-medium text-gray-700">Nome da Categoria *</Label>
+        <Label htmlFor="nome" className="text-sm font-medium text-foreground">Nome da Categoria *</Label>
         <Input
           id="nome"
           value={formData.nome}
           onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
           placeholder="Digite o nome da categoria"
           required
-          className="mt-1 rounded-lg border-gray-200 focus:border-green-300 focus:ring-green-200"
+          className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
         />
       </div>
 
       <div>
-        <Label htmlFor="descricao" className="text-sm font-medium text-gray-700">Descrição</Label>
+        <Label htmlFor="descricao" className="text-sm font-medium text-foreground">Descrição</Label>
         <Textarea
           id="descricao"
           value={formData.descricao}
           onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
           placeholder="Digite uma descrição opcional"
           rows={3}
-          className="mt-1 rounded-lg border-gray-200 focus:border-green-300 focus:ring-green-200"
+          className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
         />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="ordem" className="text-sm font-medium text-gray-700">Ordem</Label>
+          <Label htmlFor="ordem" className="text-sm font-medium text-foreground">Ordem</Label>
           <Input
             id="ordem"
             type="number"
             value={formData.ordem}
             onChange={(e) => setFormData({ ...formData, ordem: Number.parseInt(e.target.value) || 0 })}
             placeholder="0"
-            className="mt-1 rounded-lg border-gray-200 focus:border-green-300 focus:ring-green-200"
+            className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
           />
         </div>
         <div className="flex items-end">
@@ -1537,25 +1514,25 @@ function CategoriaForm({
               type="checkbox"
               checked={formData.ativo}
               onChange={(e) => setFormData({ ...formData, ativo: e.target.checked })}
-              className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+              className="w-4 h-4 text-primary border-muted rounded focus:ring-primary/20"
             />
-            <span className="text-sm font-medium text-gray-700">Categoria ativa</span>
+            <span className="text-sm font-medium text-foreground">Categoria ativa</span>
           </label>
         </div>
       </div>
 
-      <div className="flex justify-end space-x-3 pt-6 border-t border-gray-100">
+      <div className="flex justify-end space-x-3 pt-6 border-t border-muted/30">
         <Button 
           type="button" 
           variant="outline" 
           onClick={onCancel}
-          className="px-6 py-2 rounded-lg border-gray-200 hover:bg-gray-50"
+          className="px-6 py-2 rounded-xl border-muted/40 hover:bg-muted/10"
         >
           Cancelar
         </Button>
         <Button 
           type="submit"
-          className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg"
+          className="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl"
         >
           {categoria ? "Atualizar" : "Criar"} Categoria
         </Button>
@@ -1601,19 +1578,19 @@ function BordaForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <Label htmlFor="nome" className="text-sm font-medium text-gray-700">Nome da Borda *</Label>
+        <Label htmlFor="nome" className="text-sm font-medium text-foreground">Nome da Borda *</Label>
         <Input
           id="nome"
           value={formData.nome}
           onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
           placeholder="Ex: Catupiry, Cheddar, Cream Cheese"
           required
-          className="mt-1 rounded-lg border-gray-200 focus:border-yellow-300 focus:ring-yellow-200"
+          className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
         />
       </div>
 
       <div>
-        <Label htmlFor="preco" className="text-sm font-medium text-gray-700">Preço Adicional *</Label>
+        <Label htmlFor="preco" className="text-sm font-medium text-foreground">Preço Adicional *</Label>
         <Input
           id="preco"
           type="text"
@@ -1626,20 +1603,20 @@ function BordaForm({
           }}
           placeholder="R$ 0,00"
           required
-          className="mt-1 rounded-lg border-gray-200 focus:border-yellow-300 focus:ring-yellow-200"
+          className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
         />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="ordem" className="text-sm font-medium text-gray-700">Ordem</Label>
+          <Label htmlFor="ordem" className="text-sm font-medium text-foreground">Ordem</Label>
           <Input
             id="ordem"
             type="number"
             value={formData.ordem}
             onChange={(e) => setFormData({ ...formData, ordem: Number.parseInt(e.target.value) || 0 })}
             placeholder="0"
-            className="mt-1 rounded-lg border-gray-200 focus:border-yellow-300 focus:ring-yellow-200"
+            className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
           />
         </div>
         <div className="flex items-end">
@@ -1648,25 +1625,25 @@ function BordaForm({
               type="checkbox"
               checked={formData.ativo}
               onChange={(e) => setFormData({ ...formData, ativo: e.target.checked })}
-              className="w-4 h-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500"
+              className="w-4 h-4 text-primary border-muted rounded focus:ring-primary/20"
             />
-            <span className="text-sm font-medium text-gray-700">Borda disponível</span>
+            <span className="text-sm font-medium text-foreground">Borda disponível</span>
           </label>
         </div>
       </div>
 
-      <div className="flex justify-end space-x-3 pt-6 border-t border-gray-100">
+      <div className="flex justify-end space-x-3 pt-6 border-t border-muted/30">
         <Button 
           type="button" 
           variant="outline" 
           onClick={onCancel}
-          className="px-6 py-2 rounded-lg border-gray-200 hover:bg-gray-50"
+          className="px-6 py-2 rounded-xl border-muted/40 hover:bg-muted/10"
         >
           Cancelar
         </Button>
         <Button 
           type="submit"
-          className="px-6 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg"
+          className="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl"
         >
           {borda ? "Atualizar" : "Criar"} Borda
         </Button>
