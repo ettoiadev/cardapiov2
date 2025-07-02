@@ -466,11 +466,30 @@ export default function CheckoutPage() {
     })
   }
 
+  // Sanitizar número do WhatsApp para formato internacional
+  const sanitizeWhatsappNumber = (number: string): string => {
+    if (!number) return "5511999999999"
+    
+    // Remove todos os caracteres não numéricos
+    const cleaned = number.replace(/\D/g, '')
+    
+    // Se começar com 0, remove o 0 inicial
+    const withoutLeadingZero = cleaned.startsWith('0') ? cleaned.substring(1) : cleaned
+    
+    // Se não começar com 55 (código do Brasil), adiciona
+    if (!withoutLeadingZero.startsWith('55')) {
+      return `55${withoutLeadingZero}`
+    }
+    
+    return withoutLeadingZero
+  }
+
   // Finalizar pedido
   const handleFinishOrder = () => {
     setSubmitting(true)
     const message = generateWhatsAppMessage()
-    const whatsappNumber = storeConfig?.whatsapp || "5511999999999"
+    const rawWhatsappNumber = storeConfig?.whatsapp || "5511999999999"
+    const whatsappNumber = sanitizeWhatsappNumber(rawWhatsappNumber)
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
     
     // Simular um pequeno delay para mostrar o loading
