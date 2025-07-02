@@ -615,9 +615,9 @@ function HomePageContent() {
         </div>
 
         {/* Container principal flexível */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex flex-col justify-between grow">
           {/* Cardápio - área de conteúdo principal */}
-          <div className="flex-1 px-4 py-4 space-y-4">
+          <div className="px-4 py-4 space-y-4">
           {/* Seção Pizzas */}
           <Card>
             <CardContent className="p-4">
