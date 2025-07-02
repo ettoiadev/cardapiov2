@@ -364,8 +364,8 @@ export default function AdminProdutosPage() {
 
   return (
     <AdminLayout>
-      <div className="container mx-auto p-6 space-y-8">
-        {/* Header Section */}
+      <div className="container mx-auto p-6 space-y-6">
+        {/* 1. Header Section - Gerenciamento de Produtos */}
         <div className="bg-gradient-to-r from-slate-50 to-blue-50/30 rounded-2xl p-8 border border-muted/30 shadow-sm">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="space-y-2">
@@ -382,8 +382,606 @@ export default function AdminProdutosPage() {
           </div>
         </div>
 
-        {/* Management Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* 2. Lista de Produtos (exceto bebidas) */}
+        <Card className="border-muted/30 shadow-sm rounded-2xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-slate-50/50 to-blue-50/30 border-b border-muted/20 p-6">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100/80 rounded-xl">
+                  <Package className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl font-semibold text-foreground">
+                    Lista de Produtos
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {filteredProdutos.filter(p => p.tipo !== 'bebida').length} produto{filteredProdutos.filter(p => p.tipo !== 'bebida').length !== 1 ? 's' : ''} encontrado{filteredProdutos.filter(p => p.tipo !== 'bebida').length !== 1 ? 's' : ''}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Buscar produtos..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 w-64 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
+                  />
+                </div>
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl shadow-sm hover:shadow-md transition-all"
+                      onClick={() => {
+                        setEditingProduto(null)
+                        setIsDialogOpen(true)
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Novo Produto
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl rounded-2xl">
+                    <DialogHeader>
+                      <DialogTitle className="text-xl font-semibold">
+                        {editingProduto ? "Editar Produto" : "Novo Produto"}
+                      </DialogTitle>
+                    </DialogHeader>
+                    <ProdutoForm
+                      produto={editingProduto}
+                      categorias={categorias}
+                      brotoHabilitado={config.habilitar_broto}
+                      onSave={handleSave}
+                      onCancel={() => setIsDialogOpen(false)}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-6">
+            {filteredProdutos.filter(p => p.tipo !== 'bebida').length > 0 ? (
+              <div className="space-y-8">
+                {/* Seção de Pizzas */}
+                {pizzas.length > 0 && (
+                  <div>
+                    <div className="bg-gradient-to-r from-orange-50/50 to-amber-50/30 rounded-xl p-4 mb-6 border border-muted/30">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-orange-100/80 rounded-xl">
+                            <Pizza className="h-5 w-5 text-orange-600" />
+                          </div>
+                          <div>
+                            <h2 className="text-xl font-bold text-foreground">Pizzas</h2>
+                            <p className="text-sm text-muted-foreground">{pizzas.length} pizza{pizzas.length !== 1 ? 's' : ''} cadastrada{pizzas.length !== 1 ? 's' : ''}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 bg-card/50 rounded-xl p-3 border border-muted/30">
+                          <div className="flex items-center gap-2">
+                            <Pizza className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm font-medium text-foreground">Habilitar Pizza Broto</span>
+                          </div>
+                          <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={config.habilitar_broto}
+                              onChange={(e) => handleToggleBroto(e.target.checked)}
+                              className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-muted after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                      {pizzas.map((produto) => (
+                        <div
+                          key={produto.id}
+                          className="group bg-gradient-to-br from-orange-50 to-amber-50 border border-muted/30 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-muted/50"
+                        >
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              {getProductIcon(produto.tipo)}
+                              <div>
+                                <h3 className="font-semibold text-foreground text-lg leading-tight">
+                                  <span className="inline-block bg-orange-200 text-orange-800 text-sm font-bold px-2 py-1 rounded-md mr-2">
+                                    {produto.numeroSequencial}
+                                  </span>
+                                  {produto.nome}
+                                </h3>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Badge 
+                                    variant={produto.ativo ? "default" : "secondary"}
+                                    className={`text-xs ${produto.ativo ? 'bg-green-600 hover:bg-green-700 text-white' : ''}`}
+                                  >
+                                    {produto.ativo ? "Ativo" : "Inativo"}
+                                  </Badge>
+                                  <span className="text-xs text-muted-foreground capitalize">
+                                    {produto.tipo}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 rounded-lg"
+                                onClick={() => {
+                                  setEditingProduto(produto)
+                                  setIsDialogOpen(true)
+                                }}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
+                                onClick={() => handleDelete(produto.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+
+                          {produto.descricao && (
+                            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                              {produto.descricao}
+                            </p>
+                          )}
+
+                          {/* Exibir adicionais se existirem */}
+                          {produto.adicionais && produto.adicionais.length > 0 && (
+                            <div className="mb-4">
+                              <div className="text-xs text-muted-foreground mb-2 font-medium">Adicionais:</div>
+                              <div className="space-y-1">
+                                {produto.adicionais.map((adicional, index) => (
+                                  <div key={index} className="flex justify-between items-center text-xs text-muted-foreground bg-orange-50 px-2 py-1 rounded">
+                                    <span>{adicional.nome}</span>
+                                    <span className="font-medium text-green-600">
+                                      +{formatCurrency(adicional.preco)}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="space-y-3">
+                            <div className="bg-white rounded-lg p-3 border border-orange-100">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm text-muted-foreground flex items-center gap-2">
+                                  <Pizza className="h-4 w-4" />
+                                  Tradicional
+                                </span>
+                                <span className="font-semibold text-green-600">
+                                  {formatCurrency(produto.preco_tradicional)}
+                                </span>
+                              </div>
+                              {config.habilitar_broto && produto.preco_broto && (
+                                <div className="flex justify-between items-center mt-2 pt-2 border-t border-orange-100">
+                                  <span className="text-sm text-muted-foreground flex items-center gap-2">
+                                    <Pizza className="h-3 w-3" />
+                                    Broto
+                                  </span>
+                                  <span className="font-semibold text-green-600">
+                                    {formatCurrency(produto.preco_broto)}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Toggle de disponibilidade no card */}
+                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-orange-100">
+                              <span className="text-xs text-muted-foreground font-medium">
+                                {produto.ativo ? "Disponível" : "Indisponível"}
+                              </span>
+                              <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={produto.ativo}
+                                  onChange={(e) => handleToggleDisponibilidade(produto.id, e.target.checked)}
+                                  className="sr-only peer"
+                                />
+                                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-600"></div>
+                              </label>
+                            </div>
+
+                            <div className="flex items-center justify-between text-xs text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <ArrowUpDown className="h-3 w-3" />
+                                Ordem: {produto.ordem}
+                              </span>
+                              {produto.categoria_id && (
+                                <span className="flex items-center gap-1">
+                                  <Tag className="h-3 w-3" />
+                                  {categorias.find(c => c.id === produto.categoria_id)?.nome || 'Sem categoria'}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Seção de Outras Categorias */}
+                {outros.length > 0 && (
+                  <div>
+                    <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl p-4 mb-6 border border-purple-200">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-purple-200 rounded-lg">
+                          <Package className="h-6 w-6 text-purple-700" />
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-bold text-purple-900">Outras Categorias</h2>
+                          <p className="text-sm text-purple-700">{outros.length} produto{outros.length !== 1 ? 's' : ''} cadastrado{outros.length !== 1 ? 's' : ''}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                      {outros.map((produto) => (
+                        <div
+                          key={produto.id}
+                          className="group bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-purple-200"
+                        >
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              {getProductIcon(produto.tipo)}
+                              <div>
+                                <h3 className="font-semibold text-foreground text-lg leading-tight">
+                                  {produto.nome}
+                                </h3>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Badge 
+                                    variant={produto.ativo ? "default" : "secondary"}
+                                    className="text-xs"
+                                  >
+                                    {produto.ativo ? "Ativo" : "Inativo"}
+                                  </Badge>
+                                  <span className="text-xs text-muted-foreground capitalize">
+                                    {produto.tipo}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 rounded-lg"
+                                onClick={() => {
+                                  setEditingProduto(produto)
+                                  setIsDialogOpen(true)
+                                }}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
+                                onClick={() => handleDelete(produto.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+
+                          {produto.descricao && (
+                            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                              {produto.descricao}
+                            </p>
+                          )}
+
+                          <div className="space-y-3">
+                            <div className="bg-white rounded-lg p-3 border border-purple-100">
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm text-muted-foreground flex items-center gap-2">
+                                  <Package className="h-4 w-4" />
+                                  Preço
+                                </span>
+                                <span className="font-semibold text-green-600">
+                                  {formatCurrency(produto.preco_tradicional)}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between text-xs text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <ArrowUpDown className="h-3 w-3" />
+                                Ordem: {produto.ordem}
+                              </span>
+                              {produto.categoria_id && (
+                                <span className="flex items-center gap-1">
+                                  <Tag className="h-3 w-3" />
+                                  {categorias.find(c => c.id === produto.categoria_id)?.nome || 'Sem categoria'}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-muted/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Package className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-medium text-foreground mb-2">Nenhum produto encontrado</h3>
+                <p className="text-muted-foreground mb-4">Ajuste os filtros ou adicione novos produtos</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* 3. Bebidas */}
+        {bebidas.length > 0 && (
+          <Card className="border-muted/30 shadow-sm rounded-2xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-blue-50/50 to-cyan-50/30 border-b border-muted/20 p-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100/80 rounded-xl">
+                  <Coffee className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl font-semibold text-foreground">
+                    Bebidas
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {bebidas.length} bebida{bebidas.length !== 1 ? 's' : ''} cadastrada{bebidas.length !== 1 ? 's' : ''}
+                  </p>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {bebidas.map((produto) => (
+                  <div
+                    key={produto.id}
+                    className="group bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-100 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-200"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        {getProductIcon(produto.tipo)}
+                        <div>
+                          <h3 className="font-semibold text-foreground text-lg leading-tight">
+                            {produto.nome}
+                          </h3>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge 
+                              variant={produto.ativo ? "default" : "secondary"}
+                              className="text-xs"
+                            >
+                              {produto.ativo ? "Ativo" : "Inativo"}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground capitalize">
+                              {produto.tipo}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 rounded-lg"
+                          onClick={() => {
+                            setEditingProduto(produto)
+                            setIsDialogOpen(true)
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
+                          onClick={() => handleDelete(produto.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {produto.descricao && (
+                      <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                        {produto.descricao}
+                      </p>
+                    )}
+
+                    <div className="space-y-3">
+                      <div className="bg-white rounded-lg p-3 border border-blue-100">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground flex items-center gap-2">
+                            <Coffee className="h-4 w-4" />
+                            Preço
+                          </span>
+                          <span className="font-semibold text-green-600">
+                            {formatCurrency(produto.preco_tradicional)}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <ArrowUpDown className="h-3 w-3" />
+                          Ordem: {produto.ordem}
+                        </span>
+                        {produto.categoria_id && (
+                          <span className="flex items-center gap-1">
+                            <Tag className="h-3 w-3" />
+                            {categorias.find(c => c.id === produto.categoria_id)?.nome || 'Sem categoria'}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 4. Bordas Recheadas */}
+        <Card className="border-muted/30 shadow-sm rounded-2xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-yellow-50/50 to-orange-50/30 border-b border-muted/20 px-4 py-3">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-yellow-100/80 rounded-xl">
+                  <Pizza className="h-5 w-5 text-yellow-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl font-semibold text-foreground">
+                    Bordas Recheadas
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Gerencie as opções de bordas recheadas disponíveis
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {/* Toggle Global para Bordas Recheadas */}
+                <div className="flex items-center gap-2 bg-card/50 rounded-xl px-4 py-3 border border-muted/30">
+                  <div className="flex items-center gap-2">
+                    <Pizza className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium text-foreground">Habilitar Bordas</span>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config.habilitar_bordas_recheadas}
+                      onChange={(e) => handleToggleBordasRecheadas(e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-muted after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                  </label>
+                </div>
+                <Dialog open={isBordaDialogOpen} onOpenChange={setIsBordaDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="border-muted/40 hover:bg-yellow-50/50 rounded-xl"
+                      onClick={() => {
+                        setEditingBorda(null)
+                        setIsBordaDialogOpen(true)
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Nova Borda
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md rounded-2xl">
+                    <DialogHeader>
+                      <DialogTitle className="text-xl font-semibold">
+                        {editingBorda ? "Editar Borda Recheada" : "Nova Borda Recheada"}
+                      </DialogTitle>
+                    </DialogHeader>
+                    <BordaForm
+                      borda={editingBorda}
+                      onSave={handleSaveBorda}
+                      onCancel={() => setIsBordaDialogOpen(false)}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="px-4 py-3">
+            <div className="space-y-3">
+              {bordasRecheadas.length > 0 ? (
+                <div className="space-y-3">
+                  {bordasRecheadas.map((borda) => (
+                    <div 
+                      key={borda.id} 
+                      className="group bg-card/50 border border-muted/30 rounded-xl p-4 hover:shadow-md hover:border-muted/50 transition-all duration-200"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 space-y-3">
+                          <div className="flex items-center gap-3">
+                            <h3 className="font-semibold text-foreground">{borda.nome}</h3>
+                            <Badge variant={borda.ativo ? "default" : "secondary"} className="text-xs rounded-full">
+                              {borda.ativo ? "Ativo" : "Inativo"}
+                            </Badge>
+                            <span className="text-sm font-medium text-green-600">
+                              +{formatCurrency(borda.preco)}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-6">
+                              <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <ArrowUpDown className="h-4 w-4" />
+                                Ordem: {borda.ordem}
+                              </span>
+                              <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2">
+                                  {borda.ativo ? (
+                                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                  ) : (
+                                    <XCircle className="h-4 w-4 text-muted-foreground" />
+                                  )}
+                                  <span className="text-sm text-muted-foreground">
+                                    {borda.ativo ? "Disponível" : "Indisponível"}
+                                  </span>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                  <input
+                                    type="checkbox"
+                                    checked={borda.ativo}
+                                    onChange={(e) => handleToggleBorda(borda.id, e.target.checked)}
+                                    className="sr-only peer"
+                                  />
+                                  <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-muted after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity ml-3">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 rounded-lg"
+                            onClick={() => {
+                              setEditingBorda(borda)
+                              setIsBordaDialogOpen(true)
+                            }}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
+                            onClick={() => handleDeleteBorda(borda.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-muted/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Pizza className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-lg font-medium text-foreground mb-2">Nenhuma borda recheada</h3>
+                  <p className="text-muted-foreground mb-3">Crie sua primeira borda recheada para disponibilizar aos clientes</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 5. Categorias e Configurações de Sabores lado a lado */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Categories Management */}
           <Card className="border-muted/30 shadow-sm rounded-2xl overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-green-50/50 to-emerald-50/30 border-b border-muted/20 p-6">
@@ -551,18 +1149,17 @@ export default function AdminProdutosPage() {
                           <XCircle className="h-4 w-4 text-muted-foreground" />
                         )}
                         <span className="text-sm text-muted-foreground">
-                          {opcao.ativo ? "Habilitado" : "Desabilitado"}
+                          {opcao.ativo ? "Ativo" : "Inativo"}
                         </span>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input
                           type="checkbox"
                           checked={opcao.ativo}
-                          disabled={opcao.maximo_sabores === 1}
                           onChange={(e) => handleToggleOpcaoSabor(opcao.id, e.target.checked)}
                           className="sr-only peer"
                         />
-                        <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-muted after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                        <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-muted after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                       </label>
                     </div>
                   </div>
@@ -570,599 +1167,7 @@ export default function AdminProdutosPage() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Bordas Recheadas Management */}
-          <Card className="border-muted/30 shadow-sm rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-yellow-50/50 to-orange-50/30 border-b border-muted/20 px-4 py-3">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-yellow-100/80 rounded-xl">
-                    <Pizza className="h-5 w-5 text-yellow-600" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-xl font-semibold text-foreground">
-                      Bordas Recheadas
-                    </CardTitle>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Gerencie as opções de bordas recheadas disponíveis
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {/* Toggle Global para Bordas Recheadas */}
-                  <div className="flex items-center gap-2 bg-card/50 rounded-xl px-4 py-3 border border-muted/30">
-                    <div className="flex items-center gap-2">
-                      <Pizza className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-medium text-foreground">Habilitar Bordas</span>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={config.habilitar_bordas_recheadas}
-                        onChange={(e) => handleToggleBordasRecheadas(e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-muted after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                    </label>
-                  </div>
-                  <Dialog open={isBordaDialogOpen} onOpenChange={setIsBordaDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="border-muted/40 hover:bg-yellow-50/50 rounded-xl"
-                        onClick={() => {
-                          setEditingBorda(null)
-                          setIsBordaDialogOpen(true)
-                        }}
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Nova Borda
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-md rounded-2xl">
-                      <DialogHeader>
-                        <DialogTitle className="text-xl font-semibold">
-                          {editingBorda ? "Editar Borda Recheada" : "Nova Borda Recheada"}
-                        </DialogTitle>
-                      </DialogHeader>
-                      <BordaForm
-                        borda={editingBorda}
-                        onSave={handleSaveBorda}
-                        onCancel={() => setIsBordaDialogOpen(false)}
-                      />
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="px-4 py-3">
-              <div className="space-y-3">
-                {bordasRecheadas.length > 0 ? (
-                  <div className="space-y-3">
-                    {bordasRecheadas.map((borda) => (
-                      <div 
-                        key={borda.id} 
-                        className="group bg-card/50 border border-muted/30 rounded-xl p-4 hover:shadow-md hover:border-muted/50 transition-all duration-200"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1 space-y-3">
-                            <div className="flex items-center gap-3">
-                              <h3 className="font-semibold text-foreground">{borda.nome}</h3>
-                              <Badge variant={borda.ativo ? "default" : "secondary"} className="text-xs rounded-full">
-                                {borda.ativo ? "Ativo" : "Inativo"}
-                              </Badge>
-                              <span className="text-sm font-medium text-green-600">
-                                +{formatCurrency(borda.preco)}
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-6">
-                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
-                                  <ArrowUpDown className="h-4 w-4" />
-                                  Ordem: {borda.ordem}
-                                </span>
-                                <div className="flex items-center gap-3">
-                                  <div className="flex items-center gap-2">
-                                    {borda.ativo ? (
-                                      <CheckCircle2 className="h-4 w-4 text-green-500" />
-                                    ) : (
-                                      <XCircle className="h-4 w-4 text-muted-foreground" />
-                                    )}
-                                    <span className="text-sm text-muted-foreground">
-                                      {borda.ativo ? "Disponível" : "Indisponível"}
-                                    </span>
-                                  </div>
-                                  <label className="relative inline-flex items-center cursor-pointer">
-                                    <input
-                                      type="checkbox"
-                                      checked={borda.ativo}
-                                      onChange={(e) => handleToggleBorda(borda.id, e.target.checked)}
-                                      className="sr-only peer"
-                                    />
-                                    <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-muted after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                                  </label>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity ml-3">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 rounded-lg"
-                              onClick={() => {
-                                setEditingBorda(borda)
-                                setIsBordaDialogOpen(true)
-                              }}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
-                              onClick={() => handleDeleteBorda(borda.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <div className="w-16 h-16 bg-muted/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Pizza className="h-8 w-8 text-muted-foreground" />
-                    </div>
-                    <h3 className="text-lg font-medium text-foreground mb-2">Nenhuma borda recheada</h3>
-                    <p className="text-muted-foreground mb-3">Crie sua primeira borda recheada para disponibilizar aos clientes</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
         </div>
-
-        {/* Products List Section */}
-        <Card className="border-muted/30 shadow-sm rounded-2xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-slate-50/50 to-blue-50/30 border-b border-muted/20 p-6">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100/80 rounded-xl">
-                  <Package className="h-5 w-5 text-blue-600" />
-                </div>
-                <div>
-                  <CardTitle className="text-xl font-semibold text-foreground">
-                    Lista de Produtos
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {filteredProdutos.length} produto{filteredProdutos.length !== 1 ? 's' : ''} encontrado{filteredProdutos.length !== 1 ? 's' : ''}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    placeholder="Buscar produtos..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 w-64 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
-                  />
-                </div>
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button
-                      className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl shadow-sm hover:shadow-md transition-all"
-                      onClick={() => {
-                        setEditingProduto(null)
-                        setIsDialogOpen(true)
-                      }}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Novo Produto
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl rounded-2xl">
-                    <DialogHeader>
-                      <DialogTitle className="text-xl font-semibold">
-                        {editingProduto ? "Editar Produto" : "Novo Produto"}
-                      </DialogTitle>
-                    </DialogHeader>
-                    <ProdutoForm
-                      produto={editingProduto}
-                      categorias={categorias}
-                      brotoHabilitado={config.habilitar_broto}
-                      onSave={handleSave}
-                      onCancel={() => setIsDialogOpen(false)}
-                    />
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="p-6">
-            {filteredProdutos.length > 0 ? (
-              <div className="space-y-8">
-                {/* Seção de Pizzas */}
-                {pizzas.length > 0 && (
-                  <div>
-                    <div className="bg-gradient-to-r from-orange-50/50 to-amber-50/30 rounded-xl p-4 mb-6 border border-muted/30">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-orange-100/80 rounded-xl">
-                            <Pizza className="h-5 w-5 text-orange-600" />
-                          </div>
-                          <div>
-                            <h2 className="text-xl font-bold text-foreground">Pizzas</h2>
-                            <p className="text-sm text-muted-foreground">{pizzas.length} pizza{pizzas.length !== 1 ? 's' : ''} cadastrada{pizzas.length !== 1 ? 's' : ''}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3 bg-card/50 rounded-xl p-3 border border-muted/30">
-                          <div className="flex items-center gap-2">
-                            <Pizza className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium text-foreground">Habilitar Pizza Broto</span>
-                          </div>
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={config.habilitar_broto}
-                              onChange={(e) => handleToggleBroto(e.target.checked)}
-                              className="sr-only peer"
-                            />
-                            <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-muted after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                      {pizzas.map((produto) => (
-                        <div
-                          key={produto.id}
-                          className="group bg-gradient-to-br from-orange-50 to-amber-50 border border-muted/30 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-muted/50"
-                        >
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-3">
-                              {getProductIcon(produto.tipo)}
-                              <div>
-                                <h3 className="font-semibold text-foreground text-lg leading-tight">
-                                  <span className="inline-block bg-orange-200 text-orange-800 text-sm font-bold px-2 py-1 rounded-md mr-2">
-                                    {produto.numeroSequencial}
-                                  </span>
-                                  {produto.nome}
-                                </h3>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Badge 
-                                    variant={produto.ativo ? "default" : "secondary"}
-                                    className={`text-xs ${produto.ativo ? 'bg-green-600 hover:bg-green-700 text-white' : ''}`}
-                                  >
-                                    {produto.ativo ? "Ativo" : "Inativo"}
-                                  </Badge>
-                                  <span className="text-xs text-muted-foreground capitalize">
-                                    {produto.tipo}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 rounded-lg"
-                                onClick={() => {
-                                  setEditingProduto(produto)
-                                  setIsDialogOpen(true)
-                                }}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
-                                onClick={() => handleDelete(produto.id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-
-                          {produto.descricao && (
-                            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                              {produto.descricao}
-                            </p>
-                          )}
-
-                          {/* Exibir adicionais se existirem */}
-                          {produto.adicionais && produto.adicionais.length > 0 && (
-                            <div className="mb-4">
-                              <div className="text-xs text-muted-foreground mb-2 font-medium">Adicionais:</div>
-                              <div className="space-y-1">
-                                {produto.adicionais.map((adicional, index) => (
-                                  <div key={index} className="flex justify-between items-center text-xs text-muted-foreground bg-orange-50 px-2 py-1 rounded">
-                                    <span>{adicional.nome}</span>
-                                    <span className="font-medium text-green-600">
-                                      +{formatCurrency(adicional.preco)}
-                                    </span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          <div className="space-y-3">
-                            <div className="bg-white rounded-lg p-3 border border-orange-100">
-                              <div className="flex justify-between items-center">
-                                <span className="text-sm text-muted-foreground flex items-center gap-2">
-                                  <Pizza className="h-4 w-4" />
-                                  Tradicional
-                                </span>
-                                <span className="font-semibold text-green-600">
-                                  {formatCurrency(produto.preco_tradicional)}
-                                </span>
-                              </div>
-                              {config.habilitar_broto && produto.preco_broto && (
-                                <div className="flex justify-between items-center mt-2 pt-2 border-t border-orange-100">
-                                  <span className="text-sm text-muted-foreground flex items-center gap-2">
-                                    <Pizza className="h-3 w-3" />
-                                    Broto
-                                  </span>
-                                  <span className="font-semibold text-green-600">
-                                    {formatCurrency(produto.preco_broto)}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Toggle de disponibilidade no card */}
-                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-orange-100">
-                              <span className="text-xs text-muted-foreground font-medium">
-                                {produto.ativo ? "Disponível" : "Indisponível"}
-                              </span>
-                              <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={produto.ativo}
-                                  onChange={(e) => handleToggleDisponibilidade(produto.id, e.target.checked)}
-                                  className="sr-only peer"
-                                />
-                                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-600"></div>
-                              </label>
-                            </div>
-
-                            <div className="flex items-center justify-between text-xs text-muted-foreground">
-                              <span className="flex items-center gap-1">
-                                <ArrowUpDown className="h-3 w-3" />
-                                Ordem: {produto.ordem}
-                              </span>
-                              {produto.categoria_id && (
-                                <span className="flex items-center gap-1">
-                                  <Tag className="h-3 w-3" />
-                                  {categorias.find(c => c.id === produto.categoria_id)?.nome || 'Sem categoria'}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Seção de Bebidas */}
-                {bebidas.length > 0 && (
-                  <div>
-                    <div className="bg-gradient-to-r from-blue-100 to-cyan-100 rounded-xl p-4 mb-6 border border-blue-200">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-200 rounded-lg">
-                          <Coffee className="h-6 w-6 text-blue-700" />
-                        </div>
-                        <div>
-                          <h2 className="text-xl font-bold text-blue-900">Bebidas</h2>
-                          <p className="text-sm text-blue-700">{bebidas.length} bebida{bebidas.length !== 1 ? 's' : ''} cadastrada{bebidas.length !== 1 ? 's' : ''}</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                      {bebidas.map((produto) => (
-                        <div
-                          key={produto.id}
-                          className="group bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-100 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-200"
-                        >
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-3">
-                              {getProductIcon(produto.tipo)}
-                              <div>
-                                <h3 className="font-semibold text-foreground text-lg leading-tight">
-                                  {produto.nome}
-                                </h3>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Badge 
-                                    variant={produto.ativo ? "default" : "secondary"}
-                                    className="text-xs"
-                                  >
-                                    {produto.ativo ? "Ativo" : "Inativo"}
-                                  </Badge>
-                                  <span className="text-xs text-muted-foreground capitalize">
-                                    {produto.tipo}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 rounded-lg"
-                                onClick={() => {
-                                  setEditingProduto(produto)
-                                  setIsDialogOpen(true)
-                                }}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
-                                onClick={() => handleDelete(produto.id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-
-                          {produto.descricao && (
-                            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                              {produto.descricao}
-                            </p>
-                          )}
-
-                          <div className="space-y-3">
-                            <div className="bg-white rounded-lg p-3 border border-blue-100">
-                              <div className="flex justify-between items-center">
-                                <span className="text-sm text-muted-foreground flex items-center gap-2">
-                                  <Coffee className="h-4 w-4" />
-                                  Preço
-                                </span>
-                                <span className="font-semibold text-green-600">
-                                  {formatCurrency(produto.preco_tradicional)}
-                                </span>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center justify-between text-xs text-muted-foreground">
-                              <span className="flex items-center gap-1">
-                                <ArrowUpDown className="h-3 w-3" />
-                                Ordem: {produto.ordem}
-                              </span>
-                              {produto.categoria_id && (
-                                <span className="flex items-center gap-1">
-                                  <Tag className="h-3 w-3" />
-                                  {categorias.find(c => c.id === produto.categoria_id)?.nome || 'Sem categoria'}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Seção de Outras Categorias */}
-                {outros.length > 0 && (
-                  <div>
-                    <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl p-4 mb-6 border border-purple-200">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-purple-200 rounded-lg">
-                          <Package className="h-6 w-6 text-purple-700" />
-                        </div>
-                        <div>
-                          <h2 className="text-xl font-bold text-purple-900">Outras Categorias</h2>
-                          <p className="text-sm text-purple-700">{outros.length} produto{outros.length !== 1 ? 's' : ''} cadastrado{outros.length !== 1 ? 's' : ''}</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                      {outros.map((produto) => (
-                        <div
-                          key={produto.id}
-                          className="group bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-purple-200"
-                        >
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-3">
-                              {getProductIcon(produto.tipo)}
-                              <div>
-                                <h3 className="font-semibold text-foreground text-lg leading-tight">
-                                  {produto.nome}
-                                </h3>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Badge 
-                                    variant={produto.ativo ? "default" : "secondary"}
-                                    className="text-xs"
-                                  >
-                                    {produto.ativo ? "Ativo" : "Inativo"}
-                                  </Badge>
-                                  <span className="text-xs text-muted-foreground capitalize">
-                                    {produto.tipo}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 rounded-lg"
-                                onClick={() => {
-                                  setEditingProduto(produto)
-                                  setIsDialogOpen(true)
-                                }}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
-                                onClick={() => handleDelete(produto.id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-
-                          {produto.descricao && (
-                            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                              {produto.descricao}
-                            </p>
-                          )}
-
-                          <div className="space-y-3">
-                            <div className="bg-white rounded-lg p-3 border border-purple-100">
-                              <div className="flex justify-between items-center">
-                                <span className="text-sm text-muted-foreground flex items-center gap-2">
-                                  <Package className="h-4 w-4" />
-                                  Preço
-                                </span>
-                                <span className="font-semibold text-green-600">
-                                  {formatCurrency(produto.preco_tradicional)}
-                                </span>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center justify-between text-xs text-muted-foreground">
-                              <span className="flex items-center gap-1">
-                                <ArrowUpDown className="h-3 w-3" />
-                                Ordem: {produto.ordem}
-                              </span>
-                              {produto.categoria_id && (
-                                <span className="flex items-center gap-1">
-                                  <Tag className="h-3 w-3" />
-                                  {categorias.find(c => c.id === produto.categoria_id)?.nome || 'Sem categoria'}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-muted/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Package className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <h3 className="text-lg font-medium text-foreground mb-2">Nenhum produto encontrado</h3>
-                <p className="text-muted-foreground mb-4">Ajuste os filtros ou adicione novos produtos</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
       </div>
     </AdminLayout>
   )
