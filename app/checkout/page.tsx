@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useCart } from "@/lib/cart-context"
+import { useConfig } from "@/lib/config-context"
 import { formatCurrency } from "@/lib/currency-utils"
 import { supabase, isSupabaseConfigured } from "@/lib/supabase"
 
@@ -23,6 +24,7 @@ interface StoreConfig {
   aceita_cartao?: boolean
   aceita_pix?: boolean
   aceita_ticket_alimentacao?: boolean
+  habilitar_bordas_recheadas?: boolean
 }
 
 interface AddressData {
@@ -59,6 +61,7 @@ interface BordaRecheada {
 export default function CheckoutPage() {
   const router = useRouter()
   const { state, dispatch } = useCart()
+  const { config } = useConfig()
   
   // Estados principais
   const [loading, setLoading] = useState(true)
@@ -134,7 +137,7 @@ export default function CheckoutPage() {
     try {
       const { data } = await supabase
         .from("pizzaria_config")
-        .select("nome, whatsapp, taxa_entrega, valor_minimo, aceita_dinheiro, aceita_cartao, aceita_pix, aceita_ticket_alimentacao")
+        .select("nome, whatsapp, taxa_entrega, valor_minimo, aceita_dinheiro, aceita_cartao, aceita_pix, aceita_ticket_alimentacao, habilitar_bordas_recheadas")
         .single()
       
       if (data) {
@@ -149,7 +152,8 @@ export default function CheckoutPage() {
           aceita_dinheiro: true,
           aceita_cartao: true,
           aceita_pix: true,
-          aceita_ticket_alimentacao: false
+          aceita_ticket_alimentacao: false,
+          habilitar_bordas_recheadas: true
         })
       }
     } catch (error) {
@@ -162,7 +166,8 @@ export default function CheckoutPage() {
         aceita_dinheiro: true,
         aceita_cartao: true,
         aceita_pix: true,
-        aceita_ticket_alimentacao: false
+        aceita_ticket_alimentacao: false,
+        habilitar_bordas_recheadas: true
       })
     }
   }
@@ -812,7 +817,7 @@ export default function CheckoutPage() {
                   )}
 
                   {/* Seção de Bordas Recheadas (apenas para pizzas) */}
-                  {item.tipo !== "bebida" && bordasRecheadas.length > 0 && (
+                  {item.tipo !== "bebida" && bordasRecheadas.length > 0 && config.habilitar_bordas_recheadas && (
                     <div className="border-t border-gray-200 mt-2 pt-2">
                       <div className="bg-[#fefaf0] border border-yellow-300 rounded-lg p-3">
                         <h4 className="text-sm font-semibold text-gray-700 mb-3">

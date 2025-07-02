@@ -181,6 +181,15 @@ export default function AdminProdutosPage() {
     }
   }
 
+  const handleToggleBordasRecheadas = async (novoStatus: boolean) => {
+    try {
+      await updateConfig({ habilitar_bordas_recheadas: novoStatus })
+    } catch (error) {
+      console.error("Erro ao atualizar configuração de bordas recheadas:", error)
+      alert("Erro ao salvar configuração. Tente novamente.")
+    }
+  }
+
   const handleToggleDisponibilidade = async (produtoId: string, novoStatus: boolean) => {
     try {
       const { error } = await supabase
@@ -578,33 +587,51 @@ export default function AdminProdutosPage() {
                   </p>
                 </div>
               </div>
-              <Dialog open={isBordaDialogOpen} onOpenChange={setIsBordaDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="border-yellow-200 text-yellow-700 hover:bg-yellow-50 rounded-lg"
-                    onClick={() => {
-                      setEditingBorda(null)
-                      setIsBordaDialogOpen(true)
-                    }}
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Nova Borda
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold">
-                      {editingBorda ? "Editar Borda Recheada" : "Nova Borda Recheada"}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <BordaForm
-                    borda={editingBorda}
-                    onSave={handleSaveBorda}
-                    onCancel={() => setIsBordaDialogOpen(false)}
-                  />
-                </DialogContent>
-              </Dialog>
+              <div className="flex items-center gap-3">
+                {/* Toggle Global para Bordas Recheadas */}
+                <div className="flex items-center gap-3 bg-white/70 rounded-lg p-3 border border-yellow-200">
+                  <div className="flex items-center gap-2">
+                    <Pizza className="h-4 w-4 text-yellow-700" />
+                    <span className="text-sm font-medium text-yellow-900">Habilitar Bordas Recheadas</span>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={config.habilitar_bordas_recheadas}
+                      onChange={(e) => handleToggleBordasRecheadas(e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-600"></div>
+                  </label>
+                </div>
+                <Dialog open={isBordaDialogOpen} onOpenChange={setIsBordaDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="border-yellow-200 text-yellow-700 hover:bg-yellow-50 rounded-lg"
+                      onClick={() => {
+                        setEditingBorda(null)
+                        setIsBordaDialogOpen(true)
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Nova Borda
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="text-xl font-semibold">
+                        {editingBorda ? "Editar Borda Recheada" : "Nova Borda Recheada"}
+                      </DialogTitle>
+                    </DialogHeader>
+                    <BordaForm
+                      borda={editingBorda}
+                      onSave={handleSaveBorda}
+                      onCancel={() => setIsBordaDialogOpen(false)}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
           </CardHeader>
           <CardContent className="p-6">

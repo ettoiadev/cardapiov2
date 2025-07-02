@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase"
 
 interface PizzariaConfig {
   habilitar_broto: boolean
+  habilitar_bordas_recheadas: boolean
 }
 
 interface ConfigContextType {
@@ -17,7 +18,8 @@ const ConfigContext = createContext<ConfigContextType | undefined>(undefined)
 
 export function ConfigProvider({ children }: { children: ReactNode }) {
   const [config, setConfig] = useState<PizzariaConfig>({
-    habilitar_broto: true
+    habilitar_broto: true,
+    habilitar_bordas_recheadas: true
   })
   const [configId, setConfigId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -26,7 +28,7 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
     try {
       const { data, error } = await supabase
         .from("pizzaria_config")
-        .select("id, habilitar_broto")
+        .select("id, habilitar_broto, habilitar_bordas_recheadas")
         .single()
 
       if (error) {
@@ -37,7 +39,8 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
       if (data) {
         setConfigId(data.id)
         setConfig({
-          habilitar_broto: data.habilitar_broto ?? true
+          habilitar_broto: data.habilitar_broto ?? true,
+          habilitar_bordas_recheadas: data.habilitar_bordas_recheadas ?? true
         })
       }
     } catch (error) {
