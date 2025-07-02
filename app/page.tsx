@@ -631,7 +631,7 @@ function HomePageContent() {
                   <div className="text-sm text-gray-600">
                     Pizzas doces e salgadas (Tradicional 8 fatias / Broto 4 fatias)
                   </div>
-                  <div className="text-sm text-red-600">
+                  <div className="text-sm text-green-600 font-semibold">
                     Você pode escolher até {Math.max(...opcoesSabores.filter(o => o.ativo).map(o => o.maximo_sabores))} sabores
                   </div>
 
