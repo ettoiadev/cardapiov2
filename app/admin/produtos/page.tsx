@@ -1298,207 +1298,218 @@ function ProdutoForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="nome" className="text-sm font-medium text-foreground">Nome *</Label>
-          <Input
-            id="nome"
-            value={formData.nome}
-            onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-            required
-            className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
-          />
+    <div className="bg-background rounded-xl shadow-md">
+      <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <div className="bg-card rounded-xl p-4 shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="nome" className="text-sm font-medium text-foreground">Nome *</Label>
+              <Input
+                id="nome"
+                value={formData.nome}
+                onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                required
+                className="bg-muted border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
+                placeholder="Digite o nome do produto"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="categoria" className="text-sm font-medium text-foreground">Categoria *</Label>
+              <Select
+                value={formData.categoria_id}
+                onValueChange={(value) => setFormData({ ...formData, categoria_id: value })}
+                required
+              >
+                <SelectTrigger className="bg-muted border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors">
+                  <SelectValue placeholder="Selecione uma categoria" />
+                </SelectTrigger>
+                <SelectContent className="bg-background border border-input rounded-xl shadow-md">
+                  {categorias.map((categoria) => (
+                    <SelectItem key={categoria.id} value={categoria.id} className="focus:bg-muted">
+                      {categoria.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
-        <div>
-          <Label htmlFor="categoria" className="text-sm font-medium text-foreground">Categoria *</Label>
-          <Select
-            value={formData.categoria_id}
-            onValueChange={(value) => setFormData({ ...formData, categoria_id: value })}
-            required
-          >
-            <SelectTrigger className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20">
-              <SelectValue placeholder="Selecione uma categoria" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              {categorias.map((categoria) => (
-                <SelectItem key={categoria.id} value={categoria.id}>
-                  {categoria.nome}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
 
-      <div>
-        <Label htmlFor="descricao" className="text-sm font-medium text-foreground">Descrição</Label>
-        <Textarea
-          id="descricao"
-          value={formData.descricao}
-          onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-          className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
-          rows={3}
-        />
-      </div>
-
-      <div className="grid grid-cols-3 gap-4">
-        <div>
-          <Label htmlFor="tipo" className="text-sm font-medium text-foreground">Tipo</Label>
-          <Select value={formData.tipo} onValueChange={(value) => setFormData({ ...formData, tipo: value })}>
-            <SelectTrigger className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              <SelectItem value="salgada">Salgada</SelectItem>
-              <SelectItem value="doce">Doce</SelectItem>
-              <SelectItem value="bebida">Bebida</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label htmlFor="preco_tradicional" className="text-sm font-medium text-foreground">Preço Tradicional *</Label>
-          <Input
-            id="preco_tradicional"
-            type="text"
-            value={precoTradicionalFormatado}
-            onChange={(e) => {
-              const valorFormatado = formatCurrencyInput(e.target.value)
-              setPrecoTradicionalFormatado(valorFormatado)
-              const valorNumerico = parseCurrencyInput(valorFormatado)
-              setFormData({ ...formData, preco_tradicional: valorNumerico > 0 ? valorNumerico : null })
-            }}
-            placeholder="R$ 0,00"
-            required
-            className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
-          />
-        </div>
-        {brotoHabilitado && (
-          <div>
-            <Label htmlFor="preco_broto" className="text-sm font-medium text-foreground">Preço Broto *</Label>
-            <Input
-              id="preco_broto"
-              type="text"
-              value={precoBrotoFormatado}
-              onChange={(e) => {
-                const valorFormatado = formatCurrencyInput(e.target.value)
-                setPrecoBrotoFormatado(valorFormatado)
-                const valorNumerico = parseCurrencyInput(valorFormatado)
-                setFormData({ ...formData, preco_broto: valorNumerico > 0 ? valorNumerico : null })
-              }}
-              placeholder="R$ 0,00"
-              required
-              className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
+        <div className="bg-card rounded-xl p-4 shadow-sm space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="descricao" className="text-sm font-medium text-foreground">Descrição</Label>
+            <Textarea
+              id="descricao"
+              value={formData.descricao}
+              onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
+              className="bg-muted border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
+              placeholder="Descreva o produto (opcional)"
+              rows={3}
             />
           </div>
-        )}
-      </div>
 
-      {/* Toggle Produto Disponível */}
-      <div className="flex items-center justify-between p-4 bg-card/50 rounded-xl border border-muted/30">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-foreground">
-              {formData.ativo ? "Produto disponível" : "Produto indisponível"}
-            </span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="tipo" className="text-sm font-medium text-foreground">Tipo</Label>
+              <Select value={formData.tipo} onValueChange={(value) => setFormData({ ...formData, tipo: value })}>
+                <SelectTrigger className="bg-muted border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-background border border-input rounded-xl shadow-md">
+                  <SelectItem value="salgada" className="focus:bg-muted">Salgada</SelectItem>
+                  <SelectItem value="doce" className="focus:bg-muted">Doce</SelectItem>
+                  <SelectItem value="bebida" className="focus:bg-muted">Bebida</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="preco_tradicional" className="text-sm font-medium text-foreground">Preço Tradicional *</Label>
+              <Input
+                id="preco_tradicional"
+                type="text"
+                value={precoTradicionalFormatado}
+                onChange={(e) => {
+                  const valorFormatado = formatCurrencyInput(e.target.value)
+                  setPrecoTradicionalFormatado(valorFormatado)
+                  const valorNumerico = parseCurrencyInput(valorFormatado)
+                  setFormData({ ...formData, preco_tradicional: valorNumerico > 0 ? valorNumerico : null })
+                }}
+                placeholder="R$ 0,00"
+                required
+                className="bg-muted border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
+              />
+            </div>
+            {brotoHabilitado && (
+              <div className="space-y-2">
+                <Label htmlFor="preco_broto" className="text-sm font-medium text-foreground">Preço Broto *</Label>
+                <Input
+                  id="preco_broto"
+                  type="text"
+                  value={precoBrotoFormatado}
+                  onChange={(e) => {
+                    const valorFormatado = formatCurrencyInput(e.target.value)
+                    setPrecoBrotoFormatado(valorFormatado)
+                    const valorNumerico = parseCurrencyInput(valorFormatado)
+                    setFormData({ ...formData, preco_broto: valorNumerico > 0 ? valorNumerico : null })
+                  }}
+                  placeholder="R$ 0,00"
+                  required
+                  className="bg-muted border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
+                />
+              </div>
+            )}
           </div>
         </div>
-        <label className="relative inline-flex items-center cursor-pointer">
-          <input
-            type="checkbox"
-            checked={formData.ativo}
-            onChange={(e) => setFormData({ ...formData, ativo: e.target.checked })}
-            className="sr-only peer"
-          />
-          <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-muted after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-        </label>
-      </div>
 
-      {/* Seção de Adicionais */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Label className="text-sm font-medium text-foreground">Adicionais (Opcional)</Label>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={adicionarAdicional}
-            className="border-muted/40 hover:bg-primary/5 rounded-xl"
+        {/* Toggle Produto Disponível */}
+        <div className="bg-card rounded-xl p-4 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-foreground">
+                {formData.ativo ? "Produto disponível" : "Produto indisponível"}
+              </span>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.ativo}
+                onChange={(e) => setFormData({ ...formData, ativo: e.target.checked })}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ring/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-input after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+            </label>
+          </div>
+        </div>
+
+        {/* Seção de Adicionais */}
+        <div className="bg-card rounded-xl p-4 shadow-sm space-y-4">
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-medium text-foreground">Adicionais (Opcional)</Label>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={adicionarAdicional}
+              className="border border-input hover:bg-muted rounded-xl transition-colors"
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Adicionar Adicional
+            </Button>
+          </div>
+          
+          {adicionais.length > 0 && (
+            <div className="space-y-3">
+              {adicionais.map((adicional, index) => (
+                <div key={index} className="flex items-center gap-3 p-3 bg-muted rounded-xl border border-input">
+                  <div className="flex-1">
+                    <Input
+                      placeholder="Ex: Queijo Extra, Azeitona"
+                      value={adicional.nome}
+                      onChange={(e) => atualizarAdicional(index, 'nome', e.target.value)}
+                      className="bg-background border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
+                    />
+                  </div>
+                  <div className="w-32">
+                    <Input
+                      type="text"
+                      placeholder="R$ 0,00"
+                      value={adicionaisFormatados[index] || ""}
+                      onChange={(e) => {
+                        const valorFormatado = formatCurrencyInput(e.target.value)
+                        atualizarPrecoAdicional(index, valorFormatado)
+                      }}
+                      className="bg-background border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removerAdicional(index)}
+                    className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg border border-input"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Campo Ordem */}
+        <div className="bg-card rounded-xl p-4 shadow-sm">
+          <div className="flex items-center justify-end gap-4">
+            <Label htmlFor="ordem" className="text-sm font-medium text-muted-foreground">Ordem de exibição</Label>
+            <Input
+              id="ordem"
+              type="number"
+              value={formData.ordem}
+              onChange={(e) => setFormData({ ...formData, ordem: Number.parseInt(e.target.value) || 0 })}
+              className="w-20 bg-muted border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
+              placeholder="0"
+            />
+          </div>
+        </div>
+
+        {/* Botões de Ação */}
+        <div className="flex justify-end space-x-3 pt-6 border-t border-border">
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={onCancel}
+            className="px-6 py-2 rounded-xl border border-input hover:bg-muted transition-colors"
           >
-            <Plus className="h-4 w-4 mr-1" />
-            Adicionar Adicional
+            Cancelar
+          </Button>
+          <Button 
+            type="submit"
+            className="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl shadow-md transition-colors"
+          >
+            Salvar
           </Button>
         </div>
-        
-        {adicionais.length > 0 && (
-          <div className="space-y-3">
-            {adicionais.map((adicional, index) => (
-              <div key={index} className="flex items-center gap-3 p-3 bg-card/50 rounded-xl border border-muted/30">
-                <div className="flex-1">
-                  <Input
-                    placeholder="Ex: Queijo Extra, Azeitona"
-                    value={adicional.nome}
-                    onChange={(e) => atualizarAdicional(index, 'nome', e.target.value)}
-                    className="border-muted/40 focus:border-primary/50 focus:ring-primary/20 rounded-xl"
-                  />
-                </div>
-                <div className="w-32">
-                  <Input
-                    type="text"
-                    placeholder="R$ 0,00"
-                    value={adicionaisFormatados[index] || ""}
-                    onChange={(e) => {
-                      const valorFormatado = formatCurrencyInput(e.target.value)
-                      atualizarPrecoAdicional(index, valorFormatado)
-                    }}
-                    className="border-muted/40 focus:border-primary/50 focus:ring-primary/20 rounded-xl"
-                  />
-                </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removerAdicional(index)}
-                  className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="flex items-center justify-end">
-        <div className="flex items-center gap-2">
-          <Label htmlFor="ordem" className="text-sm font-medium text-foreground">Ordem</Label>
-          <Input
-            id="ordem"
-            type="number"
-            value={formData.ordem}
-            onChange={(e) => setFormData({ ...formData, ordem: Number.parseInt(e.target.value) || 0 })}
-            className="w-20 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
-          />
-        </div>
-      </div>
-
-      <div className="flex justify-end space-x-3 pt-6 border-t border-muted/30">
-        <Button 
-          type="button" 
-          variant="outline" 
-          onClick={onCancel}
-          className="px-6 py-2 rounded-xl border-muted/40 hover:bg-muted/10"
-        >
-          Cancelar
-        </Button>
-        <Button 
-          type="submit"
-          className="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl"
-        >
-          Salvar
-        </Button>
-      </div>
-    </form>
+      </form>
+    </div>
   )
 }
 
