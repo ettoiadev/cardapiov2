@@ -135,6 +135,23 @@ export default function CheckoutPage() {
 
   const loadStoreConfig = async () => {
     try {
+      if (!isSupabaseConfigured()) {
+        // Mock data para desenvolvimento quando Supabase não está configurado
+        console.warn("⚠️ Supabase não configurado. Usando dados de teste.")
+        setStoreConfig({
+          nome: "Pizzaria Teste",
+          whatsapp: "5511999999999",
+          taxa_entrega: 5.00,
+          valor_minimo: 25.00,
+          aceita_dinheiro: true,
+          aceita_cartao: true,
+          aceita_pix: true,
+          aceita_ticket_alimentacao: false,
+          habilitar_bordas_recheadas: true
+        })
+        return
+      }
+
       const { data, error } = await supabase
         .from("pizzaria_config")
         .select("nome, whatsapp, taxa_entrega, valor_minimo, aceita_dinheiro, aceita_cartao, aceita_pix, aceita_ticket_alimentacao, habilitar_bordas_recheadas")
@@ -143,12 +160,31 @@ export default function CheckoutPage() {
       if (error || !data) {
         console.error("❌ Erro: Configuração da loja não encontrada")
         console.error("   Configure os dados da pizzaria no painel administrativo")
+        // Fallback para dados de teste
+        setStoreConfig({
+          nome: "Pizzaria Configuração Pendente",
+          whatsapp: "5511999999999",
+          taxa_entrega: 5.00,
+          valor_minimo: 25.00,
+          aceita_dinheiro: true,
+          aceita_cartao: true,
+          aceita_pix: true,
+          aceita_ticket_alimentacao: false,
+          habilitar_bordas_recheadas: true
+        })
         return
       }
 
       // Validar dados obrigatórios
       if (!data.nome || !data.whatsapp) {
         console.error("❌ Erro: Dados básicos da pizzaria (nome/WhatsApp) não configurados")
+        // Aplicar fallbacks para campos ausentes
+        const configComFallback = {
+          ...data,
+          nome: data.nome || "Pizzaria",
+          whatsapp: data.whatsapp || "5511999999999"
+        }
+        setStoreConfig(configComFallback)
         return
       }
 
@@ -156,6 +192,18 @@ export default function CheckoutPage() {
       console.log("✅ Configuração da loja carregada")
     } catch (error) {
       console.error("❌ Erro ao conectar com o banco de dados:", error)
+      // Fallback para desenvolvimento
+      setStoreConfig({
+        nome: "Pizzaria Erro Conexão",
+        whatsapp: "5511999999999",
+        taxa_entrega: 5.00,
+        valor_minimo: 25.00,
+        aceita_dinheiro: true,
+        aceita_cartao: true,
+        aceita_pix: true,
+        aceita_ticket_alimentacao: false,
+        habilitar_bordas_recheadas: true
+      })
     }
   }
 
@@ -259,18 +307,35 @@ export default function CheckoutPage() {
   // Validar formulário
   const isFormValid = () => {
     if (deliveryType === "delivery") {
+      const validacoes = {
+        nome: customerName.trim() !== "",
+        telefone: customerPhone.replace(/\D/g, "").length >= 10,
+        cep: customerCep.replace(/\D/g, "").length === 8,
+        endereco: addressData !== null,
+        numero: addressNumber.trim() !== ""
+      }
+      
+      console.log("📝 Validação delivery:", validacoes)
+      
       return (
-        customerName.trim() !== "" &&
-        customerPhone.replace(/\D/g, "").length >= 10 &&
-        customerCep.replace(/\D/g, "").length === 8 &&
-        addressData !== null &&
-        addressNumber.trim() !== ""
+        validacoes.nome &&
+        validacoes.telefone &&
+        validacoes.cep &&
+        validacoes.endereco &&
+        validacoes.numero
       )
     } else {
+      const validacoes = {
+        nome: customerName.trim() !== "",
+        telefone: customerPhone.replace(/\D/g, "").length >= 10
+      }
+      
+      console.log("📝 Validação balcão:", validacoes)
+      
       // Para retirada no balcão: apenas nome e telefone são obrigatórios
       return (
-        customerName.trim() !== "" &&
-        customerPhone.replace(/\D/g, "").length >= 10
+        validacoes.nome &&
+        validacoes.telefone
       )
     }
   }
@@ -278,7 +343,7 @@ export default function CheckoutPage() {
   // Gerar mensagem para WhatsApp
   const generateWhatsAppMessage = () => {
     const deliveryFee = deliveryType === "delivery" ? (storeConfig?.taxa_entrega || 0) : 0
-    const subtotal = state.total
+    const subtotal = state.total || 0
     const total = subtotal + deliveryFee
     
     let message = `🍕 *NOVO PEDIDO - ${storeConfig?.nome}*\n\n`
@@ -476,6 +541,14 @@ export default function CheckoutPage() {
 
   // Finalizar pedido
   const handleFinishOrder = () => {
+    console.log("🔄 Iniciando processo de finalização do pedido...")
+    console.log("📋 Validações:", {
+      formValida: isFormValid(),
+      valorMinimo: isMinimumMet,
+      whatsappConfig: storeConfig?.whatsapp,
+      carrinho: state.items?.length || 0
+    })
+    
     if (!storeConfig?.whatsapp) {
       console.error("❌ Erro: WhatsApp da pizzaria não configurado")
       alert("Erro: WhatsApp da pizzaria não configurado. Entre em contato com o administrador.")
@@ -483,24 +556,76 @@ export default function CheckoutPage() {
     }
 
     setSubmitting(true)
-    const message = generateWhatsAppMessage()
-    const rawWhatsappNumber = storeConfig.whatsapp
-    const whatsappNumber = sanitizeWhatsappNumber(rawWhatsappNumber)
     
-    if (!whatsappNumber) {
-      console.error("❌ Erro: Número WhatsApp inválido")
-      alert("Erro: Número WhatsApp inválido. Entre em contato com o administrador.")
+    try {
+      const message = generateWhatsAppMessage()
+      console.log("📝 Mensagem gerada:", message.length > 0 ? "✅ OK" : "❌ Vazia")
+      
+      const rawWhatsappNumber = storeConfig.whatsapp
+      const whatsappNumber = sanitizeWhatsappNumber(rawWhatsappNumber)
+      console.log("📱 Número processado:", { original: rawWhatsappNumber, processado: whatsappNumber })
+      
+      if (!whatsappNumber) {
+        console.error("❌ Erro: Número WhatsApp inválido")
+        alert("Erro: Número WhatsApp inválido. Entre em contato com o administrador.")
+        setSubmitting(false)
+        return
+      }
+      
+      // Verificar tamanho da mensagem (WhatsApp tem limite de ~2048 caracteres na URL)
+      if (message.length > 1800) {
+        console.warn("⚠️ Mensagem muito longa, truncando...")
+        const mensagemTruncada = message.substring(0, 1750) + "\n\n... (mensagem truncada)"
+        var whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(mensagemTruncada)}`
+      } else {
+        var whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+      }
+      
+      console.log("🔗 URL do WhatsApp montada:", {
+        tamanho: whatsappUrl.length,
+        preview: whatsappUrl.substring(0, 100) + "..."
+      })
+      
+      // Tentar abrir o WhatsApp imediatamente
+      try {
+        const popup = window.open(whatsappUrl, "_blank", "noopener,noreferrer")
+        
+        if (popup && !popup.closed) {
+          console.log("✅ Redirecionamento para WhatsApp realizado com sucesso!")
+          // Verificar se o popup ainda está aberto após um pequeno delay
+          setTimeout(() => {
+            if (popup.closed) {
+              console.log("✅ Usuário interagiu com o WhatsApp e retornou")
+            }
+          }, 1000)
+        } else {
+          console.warn("⚠️ Popup bloqueado ou falhou. Tentando método alternativo...")
+          // Método alternativo: criar link temporário e clicar
+          const tempLink = document.createElement('a')
+          tempLink.href = whatsappUrl
+          tempLink.target = '_blank'
+          tempLink.rel = 'noopener noreferrer'
+          document.body.appendChild(tempLink)
+          tempLink.click()
+          document.body.removeChild(tempLink)
+          console.log("✅ Redirecionamento alternativo executado")
+        }
+      } catch (popupError) {
+        console.error("❌ Erro ao abrir popup:", popupError)
+        // Último recurso: redirecionamento direto
+        window.location.href = whatsappUrl
+      }
+      
+      // Resetar estado após um pequeno delay
+      setTimeout(() => {
+        setSubmitting(false)
+      }, 500)
+      
+    } catch (error) {
+      console.error("❌ Erro ao processar pedido:", error)
+      alert("Erro ao processar pedido. Tente novamente.")
       setSubmitting(false)
-      return
     }
-    
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
-    
-    // Simular um pequeno delay para mostrar o loading
-    setTimeout(() => {
-      window.open(whatsappUrl, "_blank")
-      setSubmitting(false)
-    }, 1000)
   }
   
   // Loading
@@ -1028,6 +1153,32 @@ export default function CheckoutPage() {
       
       {/* Botão Fixo */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4">
+        {/* Debug Info (remover depois) */}
+        {process.env.NODE_ENV === "development" && (
+          <div className="mb-2 p-2 bg-gray-100 rounded text-xs space-y-2">
+            <div className="grid grid-cols-2 gap-2">
+              <div>Valor mínimo: {isMinimumMet ? "✅" : "❌"}</div>
+              <div>Formulário: {isFormValid() ? "✅" : "❌"}</div>
+              <div>WhatsApp: {storeConfig?.whatsapp ? "✅" : "❌"}</div>
+              <div>Carrinho: {state.items?.length || 0} itens</div>
+            </div>
+            <button
+              onClick={() => {
+                console.log("🧪 Teste de redirecionamento WhatsApp")
+                const testMessage = "🧪 TESTE - Mensagem de teste do checkout"
+                const testNumber = storeConfig?.whatsapp || "5511999999999"
+                const cleanNumber = sanitizeWhatsappNumber(testNumber)
+                const testUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(testMessage)}`
+                console.log("Test URL:", testUrl)
+                window.open(testUrl, "_blank")
+              }}
+              className="w-full bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+            >
+              🧪 Testar WhatsApp
+            </button>
+          </div>
+        )}
+        
         <Button
           onClick={handleFinishOrder}
           disabled={!isMinimumMet || !isFormValid() || submitting}
