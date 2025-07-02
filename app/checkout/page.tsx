@@ -1038,7 +1038,7 @@ export default function CheckoutPage() {
             </>
           )}
         </Button>
-        <p className="text-xs text-gray-500 text-center mt-2">
+        <p className="text-sm text-green-600 font-semibold text-center mt-2">
           Você será redirecionado ao WhatsApp da pizzaria
         </p>
       </div>
