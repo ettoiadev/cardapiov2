@@ -378,6 +378,11 @@ export default function CheckoutPage() {
     const produto = produtos.find(p => p.nome === saborNome)
     return produto?.adicionais || []
   }
+  
+  const getIngredientesForSabor = (saborNome: string): string => {
+    const produto = produtos.find(p => p.nome === saborNome)
+    return produto?.descricao || ""
+  }
 
   // Atualizar adicionais de um item do carrinho
   const handleToggleAdicional = (itemId: string, sabor: string, adicional: Adicional, checked: boolean) => {
@@ -670,8 +675,18 @@ export default function CheckoutPage() {
           <div className="p-4">
             <h2 className="text-[15px] font-semibold mb-4 text-neutral-800">Resumo do Pedido</h2>
             <div className="space-y-2">
-              {state.items?.map((item, index) => (
-                <div key={index} className="bg-white rounded-lg shadow-sm p-3">
+              {state.items?.map((item, index) => {
+                // Verifica se é a primeira bebida da lista para mostrar o título
+                const isFirstBebida = item.tipo === "bebida" && 
+                  state.items?.findIndex(i => i.tipo === "bebida") === index
+                
+                return (
+                  <div key={index}>
+                    {/* Título das Bebidas - exibido apenas antes da primeira bebida */}
+                    {isFirstBebida && (
+                      <h3 className="text-sm font-semibold text-gray-600 mt-4 mb-2 pt-4 border-t border-gray-200">Bebidas</h3>
+                    )}
+                    <div className="bg-white rounded-lg shadow-sm p-3">
                   {/* Header do item com quantidade e controles */}
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3 flex-1">
@@ -701,13 +716,47 @@ export default function CheckoutPage() {
                       {/* Nome do produto */}
                       <div className="flex-1">
                         {item.sabores && item.sabores.length === 2 ? (
-                          <span className="text-[15px] font-medium text-neutral-800">
-                            Pizza 1/2 {item.sabores[0]} + 1/2 {item.sabores[1]}
-                          </span>
+                          <div>
+                            <span className="text-[15px] font-medium text-neutral-800">
+                              Pizza 1/2 {item.sabores[0]} + 1/2 {item.sabores[1]}
+                            </span>
+                            <div className="mt-1 space-y-1">
+                              {item.sabores.map((sabor, index) => {
+                                const ingredientes = getIngredientesForSabor(sabor)
+                                return ingredientes ? (
+                                  <p key={index} className="text-sm text-gray-500">
+                                    1/2 {sabor}: {ingredientes}
+                                  </p>
+                                ) : null
+                              })}
+                            </div>
+                          </div>
                         ) : item.sabores && item.sabores.length === 3 ? (
-                          <span className="text-[15px] font-medium text-neutral-800">
-                            Pizza {item.sabores.join(" + ")}
-                          </span>
+                          <div>
+                            <span className="text-[15px] font-medium text-neutral-800">
+                              Pizza {item.sabores.join(" + ")}
+                            </span>
+                            <div className="mt-1 space-y-1">
+                              {item.sabores.map((sabor, index) => {
+                                const ingredientes = getIngredientesForSabor(sabor)
+                                return ingredientes ? (
+                                  <p key={index} className="text-sm text-gray-500">
+                                    {sabor}: {ingredientes}
+                                  </p>
+                                ) : null
+                              })}
+                            </div>
+                          </div>
+                        ) : item.sabores && item.sabores.length === 1 ? (
+                          <div>
+                            <span className="text-[15px] font-medium text-neutral-800">{item.nome}</span>
+                            {(() => {
+                              const ingredientes = getIngredientesForSabor(item.sabores[0])
+                              return ingredientes ? (
+                                <p className="text-sm text-gray-500 mt-1">{ingredientes}</p>
+                              ) : null
+                            })()}
+                          </div>
                         ) : (
                           <span className="text-[15px] font-medium text-neutral-800">{item.nome}</span>
                         )}
@@ -766,8 +815,8 @@ export default function CheckoutPage() {
                   {item.tipo !== "bebida" && bordasRecheadas.length > 0 && (
                     <div className="border-t border-gray-200 mt-2 pt-2">
                       <div className="bg-[#fefaf0] border border-yellow-300 rounded-lg p-3">
-                        <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                          🧈 Borda Recheada (Opcional):
+                        <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                          Borda Recheada (Opcional):
                         </h4>
                       <div className="space-y-2">
                         {/* Opção "Sem borda" */}
@@ -810,8 +859,10 @@ export default function CheckoutPage() {
                       </div>
                     </div>
                   )}
-                </div>
-              ))}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </Card>
