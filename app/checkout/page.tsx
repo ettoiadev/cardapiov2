@@ -870,7 +870,7 @@ export default function CheckoutPage() {
                       <div className="flex-1">
                         {item.sabores && item.sabores.length === 2 ? (
                           <div>
-                            <span className="text-[15px] font-medium text-neutral-800">
+                            <span className="text-[15px] font-bold text-red-600">
                               Pizza 1/2 {item.sabores[0]} + 1/2 {item.sabores[1]}
                             </span>
                             <div className="mt-1 space-y-1">
@@ -886,7 +886,7 @@ export default function CheckoutPage() {
                           </div>
                         ) : item.sabores && item.sabores.length === 3 ? (
                           <div>
-                            <span className="text-[15px] font-medium text-neutral-800">
+                            <span className="text-[15px] font-bold text-red-600">
                               Pizza {item.sabores.join(" + ")}
                             </span>
                             <div className="mt-1 space-y-1">
@@ -902,7 +902,7 @@ export default function CheckoutPage() {
                           </div>
                         ) : item.sabores && item.sabores.length === 1 ? (
                           <div>
-                            <span className="text-[15px] font-medium text-neutral-800">{item.nome}</span>
+                            <span className="text-[15px] font-bold text-red-600">{item.nome}</span>
                             {(() => {
                               const ingredientes = getIngredientesForSabor(item.sabores[0])
                               return ingredientes ? (
@@ -911,7 +911,7 @@ export default function CheckoutPage() {
                             })()}
                           </div>
                         ) : (
-                          <span className="text-[15px] font-medium text-neutral-800">{item.nome}</span>
+                          <span className="text-[15px] font-bold text-red-600">{item.nome}</span>
                         )}
                       </div>
                     </div>
