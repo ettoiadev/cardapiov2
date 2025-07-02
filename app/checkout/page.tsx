@@ -896,7 +896,7 @@ export default function CheckoutPage() {
           <div className="p-4">
             <h2 className="text-[15px] font-semibold mb-4 text-neutral-800">Observações do Pedido</h2>
             <Textarea
-              placeholder="Ex: Sem cebola, bem passada..."
+              placeholder="Ex: Sem cebola...."
               value={orderNotes}
               onChange={(e) => setOrderNotes(e.target.value)}
               className="h-[80px] rounded-lg bg-neutral-50 border"
