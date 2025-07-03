@@ -836,8 +836,43 @@ export default function CheckoutPage() {
         {/* Resumo do Pedido */}
         <Card className="rounded-xl shadow-md">
           <div className="p-4">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-[15px] font-semibold text-neutral-800">Resumo do Pedido</h2>
+            <div className="flex items-center justify-between mb-4 gap-2">
+              <h2 className="text-[15px] font-semibold text-neutral-800 whitespace-nowrap">Resumo do Pedido</h2>
+              {/* Seletor compacto de quantidade total de pizzas */}
+              {(() => {
+                // Filtra apenas pizzas
+                const pizzaItems = state.items?.filter(i => i.tipo !== "bebida") || [];
+                if (pizzaItems.length === 0) return null;
+                // Soma total de pizzas
+                const totalPizzas = pizzaItems.reduce((sum, item) => sum + item.quantidade, 0);
+                // O seletor controla a quantidade do primeiro item de pizza
+                const firstPizza = pizzaItems[0];
+                return (
+                  <div className="flex items-center gap-1 bg-neutral-100 rounded px-2 py-1 min-w-[90px] max-w-full">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleUpdateQuantity(firstPizza.id, firstPizza.quantidade - 1)}
+                      className="h-6 w-6 p-0 rounded-full bg-neutral-200 hover:bg-neutral-300 text-xs"
+                      aria-label="Diminuir quantidade de pizza"
+                    >
+                      <Minus className="h-3 w-3" />
+                    </Button>
+                    <span className="w-8 text-center font-medium text-xs select-none">
+                      {totalPizzas}x
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleUpdateQuantity(firstPizza.id, firstPizza.quantidade + 1)}
+                      className="h-6 w-6 p-0 rounded-full bg-neutral-200 hover:bg-neutral-300 text-xs"
+                      aria-label="Aumentar quantidade de pizza"
+                    >
+                      <Plus className="h-3 w-3" />
+                    </Button>
+                  </div>
+                );
+              })()}
             </div>
             <div className="space-y-2">
               {state.items?.map((item, index) => {
