@@ -962,31 +962,8 @@ export default function CheckoutPage() {
                         </div>
                       </div>
                       
-                      {/* Controles de quantidade alinhados à direita */}
+                      {/* Valor total do item */}
                       <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleUpdateQuantity(item.id, item.quantidade - 1)}
-                            className="h-6 w-6 p-0 rounded-full bg-neutral-200 hover:bg-neutral-300 text-sm"
-                          >
-                            <Minus className="h-3 w-3" />
-                          </Button>
-                          <span className="w-8 text-center font-medium text-sm">
-                            {item.quantidade}x
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleUpdateQuantity(item.id, item.quantidade + 1)}
-                            className="h-6 w-6 p-0 rounded-full bg-neutral-200 hover:bg-neutral-300 text-sm"
-                          >
-                            <Plus className="h-3 w-3" />
-                          </Button>
-                        </div>
-                        
-                        {/* Valor total do item */}
                         <span className="font-semibold text-green-600">
                           {formatCurrency(item.preco * item.quantidade)}
                         </span>
