@@ -832,10 +832,10 @@ function HomePageContent() {
                         </div>
                         
                         {flavorMode > 1 && (
-                          <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all ${
+                          <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all ml-4 ${
                             isSelected
                               ? "border-red-500 bg-red-500"
-                              : "border-gray-300"
+                              : "border-red-500"
                           }`}>
                             {isSelected && (
                               <Check className="w-4 h-4 text-white" />
