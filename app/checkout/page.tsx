@@ -836,7 +836,9 @@ export default function CheckoutPage() {
         {/* Resumo do Pedido */}
         <Card className="rounded-xl shadow-md">
           <div className="p-4">
-            <h2 className="text-[15px] font-semibold mb-4 text-neutral-800">Resumo do Pedido</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-[15px] font-semibold text-neutral-800">Resumo do Pedido</h2>
+            </div>
             <div className="space-y-2">
               {state.items?.map((item, index) => {
                 // Verifica se é a primeira bebida da lista para mostrar o título
@@ -850,34 +852,11 @@ export default function CheckoutPage() {
                       <h3 className="text-sm font-semibold text-gray-600 mt-4 mb-2 pt-4 border-t border-gray-200">Bebidas</h3>
                     )}
                     <div className="bg-white rounded-lg shadow-sm p-3">
-                  {/* Header do item com quantidade e controles */}
+                  {/* Header do item */}
                   <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3 flex-1">
-                      {/* Controles de quantidade */}
-                      <div className="flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleUpdateQuantity(item.id, item.quantidade - 1)}
-                          className="h-6 w-6 p-0 rounded-full bg-neutral-200 hover:bg-neutral-300 text-sm"
-                        >
-                          <Minus className="h-3 w-3" />
-                        </Button>
-                        <span className="w-8 text-center font-medium text-sm">
-                          {item.quantidade}x
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleUpdateQuantity(item.id, item.quantidade + 1)}
-                          className="h-6 w-6 p-0 rounded-full bg-neutral-200 hover:bg-neutral-300 text-sm"
-                        >
-                          <Plus className="h-3 w-3" />
-                        </Button>
-                      </div>
-                      
+                    <div className="flex-1">
                       {/* Nome do produto */}
-                      <div className="flex-1">
+                      <div>
                         {item.sabores && item.sabores.length === 2 ? (
                           <div>
                             <span className="text-[15px] font-bold text-red-600">
@@ -945,14 +924,39 @@ export default function CheckoutPage() {
                             )}
                           </div>
                         )}
+                        </div>
+                      </div>
+                      
+                      {/* Controles de quantidade alinhados à direita */}
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleUpdateQuantity(item.id, item.quantidade - 1)}
+                            className="h-6 w-6 p-0 rounded-full bg-neutral-200 hover:bg-neutral-300 text-sm"
+                          >
+                            <Minus className="h-3 w-3" />
+                          </Button>
+                          <span className="w-8 text-center font-medium text-sm">
+                            {item.quantidade}x
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleUpdateQuantity(item.id, item.quantidade + 1)}
+                            className="h-6 w-6 p-0 rounded-full bg-neutral-200 hover:bg-neutral-300 text-sm"
+                          >
+                            <Plus className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        
+                        {/* Valor total do item */}
+                        <span className="font-semibold text-green-600">
+                          {formatCurrency(item.preco * item.quantidade)}
+                        </span>
                       </div>
                     </div>
-                    
-                    {/* Valor total do item */}
-                    <span className="font-semibold text-green-600">
-                      {formatCurrency(item.preco * item.quantidade)}
-                    </span>
-                  </div>
                     
                   {/* Seção de Seleção de Tamanho (apenas para pizzas) */}
                   {item.tipo !== "bebida" && (
