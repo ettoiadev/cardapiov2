@@ -82,9 +82,38 @@ function HomePageContent() {
   const [selectedFlavorsForMulti, setSelectedFlavorsForMulti] = useState<Produto[]>([])
   const [selectedSingleFlavor, setSelectedSingleFlavor] = useState<string | null>(null)
 
+  // Estados para seleção de tamanho por pizza
+  const [selectedSizes, setSelectedSizes] = useState<{ [pizzaId: string]: "tradicional" | "broto" }>({})
+
   const { dispatch, state: cartState } = useCart()
   const { config: pizzariaConfig } = useConfig()
   const router = useRouter()
+
+  // Função para verificar se uma pizza tem múltiplos tamanhos disponíveis
+  const hasMultipleSizes = (pizza: Produto): boolean => {
+    return !!(pizzariaConfig.habilitar_broto && 
+           pizza.preco_tradicional && 
+           pizza.preco_broto && 
+           pizza.preco_broto > 0)
+  }
+
+  // Função para obter o preço baseado no tamanho selecionado
+  const getPriceBySize = (pizza: Produto, size: "tradicional" | "broto"): number => {
+    return size === "broto" ? (pizza.preco_broto || 0) : (pizza.preco_tradicional || 0)
+  }
+
+  // Função para obter o tamanho selecionado para uma pizza específica
+  const getSelectedSize = (pizzaId: string): "tradicional" | "broto" => {
+    return selectedSizes[pizzaId] || "tradicional"
+  }
+
+  // Função para atualizar o tamanho selecionado de uma pizza
+  const updateSelectedSize = (pizzaId: string, size: "tradicional" | "broto") => {
+    setSelectedSizes(prev => ({
+      ...prev,
+      [pizzaId]: size
+    }))
+  }
 
   // Função para calcular o status da pizzaria
   const getStoreStatus = () => {
@@ -195,14 +224,16 @@ function HomePageContent() {
   // Processamento automático APENAS para múltiplos sabores (2 ou 3)
   useEffect(() => {
     if (flavorMode > 1 && selectedFlavorsForMulti.length === flavorMode) {
-      // Para múltiplos sabores, verificar se algum sabor tem adicionais
-      const hasAdicionais = selectedFlavorsForMulti.some(pizza => pizza.adicionais && pizza.adicionais.length > 0)
-      
       const timer = setTimeout(() => {
-        // Sempre adicionar diretamente ao carrinho sem adicionais (adicionais serão editados no checkout)
-        const tamanho = "tradicional"
+        // Para múltiplos sabores, usar o primeiro tamanho comum ou tradicional como padrão
+        // Se todos os sabores têm o mesmo tamanho selecionado, usar esse tamanho
+        const tamanhosSelecionados = selectedFlavorsForMulti.map(pizza => getSelectedSize(pizza.id))
+        const tamanhoComum = tamanhosSelecionados.every(t => t === tamanhosSelecionados[0]) 
+          ? tamanhosSelecionados[0] 
+          : "tradicional"
+        
         const prices = selectedFlavorsForMulti.map(pizza => 
-          pizza.preco_tradicional || 0
+          getPriceBySize(pizza, tamanhoComum)
         )
         const preco = Math.max(...prices)
         const sabores = selectedFlavorsForMulti.map(p => p.nome)
@@ -211,9 +242,9 @@ function HomePageContent() {
         dispatch({
           type: "ADD_ITEM",
           payload: {
-            id: `multi-${sabores.sort().join("-")}-${tamanho}`,
+            id: `multi-${sabores.sort().join("-")}-${tamanhoComum}`,
             nome: nomeItem,
-            tamanho: tamanho,
+            tamanho: tamanhoComum,
             sabores: sabores,
             preco: preco,
             tipo: selectedFlavorsForMulti[0].tipo,
@@ -228,7 +259,7 @@ function HomePageContent() {
       
       return () => clearTimeout(timer)
     }
-  }, [flavorMode, selectedFlavorsForMulti, dispatch])
+  }, [flavorMode, selectedFlavorsForMulti, dispatch, selectedSizes])
 
   const loadData = async () => {
     try {
@@ -333,12 +364,14 @@ function HomePageContent() {
   }
 
   const handleSingleFlavorSelection = (pizza: Produto) => {
-    // Para 1 sabor: sempre adicionar diretamente ao carrinho (adicionais serão editados no checkout)
+    // Para 1 sabor: usar o tamanho selecionado pelo usuário
     setSelectedSingleFlavor(pizza.id)
     setSelectedFlavorsForMulti([pizza])
     
-    // Adicionar diretamente ao carrinho sem adicionais
-    const tamanho = "tradicional"
+    // Obter o tamanho selecionado para esta pizza
+    const tamanho = getSelectedSize(pizza.id)
+    const preco = getPriceBySize(pizza, tamanho)
+    
     dispatch({
       type: "ADD_ITEM",
       payload: {
@@ -346,7 +379,7 @@ function HomePageContent() {
         nome: pizza.nome,
         tamanho: tamanho,
         sabores: [pizza.nome],
-        preco: pizza.preco_tradicional || 0,
+        preco: preco,
         tipo: pizza.tipo,
       },
     })
@@ -381,11 +414,15 @@ function HomePageContent() {
   const handleAddToCart = () => {
     if (selectedFlavorsForMulti.length !== flavorMode) return
 
-    const tamanho = "tradicional" // Padrão tradicional, usuário pode editar no checkout
+    // Para múltiplos sabores, usar o primeiro tamanho comum ou tradicional como padrão
+    const tamanhosSelecionados = selectedFlavorsForMulti.map(pizza => getSelectedSize(pizza.id))
+    const tamanho = tamanhosSelecionados.every(t => t === tamanhosSelecionados[0]) 
+      ? tamanhosSelecionados[0] 
+      : "tradicional"
 
-    // Calcula o maior preço entre os sabores selecionados
+    // Calcula o maior preço entre os sabores selecionados usando o tamanho determinado
     const prices = selectedFlavorsForMulti.map(pizza => 
-      pizza.preco_tradicional || 0 // Sempre usar preço tradicional por padrão
+      getPriceBySize(pizza, tamanho)
     )
     const preco = Math.max(...prices)
 
@@ -735,16 +772,63 @@ function HomePageContent() {
                             )}
                           </div>
                           {pizza.descricao && <p className="text-sm text-gray-600 mt-1">{pizza.descricao}</p>}
-                          <div className="flex items-center space-x-4 mt-2">
-                            {pizzariaConfig.habilitar_broto && pizza.preco_broto && (
-                              <span className="text-sm text-green-600 font-bold">Broto: {formatCurrency(pizza.preco_broto)}</span>
-                            )}
-                            {pizza.preco_tradicional && (
-                              <span className="text-sm font-bold text-green-600">
-                                Tradicional: {formatCurrency(pizza.preco_tradicional)}
-                              </span>
-                            )}
-                          </div>
+                          
+                          {/* Seleção de tamanho inline */}
+                          {hasMultipleSizes(pizza) ? (
+                            <div className="mt-3">
+                              <div className="flex space-x-2">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    updateSelectedSize(pizza.id, "tradicional")
+                                  }}
+                                  className={`flex-1 px-3 py-2 rounded-lg border text-sm font-medium transition-all ${
+                                    getSelectedSize(pizza.id) === "tradicional"
+                                      ? "border-green-500 bg-green-50 text-green-700"
+                                      : "border-gray-300 bg-white text-gray-600 hover:border-gray-400"
+                                  }`}
+                                >
+                                  <div className="text-center">
+                                    <div className="font-semibold">Tradicional</div>
+                                    <div className="text-xs opacity-75">8 fatias</div>
+                                    <div className="font-bold text-green-600 mt-1">
+                                      {formatCurrency(pizza.preco_tradicional)}
+                                    </div>
+                                  </div>
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    updateSelectedSize(pizza.id, "broto")
+                                  }}
+                                  className={`flex-1 px-3 py-2 rounded-lg border text-sm font-medium transition-all ${
+                                    getSelectedSize(pizza.id) === "broto"
+                                      ? "border-green-500 bg-green-50 text-green-700"
+                                      : "border-gray-300 bg-white text-gray-600 hover:border-gray-400"
+                                  }`}
+                                >
+                                  <div className="text-center">
+                                    <div className="font-semibold">Broto</div>
+                                    <div className="text-xs opacity-75">4 fatias</div>
+                                    <div className="font-bold text-green-600 mt-1">
+                                      {formatCurrency(pizza.preco_broto)}
+                                    </div>
+                                  </div>
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-center space-x-4 mt-2">
+                              {pizzariaConfig.habilitar_broto && pizza.preco_broto && (
+                                <span className="text-sm text-green-600 font-bold">Broto: {formatCurrency(pizza.preco_broto)}</span>
+                              )}
+                              {pizza.preco_tradicional && (
+                                <span className="text-sm font-bold text-green-600">
+                                  Tradicional: {formatCurrency(pizza.preco_tradicional)}
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
                         
                         {flavorMode > 1 && (

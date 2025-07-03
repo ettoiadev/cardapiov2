@@ -33,6 +33,7 @@ type CartAction =
   | { type: "UPDATE_QUANTITY"; payload: { id: string; quantidade: number } }
   | { type: "UPDATE_ADICIONAIS"; payload: { id: string; adicionais: { sabor: string; itens: { nome: string; preco: number }[] }[] } }
   | { type: "UPDATE_BORDA"; payload: { id: string; bordaRecheada?: { id: string; nome: string; preco: number } } }
+  | { type: "UPDATE_TAMANHO"; payload: { id: string; tamanho: "broto" | "tradicional"; novoPreco: number } }
   | { type: "CLEAR_CART" }
 
 const CartContext = createContext<{
@@ -139,6 +140,30 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
             ...item,
             bordaRecheada: action.payload.bordaRecheada,
             preco: newPrice
+          }
+        }
+        return item
+      })
+
+      const newTotal = newItems.reduce((sum, item) => sum + item.preco * item.quantidade, 0)
+
+      return {
+        items: newItems,
+        total: newTotal,
+      }
+    }
+
+    case "UPDATE_TAMANHO": {
+      const newItems = state.items.map((item) => {
+        if (item.id === action.payload.id) {
+          // Atualizar o ID para refletir o novo tamanho
+          const newId = item.id.replace(/-tradicional$|-broto$/, `-${action.payload.tamanho}`)
+          
+          return {
+            ...item,
+            id: newId,
+            tamanho: action.payload.tamanho,
+            preco: action.payload.novoPreco
           }
         }
         return item

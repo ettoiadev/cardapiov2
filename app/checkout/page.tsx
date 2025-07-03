@@ -25,6 +25,7 @@ interface StoreConfig {
   aceita_pix?: boolean
   aceita_ticket_alimentacao?: boolean
   habilitar_bordas_recheadas?: boolean
+  habilitar_broto?: boolean
 }
 
 interface AddressData {
@@ -147,14 +148,15 @@ export default function CheckoutPage() {
           aceita_cartao: true,
           aceita_pix: true,
           aceita_ticket_alimentacao: false,
-          habilitar_bordas_recheadas: true
+          habilitar_bordas_recheadas: true,
+          habilitar_broto: true
         })
         return
       }
 
       const { data, error } = await supabase
         .from("pizzaria_config")
-        .select("nome, whatsapp, taxa_entrega, valor_minimo, aceita_dinheiro, aceita_cartao, aceita_pix, aceita_ticket_alimentacao, habilitar_bordas_recheadas")
+        .select("nome, whatsapp, taxa_entrega, valor_minimo, aceita_dinheiro, aceita_cartao, aceita_pix, aceita_ticket_alimentacao, habilitar_bordas_recheadas, habilitar_broto")
         .single()
       
       if (error || !data) {
@@ -170,7 +172,8 @@ export default function CheckoutPage() {
           aceita_cartao: true,
           aceita_pix: true,
           aceita_ticket_alimentacao: false,
-          habilitar_bordas_recheadas: true
+          habilitar_bordas_recheadas: true,
+          habilitar_broto: true
         })
         return
       }
@@ -202,7 +205,8 @@ export default function CheckoutPage() {
         aceita_cartao: true,
         aceita_pix: true,
         aceita_ticket_alimentacao: false,
-        habilitar_bordas_recheadas: true
+        habilitar_bordas_recheadas: true,
+        habilitar_broto: true
       })
     }
   }
@@ -351,7 +355,13 @@ export default function CheckoutPage() {
     // Resumo dos itens
     message += `📋 *ITENS DO PEDIDO:*\n`
     state.items?.forEach((item, index) => {
-      message += `${index + 1}. ${item.quantidade}x ${item.nome}\n`
+      message += `${index + 1}. ${item.quantidade}x ${item.nome}`
+      
+      // Mostrar tamanho se for pizza
+      if (item.tipo !== "bebida") {
+        message += ` - ${item.tamanho === "broto" ? "Broto" : "Tradicional"}`
+      }
+      message += `\n`
       
       // Mostrar sabores se for pizza com múltiplos sabores
       if (item.sabores && item.sabores.length > 0) {
@@ -873,6 +883,11 @@ export default function CheckoutPage() {
                             <span className="text-[15px] font-bold text-red-600">
                               Pizza 1/2 {item.sabores[0]} + 1/2 {item.sabores[1]}
                             </span>
+                            {item.tipo !== "bebida" && (
+                              <span className="text-sm text-gray-600 ml-2">
+                                - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
+                              </span>
+                            )}
                             <div className="mt-1 space-y-1">
                               {item.sabores.map((sabor, index) => {
                                 const ingredientes = getIngredientesForSabor(sabor)
@@ -889,6 +904,11 @@ export default function CheckoutPage() {
                             <span className="text-[15px] font-bold text-red-600">
                               Pizza {item.sabores.join(" + ")}
                             </span>
+                            {item.tipo !== "bebida" && (
+                              <span className="text-sm text-gray-600 ml-2">
+                                - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
+                              </span>
+                            )}
                             <div className="mt-1 space-y-1">
                               {item.sabores.map((sabor, index) => {
                                 const ingredientes = getIngredientesForSabor(sabor)
@@ -903,6 +923,11 @@ export default function CheckoutPage() {
                         ) : item.sabores && item.sabores.length === 1 ? (
                           <div>
                             <span className="text-[15px] font-bold text-red-600">{item.nome}</span>
+                            {item.tipo !== "bebida" && (
+                              <span className="text-sm text-gray-600 ml-2">
+                                - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
+                              </span>
+                            )}
                             {(() => {
                               const ingredientes = getIngredientesForSabor(item.sabores[0])
                               return ingredientes ? (
@@ -911,7 +936,14 @@ export default function CheckoutPage() {
                             })()}
                           </div>
                         ) : (
-                          <span className="text-[15px] font-bold text-red-600">{item.nome}</span>
+                          <div>
+                            <span className="text-[15px] font-bold text-red-600">{item.nome}</span>
+                            {item.tipo !== "bebida" && (
+                              <span className="text-sm text-gray-600 ml-2">
+                                - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
+                              </span>
+                            )}
+                          </div>
                         )}
                       </div>
                     </div>
@@ -922,6 +954,102 @@ export default function CheckoutPage() {
                     </span>
                   </div>
                     
+                  {/* Seção de Seleção de Tamanho (apenas para pizzas) */}
+                  {item.tipo !== "bebida" && (
+                    <div className="border-t border-gray-200 mt-2 pt-2">
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                          Tamanho da Pizza:
+                        </h4>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => {
+                              const pizza = produtos.find(p => item.sabores?.includes(p.nome))
+                              if (pizza && pizza.preco_tradicional) {
+                                const basePrice = pizza.preco_tradicional
+                                const adicionaisPrice = item.adicionais?.reduce((sum, grupo) => 
+                                  sum + grupo.itens.reduce((itemSum, adicional) => itemSum + adicional.preco, 0), 0
+                                ) || 0
+                                const bordaPrice = item.bordaRecheada?.preco || 0
+                                const novoPreco = basePrice + adicionaisPrice + bordaPrice
+                                
+                                dispatch({
+                                  type: "UPDATE_TAMANHO",
+                                  payload: {
+                                    id: item.id,
+                                    tamanho: "tradicional",
+                                    novoPreco: novoPreco
+                                  }
+                                })
+                              }
+                            }}
+                            className={`flex-1 px-3 py-2 rounded-lg border text-sm font-medium transition-all ${
+                              item.tamanho === "tradicional"
+                                ? "border-blue-500 bg-blue-100 text-blue-700"
+                                : "border-gray-300 bg-white text-gray-600 hover:border-gray-400"
+                            }`}
+                          >
+                            <div className="text-center">
+                              <div className="font-semibold">Tradicional</div>
+                              <div className="text-xs opacity-75">8 fatias</div>
+                              <div className="font-bold text-green-600 mt-1">
+                                {(() => {
+                                  const pizza = produtos.find(p => item.sabores?.includes(p.nome))
+                                  return pizza?.preco_tradicional ? formatCurrency(pizza.preco_tradicional) : "-"
+                                })()}
+                              </div>
+                            </div>
+                          </button>
+                          
+                          {/* Só mostrar opção Broto se estiver habilitado e a pizza tiver preço broto */}
+                          {storeConfig?.habilitar_broto && (() => {
+                            const pizza = produtos.find(p => item.sabores?.includes(p.nome))
+                            return pizza?.preco_broto && pizza.preco_broto > 0
+                          })() && (
+                            <button
+                              onClick={() => {
+                                const pizza = produtos.find(p => item.sabores?.includes(p.nome))
+                                if (pizza && pizza.preco_broto) {
+                                  const basePrice = pizza.preco_broto
+                                  const adicionaisPrice = item.adicionais?.reduce((sum, grupo) => 
+                                    sum + grupo.itens.reduce((itemSum, adicional) => itemSum + adicional.preco, 0), 0
+                                  ) || 0
+                                  const bordaPrice = item.bordaRecheada?.preco || 0
+                                  const novoPreco = basePrice + adicionaisPrice + bordaPrice
+                                  
+                                  dispatch({
+                                    type: "UPDATE_TAMANHO",
+                                    payload: {
+                                      id: item.id,
+                                      tamanho: "broto",
+                                      novoPreco: novoPreco
+                                    }
+                                  })
+                                }
+                              }}
+                              className={`flex-1 px-3 py-2 rounded-lg border text-sm font-medium transition-all ${
+                                item.tamanho === "broto"
+                                  ? "border-blue-500 bg-blue-100 text-blue-700"
+                                  : "border-gray-300 bg-white text-gray-600 hover:border-gray-400"
+                              }`}
+                            >
+                              <div className="text-center">
+                                <div className="font-semibold">Broto</div>
+                                <div className="text-xs opacity-75">4 fatias</div>
+                                <div className="font-bold text-green-600 mt-1">
+                                  {(() => {
+                                    const pizza = produtos.find(p => item.sabores?.includes(p.nome))
+                                    return pizza?.preco_broto ? formatCurrency(pizza.preco_broto) : "-"
+                                  })()}
+                                </div>
+                              </div>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Seção de Adicionais Editáveis por Sabor */}
                   {item.sabores && item.sabores.length > 0 && (
                     <div className="border-t border-gray-200 mt-2 pt-2 space-y-3">
