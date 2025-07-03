@@ -791,7 +791,7 @@ function HomePageContent() {
                                   <div className="text-center">
                                     <div className="font-semibold">Tradicional</div>
                                     <div className="text-xs opacity-75">8 fatias</div>
-                                    <div className="font-bold text-green-600 mt-1">
+                                    <div className="font-bold text-black mt-1">
                                       {formatCurrency(pizza.preco_tradicional)}
                                     </div>
                                   </div>
@@ -810,7 +810,7 @@ function HomePageContent() {
                                   <div className="text-center">
                                     <div className="font-semibold">Broto</div>
                                     <div className="text-xs opacity-75">4 fatias</div>
-                                    <div className="font-bold text-green-600 mt-1">
+                                    <div className="font-bold text-black mt-1">
                                       {formatCurrency(pizza.preco_broto)}
                                     </div>
                                   </div>
@@ -820,10 +820,10 @@ function HomePageContent() {
                           ) : (
                             <div className="flex items-center space-x-4 mt-2">
                               {pizzariaConfig.habilitar_broto && pizza.preco_broto && (
-                                <span className="text-sm text-green-600 font-bold">Broto: {formatCurrency(pizza.preco_broto)}</span>
+                                <span className="text-sm text-black font-bold">Broto: {formatCurrency(pizza.preco_broto)}</span>
                               )}
                               {pizza.preco_tradicional && (
-                                <span className="text-sm font-bold text-green-600">
+                                <span className="text-sm font-bold text-black">
                                   Tradicional: {formatCurrency(pizza.preco_tradicional)}
                                 </span>
                               )}
