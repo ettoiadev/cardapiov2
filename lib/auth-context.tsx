@@ -117,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // IMPORTANTE: Em produção, implementar verificação de hash de senha segura
       // Por enquanto, verificação simplificada - DEVE SER ALTERADO PARA PRODUÇÃO
-      console.warn("⚠️ ATENÇÃO: Sistema de autenticação simplificado - implementar hash de senha para produção")
+      // console.warn("⚠️ ATENÇÃO: Sistema de autenticação simplificado - implementar hash de senha para produção")
       
       // Verificar senha (substituir por verificação de hash em produção)
       if (adminData.senha !== senha) {
