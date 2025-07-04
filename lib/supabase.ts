@@ -19,6 +19,64 @@ export const isSupabaseConfigured = () => {
   return !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 }
 
+// Helper function to test Supabase connectivity
+export const testSupabaseConnection = async () => {
+  try {
+    if (!isSupabaseConfigured()) {
+      return {
+        success: false,
+        error: "Supabase não configurado - variáveis de ambiente ausentes",
+        details: "Configure NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY"
+      }
+    }
+
+    // Test simple query to verify connection
+    const { data, error } = await supabase
+      .from('pizzaria_config')
+      .select('id')
+      .limit(1)
+
+    if (error) {
+      return {
+        success: false,
+        error: "Erro na consulta ao banco",
+        details: error.message
+      }
+    }
+
+    return {
+      success: true,
+      message: "Conexão com Supabase funcionando",
+      hasData: data && data.length > 0
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: "Erro de rede ou configuração",
+      details: error instanceof Error ? error.message : "Erro desconhecido"
+    }
+  }
+}
+
+// Helper function to get detailed environment info for debugging
+export const getSupabaseDebugInfo = () => {
+  const info = {
+    configured: isSupabaseConfigured(),
+    url: process.env.NEXT_PUBLIC_SUPABASE_URL || "NOT_SET",
+    hasAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    anonKeyLength: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.length || 0,
+    environment: process.env.NODE_ENV || "unknown"
+  }
+
+  // Don't log actual keys for security
+  console.log("🔍 Supabase Debug Info:", {
+    ...info,
+    url: info.url.includes('placeholder') ? 'PLACEHOLDER (NOT CONFIGURED)' : 'CONFIGURED'
+  })
+
+  return info
+}
+
 export type Database = {
   public: {
     Tables: {

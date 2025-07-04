@@ -1,6 +1,6 @@
 "use client"
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
-import { supabase } from "@/lib/supabase"
+import { supabase, testSupabaseConnection, getSupabaseDebugInfo } from "@/lib/supabase"
 
 interface Admin {
   id: string
@@ -14,6 +14,7 @@ interface AuthContextType {
   logout: () => void
   updateCredentials: (novoEmail: string, novaSenha: string) => Promise<boolean>
   loading: boolean
+  connectionTest: () => Promise<any>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -29,10 +30,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAdmin(JSON.parse(savedAdmin))
     }
     setLoading(false)
+
+    // Debug info on load
+    getSupabaseDebugInfo()
   }, [])
+
+  const connectionTest = async () => {
+    console.log("🔧 Testando conexão com Supabase...")
+    const result = await testSupabaseConnection()
+    console.log("📊 Resultado do teste:", result)
+    return result
+  }
 
   const login = async (email: string, senha: string): Promise<boolean> => {
     try {
+      console.log("🔐 Iniciando processo de login...")
+      
+      // Test connection first
+      const connectionResult = await testSupabaseConnection()
+      if (!connectionResult.success) {
+        console.error("❌ Falha na conexão:", connectionResult.error)
+        console.error("📋 Detalhes:", connectionResult.details)
+        throw new Error(`Erro de conexão: ${connectionResult.error}`)
+      }
+
+      console.log("✅ Conexão com Supabase verificada")
+
       // Buscar admin no banco de dados
       const { data, error } = await supabase
         .from("admins")
@@ -41,7 +64,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq("ativo", true)
         .single()
 
-      if (error || !data) {
+      if (error) {
+        console.error("❌ Erro na consulta de admin:", error)
+        if (error.code === 'PGRST116') {
+          console.error("📋 Nenhum admin encontrado com este email")
+        } else {
+          console.error("📋 Erro técnico:", error.message)
+        }
+        return false
+      }
+
+      if (!data) {
         console.error("❌ Erro: Credenciais inválidas ou usuário não encontrado")
         return false
       }
@@ -78,6 +111,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return false
       }
 
+      // Test connection first
+      const connectionResult = await testSupabaseConnection()
+      if (!connectionResult.success) {
+        console.error("❌ Falha na conexão para atualizar credenciais:", connectionResult.error)
+        throw new Error(`Erro de conexão: ${connectionResult.error}`)
+      }
+
       // Por enquanto, vamos simular a atualização para desenvolvimento
       // Em produção, isso deveria ser feito com hash seguro no backend
       console.log("Simulando atualização de credenciais:", { novoEmail, novaSenha })
@@ -98,9 +138,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setAdmin(null)
     localStorage.removeItem("admin")
+    console.log("🚪 Logout realizado")
   }
 
-  return <AuthContext.Provider value={{ admin, login, logout, updateCredentials, loading }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ admin, login, logout, updateCredentials, loading, connectionTest }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {
