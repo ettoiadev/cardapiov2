@@ -80,7 +80,7 @@ function HomePageContent() {
   const [showStoreInfo, setShowStoreInfo] = useState(false)
   const [flavorMode, setFlavorMode] = useState<1 | 2 | 3>(1)
   const [selectedFlavorsForMulti, setSelectedFlavorsForMulti] = useState<Produto[]>([])
-  const [selectedSingleFlavor, setSelectedSingleFlavor] = useState<string | null>(null)
+  // selectedSingleFlavor removido - marcação visual agora baseada no carrinho
 
   // Estados para seleção de tamanho por pizza
   const [selectedSizes, setSelectedSizes] = useState<{ [pizzaId: string]: "tradicional" | "broto" }>({})
@@ -365,7 +365,7 @@ function HomePageContent() {
 
   const handleSingleFlavorSelection = (pizza: Produto) => {
     // Para 1 sabor: usar o tamanho selecionado pelo usuário
-    setSelectedSingleFlavor(pizza.id)
+    // Não mais sobrescrever selectedSingleFlavor para permitir múltiplas marcações visuais
     setSelectedFlavorsForMulti([pizza])
     
     // Obter o tamanho selecionado para esta pizza
@@ -701,7 +701,7 @@ function HomePageContent() {
                           onClick={() => {
                             setFlavorMode(opcao.maximo_sabores as 1 | 2 | 3)
                             setSelectedFlavorsForMulti([])
-                            setSelectedSingleFlavor(null)
+                            // selectedSingleFlavor removido - marcação visual agora baseada no carrinho
                           }}
                         >
                           <div className="w-8 h-8 mb-2 flex-shrink-0 flex items-center justify-center relative">
@@ -737,7 +737,10 @@ function HomePageContent() {
                       .map((pizza, index) => {
                       const isSelected = selectedFlavorsForMulti.find(p => p.id === pizza.id)
                       const isDisabled = selectedFlavorsForMulti.length >= flavorMode && !isSelected
-                      const isSingleFlavorSelected = flavorMode === 1 && selectedSingleFlavor === pizza.id
+                      // Para 1 sabor: verificar se a pizza está no carrinho (múltiplas seleções visuais permitidas)
+                      const isSingleFlavorSelected = flavorMode === 1 && cartState.items.some(item => 
+                        item.sabores.length === 1 && item.sabores[0] === pizza.nome
+                      )
                       const pizzaNumber = index + 1 // Numeração sequencial baseada na posição ordenada
                       
                       return (
