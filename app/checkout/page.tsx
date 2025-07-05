@@ -350,12 +350,15 @@ export default function CheckoutPage() {
     const subtotal = state.total || 0
     const total = subtotal + deliveryFee
     
-    let message = `🍕 *NOVO PEDIDO - ${storeConfig?.nome}*\n\n`
+    let message = `📦 *NOVO PEDIDO - ${storeConfig?.nome}*\n\n`
     
     // Resumo dos itens
-    message += `📋 *ITENS DO PEDIDO:*\n`
+    message += `🍕 *ITENS DO PEDIDO:*\n`
     state.items?.forEach((item, index) => {
-      message += `${index + 1}. ${item.quantidade}x ${item.nome}`
+      // Determinar emoji baseado no tipo
+      const itemEmoji = item.tipo === "bebida" ? "🥤" : "🍕"
+      
+      message += `${index + 1}x ${item.nome}`
       
       // Mostrar tamanho se for pizza
       if (item.tipo !== "bebida") {
@@ -366,11 +369,11 @@ export default function CheckoutPage() {
       // Mostrar sabores se for pizza com múltiplos sabores
       if (item.sabores && item.sabores.length > 0) {
         if (item.sabores.length === 1) {
-          message += `   • Sabor: ${item.sabores[0]}\n`
+          message += `  • Sabor: ${item.sabores[0]}\n`
         } else if (item.sabores.length === 2) {
-          message += `   • Sabores:\n     1/2 ${item.sabores[0]}\n     1/2 ${item.sabores[1]}\n`
+          message += `  • Sabores:\n    1/2 ${item.sabores[0]}\n    1/2 ${item.sabores[1]}\n`
         } else {
-          message += `   • Sabores: ${item.sabores.join(', ')}\n`
+          message += `  • Sabores: ${item.sabores.join(', ')}\n`
         }
       }
       
@@ -378,21 +381,21 @@ export default function CheckoutPage() {
       if (item.adicionais && item.adicionais.length > 0) {
         item.adicionais.forEach((adicionalGrupo) => {
           if (adicionalGrupo.itens.length > 0) {
-            message += `   • Adicionais (${adicionalGrupo.sabor}): ${adicionalGrupo.itens.map(adic => `${adic.nome} (+${formatCurrency(adic.preco)})`).join(', ')}\n`
+            message += `  • Adicionais (${adicionalGrupo.sabor}): ${adicionalGrupo.itens.map(adic => `${adic.nome} (+${formatCurrency(adic.preco)})`).join(', ')}\n`
           }
         })
       }
       
       // Mostrar borda recheada se existir
       if (item.bordaRecheada) {
-        message += `   • Borda Recheada: ${item.bordaRecheada.nome} (+${formatCurrency(item.bordaRecheada.preco)})\n`
+        message += `  • Borda Recheada: ${item.bordaRecheada.nome} (+${formatCurrency(item.bordaRecheada.preco)})\n`
       }
       
-      message += `   • Valor: ${formatCurrency(item.preco * item.quantidade)}\n\n`
+      message += `  • Valor: ${formatCurrency(item.preco * item.quantidade)}\n\n`
     })
     
     // Tipo de entrega
-    message += `🚴 *ENTREGA:* ${deliveryType === "delivery" ? "Delivery" : "Retirada no Balcão"}\n\n`
+    message += `📍 *ENTREGA:* ${deliveryType === "delivery" ? "Delivery" : "Retirada no Balcão"}\n\n`
     
     // Dados do cliente
     message += `👤 *DADOS DO CLIENTE:*\n`
@@ -414,7 +417,7 @@ export default function CheckoutPage() {
     
     // Observações do pedido
     if (orderNotes) {
-      message += `📝 *OBSERVAÇÕES DO PEDIDO:*\n${orderNotes}\n\n`
+      message += `💬 *OBSERVAÇÕES DO PEDIDO:*\n${orderNotes}\n\n`
     }
     
     // Forma de pagamento
@@ -425,7 +428,7 @@ export default function CheckoutPage() {
       credito: "Cartão de Crédito",
       ticket_alimentacao: "Ticket Alimentação"
     }
-    message += `💳 *FORMA DE PAGAMENTO:* ${paymentLabels[paymentMethod]}\n\n`
+    message += `💳 *FORMA DE PAGAMENTO:*\n${paymentLabels[paymentMethod]}\n\n`
     
     // Resumo financeiro
     message += `💰 *VALORES:*\n`
@@ -435,7 +438,7 @@ export default function CheckoutPage() {
     }
     message += `*TOTAL: ${formatCurrency(total)}*\n\n`
     
-    message += `✅ Aguardo confirmação!`
+    message += `✅ Aguardando confirmação!`
     
     return message
   }
