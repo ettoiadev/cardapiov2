@@ -539,7 +539,7 @@ export default function AdminConfigPage() {
         const file = files[i]
         
         // Redimensionar imagem para otimizar
-        const resizedBlob = await resizeImage(file, 1200, 600)
+        const resizedBlob = await resizeImage(file, 1200, 320)
         
         // Upload da imagem
         const imageUrl = await uploadImage(resizedBlob, 'carousel', file.name)
@@ -1822,9 +1822,9 @@ export default function AdminConfigPage() {
                 className="hidden"
               />
               
-              <p className="text-xs text-gray-500 mt-2">
-                <strong>Tamanho recomendado:</strong> 1200x675px (16:9). As imagens serão redimensionadas automaticamente.
-              </p>
+                             <p className="text-xs text-gray-500 mt-2">
+                 <strong>Tamanho recomendado:</strong> 1200x320px. As imagens serão redimensionadas automaticamente.
+               </p>
             </div>
 
             {/* Lista de Imagens */}
@@ -1839,11 +1839,11 @@ export default function AdminConfigPage() {
                     <div key={image.id} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
                       {/* Preview da imagem */}
                       <div className="relative">
-                        <img
-                          src={image.url}
-                          alt={`Carousel ${index + 1}`}
-                          className="w-16 h-16 object-cover rounded-lg border border-gray-200"
-                        />
+                                                 <img
+                           src={image.url}
+                           alt={`Carousel ${index + 1}`}
+                           className="w-20 h-8 object-cover rounded-lg border border-gray-200"
+                         />
                         {!image.ativo && (
                           <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center">
                             <EyeOff className="h-4 w-4 text-white" />

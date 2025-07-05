@@ -31,7 +31,7 @@ Foi implementado um sistema completo de carousel responsivo na homepage do card�
 ### 1. `HomepageCarousel` (`components/homepage-carousel.tsx`)
 
 **Funcionalidades:**
-- Exibição responsiva das imagens (aspect ratio 16:9)
+- Exibição com tamanho fixo de 1200x320 pixels
 - Transição automática baseada no intervalo configurado
 - Controles de navegação manual (setas laterais)
 - Indicadores de posição (pontos na parte inferior)
@@ -41,9 +41,9 @@ Foi implementado um sistema completo de carousel responsivo na homepage do card�
 **Características técnicas:**
 - Componente client-side com hooks React
 - Carregamento otimizado com `priority` para primeira imagem
-- Responsivo com `sizes` apropriados para diferentes telas
+- Tamanho fixo responsivo com dimensões específicas
 - Bordas arredondadas e sombra sutil
-- Altura máxima de 48 (192px) para manter proporção
+- Dimensões: 1200x320px (proporção 15:4)
 
 ## Painel Administrativo
 
@@ -60,7 +60,7 @@ Foi implementado um sistema completo de carousel responsivo na homepage do card�
 
 #### 2. **Gerenciamento de Imagens**
 - Upload múltiplo de imagens (máximo 10)
-- Redimensionamento automático para 1200x600px
+- Redimensionamento automático para 1200x320px
 - Preview das imagens com status visual
 - Controles de ordem (subir/descer)
 - Toggle individual para ativar/desativar imagens
@@ -99,8 +99,8 @@ Foi implementado um sistema completo de carousel responsivo na homepage do card�
 - Transição suave entre imagens (500ms)
 
 ### 3. **Responsividade**
-- Aspect ratio fixo 16:9
-- Altura máxima para dispositivos móveis
+- Tamanho fixo 1200x320px
+- Adaptação proporcional para dispositivos móveis
 - Controles proporcionais ao tamanho da tela
 
 ### 4. **Performance**

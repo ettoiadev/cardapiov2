@@ -87,7 +87,7 @@ export function HomepageCarousel() {
   }
 
   return (
-    <div className="relative w-full aspect-[16/9] max-h-48 bg-gray-100 rounded-lg overflow-hidden shadow-sm">
+    <div className="relative w-full h-80 bg-gray-100 rounded-lg overflow-hidden shadow-sm" style={{ maxWidth: '1200px', height: '320px' }}>
       {/* Container das imagens */}
       <div className="relative w-full h-full">
         {images.map((image, index) => (
