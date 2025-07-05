@@ -844,7 +844,7 @@ export default function CheckoutPage() {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex-1">
                       {/* Nome do produto com Stepper para bebidas e pizzas */}
-                      <div className="flex items-start gap-3">
+                      <div className={`flex gap-3 ${item.tipo === "bebida" ? "items-center" : "items-start"}`}>
                         {/* Stepper para bebidas e pizzas */}
                         <div className="flex flex-col items-center">
                           <Button
