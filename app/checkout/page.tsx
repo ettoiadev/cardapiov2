@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, ShoppingBag, MapPin, Phone, User, CreditCard, DollarSign, Smartphone, Loader2, Plus, Minus, QrCode, Banknote, UtensilsCrossed, Bike, Pizza, MessageCircle, ScanLine, Wallet, ArrowDownToLine } from "lucide-react"
+import { ArrowLeft, ShoppingBag, MapPin, Phone, User, CreditCard, DollarSign, Smartphone, Loader2, Plus, Minus, QrCode, Banknote, UtensilsCrossed, Bike, Pizza, MessageCircle, ScanLine, Wallet, ArrowDownToLine, ChevronUp, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -846,25 +846,25 @@ export default function CheckoutPage() {
                       {/* Nome do produto com Stepper para bebidas e pizzas */}
                       <div className="flex items-start gap-3">
                         {/* Stepper para bebidas e pizzas */}
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-col items-center">
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 rounded-full"
-                            onClick={() => handleUpdateQuantity(item.id, item.quantidade - 1)}
+                            className="h-6 w-8 p-0 hover:bg-transparent"
+                            onClick={() => handleUpdateQuantity(item.id, item.quantidade + 1)}
                           >
-                            <Minus className="h-4 w-4" />
+                            <ChevronUp className="h-4 w-4 text-red-600" />
                           </Button>
-                          <span className="font-semibold text-sm min-w-[20px] text-center">
+                          <span className="font-semibold text-sm text-black min-w-[20px] text-center py-1">
                             {item.quantidade}
                           </span>
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 rounded-full"
-                            onClick={() => handleUpdateQuantity(item.id, item.quantidade + 1)}
+                            className="h-6 w-8 p-0 hover:bg-transparent"
+                            onClick={() => handleUpdateQuantity(item.id, item.quantidade - 1)}
                           >
-                            <Plus className="h-4 w-4" />
+                            <ChevronDown className="h-4 w-4 text-red-600" />
                           </Button>
                         </div>
                         
