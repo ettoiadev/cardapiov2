@@ -352,10 +352,14 @@ export default function CheckoutPage() {
     
     let message = `*NOVO PEDIDO - ${storeConfig?.nome}*\n\n`
     
-    // Resumo dos itens
-    message += `*ITENS DO PEDIDO:*\n`
-    state.items?.forEach((item, index) => {
-      message += `${index + 1}x ${item.nome}`
+    // Resumo dos itens com formatação melhorada
+    message += `🧾 *ITENS DO PEDIDO:*\n\n`
+    state.items?.forEach((item) => {
+      // Emoji baseado no tipo de item
+      const emoji = item.tipo === "bebida" ? "🥤" : "🍕"
+      
+      // Linha principal do item com quantidade clara
+      message += `${emoji} ${item.quantidade}x ${item.nome}`
       
       // Mostrar tamanho se for pizza
       if (item.tipo !== "bebida") {
@@ -388,20 +392,21 @@ export default function CheckoutPage() {
         message += `  • Borda Recheada: ${item.bordaRecheada.nome} (+${formatCurrency(item.bordaRecheada.preco)})\n`
       }
       
-      message += `  • Valor: ${formatCurrency(item.preco * item.quantidade)}\n\n`
+      // Total do item
+      message += `  • Total: ${formatCurrency(item.preco * item.quantidade)}\n\n`
     })
     
     // Tipo de entrega
-    message += `*ENTREGA:* ${deliveryType === "delivery" ? "Delivery" : "Retirada no Balcão"}\n\n`
+    message += `🚚 *ENTREGA:* ${deliveryType === "delivery" ? "Delivery" : "Retirada no Balcão"}\n\n`
     
     // Dados do cliente
-    message += `*DADOS DO CLIENTE:*\n`
+    message += `👤 *DADOS DO CLIENTE:*\n`
     message += `Nome: ${customerName}\n`
     message += `Telefone: ${customerPhone}\n\n`
     
     // Dados do cliente (se delivery)
     if (deliveryType === "delivery") {
-      message += `*ENDEREÇO DE ENTREGA:*\n`
+      message += `📍 *ENDEREÇO DE ENTREGA:*\n`
       if (addressData) {
         message += `${addressData.logradouro}, ${addressNumber}\n`
         if (addressComplement) message += `${addressComplement}\n`
@@ -414,7 +419,7 @@ export default function CheckoutPage() {
     
     // Observações do pedido
     if (orderNotes) {
-      message += `*OBSERVAÇÕES DO PEDIDO:*\n${orderNotes}\n\n`
+      message += `📝 *OBSERVAÇÕES DO PEDIDO:*\n${orderNotes}\n\n`
     }
     
     // Forma de pagamento
@@ -425,17 +430,17 @@ export default function CheckoutPage() {
       credito: "Cartão de Crédito",
       ticket_alimentacao: "Ticket Alimentação"
     }
-    message += `*FORMA DE PAGAMENTO:*\n${paymentLabels[paymentMethod]}\n\n`
+    message += `💳 *FORMA DE PAGAMENTO:*\n${paymentLabels[paymentMethod]}\n\n`
     
     // Resumo financeiro
-    message += `*VALORES:*\n`
+    message += `💰 *VALORES:*\n`
     message += `Subtotal: ${formatCurrency(subtotal)}\n`
     if (deliveryType === "delivery") {
       message += `Taxa de entrega: ${formatCurrency(deliveryFee)}\n`
     }
     message += `*TOTAL: ${formatCurrency(total)}*\n\n`
     
-    message += `Aguardando confirmação!`
+    message += `⏰ Aguardando confirmação!`
     
     return message
   }
