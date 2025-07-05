@@ -350,14 +350,11 @@ export default function CheckoutPage() {
     const subtotal = state.total || 0
     const total = subtotal + deliveryFee
     
-    let message = `📦 *NOVO PEDIDO - ${storeConfig?.nome}*\n\n`
+    let message = `*NOVO PEDIDO - ${storeConfig?.nome}*\n\n`
     
     // Resumo dos itens
-    message += `🍕 *ITENS DO PEDIDO:*\n`
+    message += `*ITENS DO PEDIDO:*\n`
     state.items?.forEach((item, index) => {
-      // Determinar emoji baseado no tipo
-      const itemEmoji = item.tipo === "bebida" ? "🥤" : "🍕"
-      
       message += `${index + 1}x ${item.nome}`
       
       // Mostrar tamanho se for pizza
@@ -395,16 +392,16 @@ export default function CheckoutPage() {
     })
     
     // Tipo de entrega
-    message += `📍 *ENTREGA:* ${deliveryType === "delivery" ? "Delivery" : "Retirada no Balcão"}\n\n`
+    message += `*ENTREGA:* ${deliveryType === "delivery" ? "Delivery" : "Retirada no Balcão"}\n\n`
     
     // Dados do cliente
-    message += `👤 *DADOS DO CLIENTE:*\n`
+    message += `*DADOS DO CLIENTE:*\n`
     message += `Nome: ${customerName}\n`
     message += `Telefone: ${customerPhone}\n\n`
     
     // Dados do cliente (se delivery)
     if (deliveryType === "delivery") {
-      message += `📍 *ENDEREÇO DE ENTREGA:*\n`
+      message += `*ENDEREÇO DE ENTREGA:*\n`
       if (addressData) {
         message += `${addressData.logradouro}, ${addressNumber}\n`
         if (addressComplement) message += `${addressComplement}\n`
@@ -417,7 +414,7 @@ export default function CheckoutPage() {
     
     // Observações do pedido
     if (orderNotes) {
-      message += `💬 *OBSERVAÇÕES DO PEDIDO:*\n${orderNotes}\n\n`
+      message += `*OBSERVAÇÕES DO PEDIDO:*\n${orderNotes}\n\n`
     }
     
     // Forma de pagamento
@@ -428,17 +425,17 @@ export default function CheckoutPage() {
       credito: "Cartão de Crédito",
       ticket_alimentacao: "Ticket Alimentação"
     }
-    message += `💳 *FORMA DE PAGAMENTO:*\n${paymentLabels[paymentMethod]}\n\n`
+    message += `*FORMA DE PAGAMENTO:*\n${paymentLabels[paymentMethod]}\n\n`
     
     // Resumo financeiro
-    message += `💰 *VALORES:*\n`
+    message += `*VALORES:*\n`
     message += `Subtotal: ${formatCurrency(subtotal)}\n`
     if (deliveryType === "delivery") {
       message += `Taxa de entrega: ${formatCurrency(deliveryFee)}\n`
     }
     message += `*TOTAL: ${formatCurrency(total)}*\n\n`
     
-    message += `✅ Aguardando confirmação!`
+    message += `Aguardando confirmação!`
     
     return message
   }
