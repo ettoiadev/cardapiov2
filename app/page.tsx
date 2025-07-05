@@ -13,6 +13,7 @@ import { useConfig } from "@/lib/config-context"
 import { StoreInfoModal } from "@/components/store-info-modal"
 import { CartFooter } from "@/components/cart-footer"
 import { SocialFooter } from "@/components/social-footer"
+import { HomepageCarousel } from "@/components/homepage-carousel"
 import { formatCurrency } from "@/lib/currency-utils"
 
 interface PizzariaConfig {
@@ -703,6 +704,9 @@ function HomePageContent() {
         <div className="flex flex-col justify-between grow">
           {/* Cardápio - área de conteúdo principal */}
           <div className="px-4 py-4 space-y-4">
+          {/* Carousel */}
+          <HomepageCarousel />
+          
           {/* Seção Pizzas */}
           <Card>
             <CardContent className="p-4">

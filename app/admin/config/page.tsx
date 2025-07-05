@@ -36,7 +36,11 @@ import {
   Share2,
   QrCode,
   Banknote,
-  UtensilsCrossed
+  UtensilsCrossed,
+  ImageIcon,
+  RotateCcw,
+  Eye,
+  EyeOff
 } from "lucide-react"
 
 interface PizzariaConfig {
@@ -124,9 +128,20 @@ export default function AdminConfigPage() {
   // Refs para inputs de arquivo
   const capaInputRef = useRef<HTMLInputElement>(null)
   const perfilInputRef = useRef<HTMLInputElement>(null)
+  const carouselInputRef = useRef<HTMLInputElement>(null)
+
+  // Estados para o carousel
+  const [carouselConfig, setCarouselConfig] = useState({
+    ativo: true,
+    intervalo_segundos: 5
+  })
+  const [carouselImages, setCarouselImages] = useState<any[]>([])
+  const [uploadingCarousel, setUploadingCarousel] = useState(false)
+  const [carouselMessage, setCarouselMessage] = useState("")
 
   useEffect(() => {
     loadConfig()
+    loadCarouselData()
   }, [])
 
   // Função para redimensionar imagem
@@ -476,6 +491,194 @@ export default function AdminConfigPage() {
       }
     } catch (error) {
       console.error("Erro ao conectar com Supabase:", error)
+    }
+  }
+
+  // Funções para gerenciar o carousel
+  const loadCarouselData = async () => {
+    try {
+      // Carregar configuração do carousel
+      const { data: configData } = await supabase
+        .from('carousel_config')
+        .select('ativo, intervalo_segundos')
+        .single()
+
+      if (configData) {
+        setCarouselConfig(configData)
+      }
+
+      // Carregar imagens do carousel
+      const { data: imagesData } = await supabase
+        .from('carousel_images')
+        .select('id, url, ordem, ativo')
+        .order('ordem')
+
+      if (imagesData) {
+        setCarouselImages(imagesData)
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dados do carousel:', error)
+    }
+  }
+
+  const handleCarouselUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    if (!files || files.length === 0) return
+
+    // Verificar se já temos 10 imagens
+    if (carouselImages.length >= 10) {
+      setCarouselMessage("Máximo de 10 imagens permitidas no carousel")
+      return
+    }
+
+    setUploadingCarousel(true)
+    setCarouselMessage("")
+
+    try {
+      for (let i = 0; i < files.length && carouselImages.length + i < 10; i++) {
+        const file = files[i]
+        
+        // Redimensionar imagem para otimizar
+        const resizedBlob = await resizeImage(file, 1200, 600)
+        
+        // Upload da imagem
+        const imageUrl = await uploadImage(resizedBlob, 'carousel', file.name)
+        
+        // Salvar no banco
+        const nextOrdem = Math.max(...carouselImages.map(img => img.ordem), 0) + 1
+        
+        const { data, error } = await supabase
+          .from('carousel_images')
+          .insert({
+            url: imageUrl,
+            ordem: nextOrdem,
+            ativo: true
+          })
+          .select()
+          .single()
+
+        if (error) {
+          console.error('Erro ao salvar imagem do carousel:', error)
+          continue
+        }
+
+        // Adicionar à lista local
+        setCarouselImages(prev => [...prev, data])
+      }
+
+      setCarouselMessage("Imagens do carousel enviadas com sucesso!")
+      
+      // Limpar input
+      if (carouselInputRef.current) {
+        carouselInputRef.current.value = ""
+      }
+    } catch (error) {
+      console.error('Erro no upload do carousel:', error)
+      setCarouselMessage("Erro ao enviar imagens do carousel")
+    } finally {
+      setUploadingCarousel(false)
+    }
+  }
+
+  const handleDeleteCarouselImage = async (imageId: string, imageUrl: string) => {
+    try {
+      // Deletar do banco
+      const { error } = await supabase
+        .from('carousel_images')
+        .delete()
+        .eq('id', imageId)
+
+      if (error) {
+        console.error('Erro ao deletar imagem:', error)
+        return
+      }
+
+      // Deletar do storage
+      const filePath = extractFilePathFromUrl(imageUrl)
+      if (filePath) {
+        await supabase.storage
+          .from('images')
+          .remove([filePath])
+      }
+
+      // Remover da lista local
+      setCarouselImages(prev => prev.filter(img => img.id !== imageId))
+      setCarouselMessage("Imagem removida com sucesso!")
+    } catch (error) {
+      console.error('Erro ao deletar imagem:', error)
+      setCarouselMessage("Erro ao deletar imagem")
+    }
+  }
+
+  const handleToggleCarouselImage = async (imageId: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('carousel_images')
+        .update({ ativo: !currentStatus })
+        .eq('id', imageId)
+
+      if (error) {
+        console.error('Erro ao alterar status da imagem:', error)
+        return
+      }
+
+      // Atualizar lista local
+      setCarouselImages(prev => 
+        prev.map(img => 
+          img.id === imageId ? { ...img, ativo: !currentStatus } : img
+        )
+      )
+      
+      setCarouselMessage(`Imagem ${!currentStatus ? 'ativada' : 'desativada'} com sucesso!`)
+    } catch (error) {
+      console.error('Erro ao alterar status da imagem:', error)
+      setCarouselMessage("Erro ao alterar status da imagem")
+    }
+  }
+
+  const handleUpdateCarouselOrder = async (imageId: string, newOrder: number) => {
+    try {
+      const { error } = await supabase
+        .from('carousel_images')
+        .update({ ordem: newOrder })
+        .eq('id', imageId)
+
+      if (error) {
+        console.error('Erro ao alterar ordem da imagem:', error)
+        return
+      }
+
+      // Atualizar lista local
+      setCarouselImages(prev => 
+        prev.map(img => 
+          img.id === imageId ? { ...img, ordem: newOrder } : img
+        ).sort((a, b) => a.ordem - b.ordem)
+      )
+    } catch (error) {
+      console.error('Erro ao alterar ordem da imagem:', error)
+    }
+  }
+
+  const handleSaveCarouselConfig = async () => {
+    try {
+      const { error } = await supabase
+        .from('carousel_config')
+        .update({
+          ativo: carouselConfig.ativo,
+          intervalo_segundos: carouselConfig.intervalo_segundos
+        })
+        .eq('id', (await supabase.from('carousel_config').select('id').single()).data?.id)
+
+      if (error) {
+        console.error('Erro ao salvar configuração do carousel:', error)
+        setCarouselMessage("Erro ao salvar configuração")
+        return
+      }
+
+      setCarouselMessage("Configuração do carousel salva com sucesso!")
+    } catch (error) {
+      console.error('Erro ao salvar configuração do carousel:', error)
+      setCarouselMessage("Erro ao salvar configuração")
     }
   }
 
@@ -1516,6 +1719,216 @@ export default function AdminConfigPage() {
                 )}
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Carousel */}
+        <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b border-purple-100 p-5">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <ImageIcon className="h-6 w-6 text-purple-600" />
+              </div>
+              <div>
+                <CardTitle className="text-lg font-semibold text-gray-900">
+                  Carousel da Homepage
+                </CardTitle>
+                <p className="text-sm text-gray-500 mt-1">
+                  Gerencie as imagens do carousel que aparece na homepage
+                </p>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-5 space-y-6">
+            {/* Configurações do Carousel */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-medium text-gray-700">
+                  Carousel Ativo
+                </Label>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="carousel-ativo"
+                    checked={carouselConfig.ativo}
+                    onChange={(e) => setCarouselConfig(prev => ({ ...prev, ativo: e.target.checked }))}
+                    className="h-4 w-4 text-purple-600 rounded focus:ring-purple-500"
+                  />
+                  <Label htmlFor="carousel-ativo" className="text-sm">
+                    {carouselConfig.ativo ? 'Ativo' : 'Inativo'}
+                  </Label>
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                  Intervalo de Transição (segundos)
+                </Label>
+                <Input
+                  type="number"
+                  min="1"
+                  max="30"
+                  value={carouselConfig.intervalo_segundos}
+                  onChange={(e) => setCarouselConfig(prev => ({ ...prev, intervalo_segundos: parseInt(e.target.value) || 5 }))}
+                  className="w-24"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Tempo entre cada imagem (1-30 segundos)
+                </p>
+              </div>
+
+              <div className="flex justify-end">
+                <Button
+                  onClick={handleSaveCarouselConfig}
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  Salvar Configurações
+                </Button>
+              </div>
+            </div>
+
+            {/* Upload de Imagens */}
+            <div className="border-t pt-6">
+              <Label className="text-sm font-medium text-gray-700 flex items-center gap-2 mb-3">
+                <Upload className="h-4 w-4" />
+                Adicionar Imagens ({carouselImages.length}/10)
+              </Label>
+              
+              <div 
+                className="border-2 border-dashed border-purple-300 rounded-lg p-6 text-center hover:border-purple-400 transition-colors cursor-pointer"
+                onClick={() => carouselInputRef.current?.click()}
+              >
+                {uploadingCarousel ? (
+                  <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="h-8 w-8 text-purple-600 animate-spin" />
+                    <p className="text-sm text-gray-600">Processando imagens...</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-2">
+                    <Upload className="h-8 w-8 text-purple-600" />
+                    <p className="text-sm font-medium text-gray-700">Clique para selecionar imagens</p>
+                    <p className="text-xs text-gray-500">PNG, JPG - Múltiplas imagens permitidas</p>
+                  </div>
+                )}
+              </div>
+              
+              <input
+                ref={carouselInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleCarouselUpload}
+                className="hidden"
+              />
+              
+              <p className="text-xs text-gray-500 mt-2">
+                <strong>Tamanho recomendado:</strong> 1200x675px (16:9). As imagens serão redimensionadas automaticamente.
+              </p>
+            </div>
+
+            {/* Lista de Imagens */}
+            {carouselImages.length > 0 && (
+              <div className="border-t pt-6">
+                <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                  Imagens do Carousel
+                </Label>
+                
+                <div className="space-y-3">
+                  {carouselImages.map((image, index) => (
+                    <div key={image.id} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                      {/* Preview da imagem */}
+                      <div className="relative">
+                        <img
+                          src={image.url}
+                          alt={`Carousel ${index + 1}`}
+                          className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                        />
+                        {!image.ativo && (
+                          <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center">
+                            <EyeOff className="h-4 w-4 text-white" />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Informações */}
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-700">
+                          Imagem {index + 1}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Ordem: {image.ordem} • {image.ativo ? 'Ativa' : 'Inativa'}
+                        </p>
+                      </div>
+
+                      {/* Controles de ordem */}
+                      <div className="flex flex-col gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleUpdateCarouselOrder(image.id, image.ordem - 1)}
+                          disabled={index === 0}
+                          className="h-6 w-6 p-0"
+                        >
+                          <RotateCcw className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleUpdateCarouselOrder(image.id, image.ordem + 1)}
+                          disabled={index === carouselImages.length - 1}
+                          className="h-6 w-6 p-0"
+                        >
+                          <RotateCcw className="h-3 w-3 rotate-180" />
+                        </Button>
+                      </div>
+
+                      {/* Botões de ação */}
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleToggleCarouselImage(image.id, image.ativo)}
+                          className="h-8 w-8 p-0"
+                        >
+                          {image.ativo ? (
+                            <Eye className="h-4 w-4 text-green-600" />
+                          ) : (
+                            <EyeOff className="h-4 w-4 text-gray-400" />
+                          )}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteCarouselImage(image.id, image.url)}
+                          className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Mensagem de feedback */}
+            {carouselMessage && (
+              <div className={`p-3 rounded-lg ${
+                carouselMessage.includes('sucesso') || carouselMessage.includes('salva')
+                  ? 'bg-green-50 text-green-700 border border-green-200'
+                  : 'bg-red-50 text-red-700 border border-red-200'
+              }`}>
+                <div className="flex items-center gap-2">
+                  {carouselMessage.includes('sucesso') || carouselMessage.includes('salva') ? (
+                    <CheckCircle2 className="h-4 w-4" />
+                  ) : (
+                    <AlertCircle className="h-4 w-4" />
+                  )}
+                  <span className="text-sm">{carouselMessage}</span>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
