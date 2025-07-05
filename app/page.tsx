@@ -364,11 +364,6 @@ function HomePageContent() {
           tipo: pizza.tipo,
         },
       })
-      
-      // Scroll automático para a próxima categoria apenas quando adicionar
-      setTimeout(() => {
-        scrollToNextCategory()
-      }, 500)
     }
     
     // Reset da seleção visual
