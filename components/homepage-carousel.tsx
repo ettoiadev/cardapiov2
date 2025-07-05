@@ -87,7 +87,7 @@ export function HomepageCarousel() {
   }
 
   return (
-    <div className="relative w-full h-80 bg-gray-100 rounded-lg overflow-hidden shadow-sm" style={{ maxWidth: '1200px', height: '320px' }}>
+    <div className="relative w-full bg-gray-100 rounded-lg overflow-hidden shadow-sm mx-auto" style={{ maxWidth: '1200px', aspectRatio: '1200/320' }}>
       {/* Container das imagens */}
       <div className="relative w-full h-full">
         {images.map((image, index) => (
@@ -102,7 +102,7 @@ export function HomepageCarousel() {
               alt={`Slide ${index + 1}`}
               fill
               className="object-cover"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              sizes="(max-width: 768px) 100vw, 1200px"
               priority={index === 0}
             />
           </div>
