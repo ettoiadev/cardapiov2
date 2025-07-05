@@ -392,7 +392,7 @@ export default function CheckoutPage() {
     })
     
     // Tipo de entrega
-          message += `🏍️ *ENTREGA:* ${deliveryType === "delivery" ? "Delivery" : "Retirada no Balcão"}\n\n`
+    message += `🚴 *ENTREGA:* ${deliveryType === "delivery" ? "Delivery" : "Retirada no Balcão"}\n\n`
     
     // Dados do cliente
     message += `👤 *DADOS DO CLIENTE:*\n`
@@ -530,8 +530,8 @@ export default function CheckoutPage() {
 
   // Sanitizar número do WhatsApp para formato internacional
   const sanitizeWhatsappNumber = (number: string): string => {
-    // Se não tiver número configurado, retornar erro
-    if (!number) return ""
+    // Se não tiver número configurado, usar o número padrão da pizzaria
+    if (!number) return "5512991605573"
     
     // Remove todos os caracteres não numéricos
     let cleaned = number.replace(/\D/g, '')
