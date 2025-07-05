@@ -394,8 +394,10 @@ function HomePageContent() {
 
   const handleMultiFlavorSelection = (pizza: Produto) => {
     // Para múltiplos sabores: comportamento de seleção toggle
-    if (selectedFlavorsForMulti.find(p => p.id === pizza.id)) {
-      // Remove se já estiver selecionado
+    const isCurrentlySelected = selectedFlavorsForMulti.find(p => p.id === pizza.id)
+    
+    if (isCurrentlySelected) {
+      // Remove APENAS o sabor clicado se já estiver selecionado
       setSelectedFlavorsForMulti(prev => prev.filter(p => p.id !== pizza.id))
     } else if (selectedFlavorsForMulti.length < flavorMode) {
       // Adiciona se ainda não atingiu o limite
