@@ -367,8 +367,8 @@ export default function CheckoutPage() {
       }
       message += `\n`
       
-      // Mostrar sabores se for pizza com múltiplos sabores
-      if (item.sabores && item.sabores.length > 0) {
+      // Mostrar sabores se for pizza com múltiplos sabores (não mostrar para bebidas)
+      if (item.sabores && item.sabores.length > 0 && item.tipo !== "bebida") {
         if (item.sabores.length === 1) {
           message += `  • Sabor: ${item.sabores[0]}\n`
         } else if (item.sabores.length === 2) {
@@ -397,7 +397,7 @@ export default function CheckoutPage() {
     })
     
     // Tipo de entrega
-    message += `🚚 *ENTREGA:* ${deliveryType === "delivery" ? "Delivery" : "Retirada no Balcão"}\n\n`
+    message += `🏍️ *ENTREGA:* ${deliveryType === "delivery" ? "Delivery" : "Retirada no Balcão"}\n\n`
     
     // Dados do cliente
     message += `👤 *DADOS DO CLIENTE:*\n`
@@ -440,7 +440,7 @@ export default function CheckoutPage() {
     }
     message += `*TOTAL: ${formatCurrency(total)}*\n\n`
     
-    message += `⏰ Aguardando confirmação!`
+    message += `⏳ Aguardando confirmação!`
     
     return message
   }

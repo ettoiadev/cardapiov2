@@ -58,13 +58,13 @@ message += `👤 *DADOS DO CLIENTE:*`
 
 **Resultado:**
 - 🧾 Itens do Pedido
-- 🚚 Entrega
+- 🏍️ Entrega
 - 👤 Dados do Cliente
 - 📍 Endereço de Entrega
 - 📝 Observações do Pedido
 - 💳 Forma de Pagamento
 - 💰 Valores
-- ⏰ Aguardando confirmação
+- ⏳ Aguardando confirmação
 
 ### **4. Terminologia Melhorada**
 ```typescript
@@ -107,7 +107,7 @@ message += `  • Total: ${formatCurrency(item.preco * item.quantidade)}\n\n`
 🥤 2x Coca-Cola Zero 1L
   • Total: R$ 24,00
 
-🚚 *ENTREGA:* Delivery
+🏍️ *ENTREGA:* Delivery
 
 👤 *DADOS DO CLIENTE:*
 Nome: João Silva
@@ -126,7 +126,7 @@ Subtotal: R$ 91,00
 Taxa de entrega: R$ 5,00
 *TOTAL: R$ 96,00*
 
-⏰ Aguardando confirmação!
+⏳ Aguardando confirmação!
 ```
 
 ## Benefícios Implementados
@@ -207,6 +207,50 @@ Taxa de entrega: R$ 5,00
 - Organização visual
 - Experiência do cliente final
 
+## Ajustes Adicionais
+
+### **Alterações Específicas Implementadas:**
+
+#### **1. Remoção do Label "Sabor" para Bebidas**
+```typescript
+// ANTES: Mostrava "Sabor:" para bebidas (redundante)
+if (item.sabores && item.sabores.length > 0) {
+
+// DEPOIS: Só mostra sabores para pizzas
+if (item.sabores && item.sabores.length > 0 && item.tipo !== "bebida") {
+```
+
+**Resultado:**
+- ✅ Bebidas não mostram mais "Sabor:" (redundante)
+- ✅ Pizzas continuam mostrando sabores normalmente
+- ✅ Nome da bebida já inclui o sabor (ex: "Coca-Cola Zero 1L")
+
+#### **2. Ícone de Entrega Atualizado**
+```typescript
+// ANTES: Caminhão
+message += `🚚 *ENTREGA:*`
+
+// DEPOIS: Motocicleta
+message += `🏍️ *ENTREGA:*`
+```
+
+**Resultado:**
+- ✅ Ícone mais apropriado para delivery (🏍️)
+- ✅ Representa melhor o meio de transporte usado
+
+#### **3. Ícone de Confirmação Atualizado**
+```typescript
+// ANTES: Relógio
+message += `⏰ Aguardando confirmação!`
+
+// DEPOIS: Ampulheta
+message += `⏳ Aguardando confirmação!`
+```
+
+**Resultado:**
+- ✅ Ícone mais apropriado para "aguardando" (⏳)
+- ✅ Transmite melhor a ideia de espera/processamento
+
 ## Conclusão
 
 A refatoração eliminou completamente a confusão na seção "Itens do Pedido" através de:
@@ -215,5 +259,6 @@ A refatoração eliminou completamente a confusão na seção "Itens do Pedido" 
 2. **Emojis contextuais** para melhor organização
 3. **Terminologia precisa** ("Total" vs "Valor")
 4. **Formatação consistente** em todas as seções
+5. **Ajustes específicos** para bebidas e ícones mais apropriados
 
 O resultado é uma mensagem WhatsApp **mais clara, organizada e profissional**, mantendo toda a funcionalidade existente intacta. 
