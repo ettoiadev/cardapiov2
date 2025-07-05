@@ -336,32 +336,43 @@ function HomePageContent() {
   }
 
   const handleSingleFlavorSelection = (pizza: Produto) => {
-    // Para 1 sabor: usar o tamanho selecionado pelo usuário
-    // Não mais sobrescrever selectedSingleFlavor para permitir múltiplas marcações visuais
-    setSelectedFlavorsForMulti([pizza])
-    
-    // Obter o tamanho selecionado para esta pizza
+    // Para 1 sabor: verificar se já está no carrinho para toggle
     const tamanho = getSelectedSize(pizza.id)
-    const preco = getPriceBySize(pizza, tamanho)
+    const itemId = `${pizza.id}-${tamanho}`
     
-    dispatch({
-      type: "ADD_ITEM",
-      payload: {
-        id: `${pizza.id}-${tamanho}`,
-        nome: pizza.nome,
-        tamanho: tamanho,
-        sabores: [pizza.nome],
-        preco: preco,
-        tipo: pizza.tipo,
-      },
-    })
+    // Verificar se o item já está no carrinho
+    const existingItem = cartState.items.find(item => item.id === itemId)
     
-    // Scroll automático para a próxima categoria após um pequeno delay
-    setTimeout(() => {
-      scrollToNextCategory()
-      // Reset da seleção após adicionar ao carrinho
-      setSelectedFlavorsForMulti([])
-    }, 500)
+    if (existingItem) {
+      // Se já está no carrinho, remover
+      dispatch({
+        type: "REMOVE_ITEM",
+        payload: itemId,
+      })
+    } else {
+      // Se não está no carrinho, adicionar
+      const preco = getPriceBySize(pizza, tamanho)
+      
+      dispatch({
+        type: "ADD_ITEM",
+        payload: {
+          id: itemId,
+          nome: pizza.nome,
+          tamanho: tamanho,
+          sabores: [pizza.nome],
+          preco: preco,
+          tipo: pizza.tipo,
+        },
+      })
+      
+      // Scroll automático para a próxima categoria apenas quando adicionar
+      setTimeout(() => {
+        scrollToNextCategory()
+      }, 500)
+    }
+    
+    // Reset da seleção visual
+    setSelectedFlavorsForMulti([])
   }
 
   const handleMultiFlavorSelection = (pizza: Produto) => {
