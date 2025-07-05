@@ -588,10 +588,26 @@ export default function CheckoutPage() {
         console.warn("⚠️ Mensagem muito longa, truncando...")
         mensagemFinal = mensagemFinal.substring(0, 1750) + "\n\n... (mensagem truncada)"
       }
-      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(mensagemFinal)}`
       
-      // Redirecionamento direto para o WhatsApp (sem intermediários, sem iframe)
-      window.location.href = whatsappUrl
+      // Tentar abrir o aplicativo nativo primeiro, depois fallback para wa.me
+      const whatsappAppUrl = `whatsapp://send?phone=${whatsappNumber}&text=${encodeURIComponent(mensagemFinal)}`
+      const whatsappWebUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(mensagemFinal)}`
+      
+      // Detectar se é mobile para priorizar o app nativo
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      
+      if (isMobile) {
+        // No mobile, tentar abrir o app nativo primeiro
+        window.location.href = whatsappAppUrl
+        
+        // Fallback para wa.me após um pequeno delay se o app não abrir
+        setTimeout(() => {
+          window.location.href = whatsappWebUrl
+        }, 2000)
+      } else {
+        // No desktop, usar wa.me diretamente
+        window.location.href = whatsappWebUrl
+      }
       
       // Resetar estado após um pequeno delay
       setTimeout(() => {
