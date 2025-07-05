@@ -518,6 +518,7 @@ export default function AdminConfigPage() {
       }
     } catch (error) {
       console.error('Erro ao carregar dados do carousel:', error)
+      setCarouselMessage(`Erro ao carregar dados: ${error instanceof Error ? error.message : 'Erro desconhecido'}`)
     }
   }
 
@@ -538,6 +539,12 @@ export default function AdminConfigPage() {
       for (let i = 0; i < files.length && carouselImages.length + i < 10; i++) {
         const file = files[i]
         
+        // Validar tipo de arquivo
+        if (!file.type.startsWith('image/')) {
+          console.warn(`Arquivo ${file.name} não é uma imagem válida`)
+          continue
+        }
+        
         // Redimensionar imagem para otimizar
         const resizedBlob = await resizeImage(file, 1200, 320)
         
@@ -545,7 +552,7 @@ export default function AdminConfigPage() {
         const imageUrl = await uploadImage(resizedBlob, 'carousel', file.name)
         
         // Salvar no banco
-        const nextOrdem = Math.max(...carouselImages.map(img => img.ordem), 0) + 1
+        const nextOrdem = carouselImages.length > 0 ? Math.max(...carouselImages.map(img => img.ordem)) + 1 : 1
         
         const { data, error } = await supabase
           .from('carousel_images')
@@ -559,6 +566,7 @@ export default function AdminConfigPage() {
 
         if (error) {
           console.error('Erro ao salvar imagem do carousel:', error)
+          setCarouselMessage(`Erro ao salvar imagem: ${error.message}`)
           continue
         }
 
