@@ -824,43 +824,8 @@ export default function CheckoutPage() {
         {/* Resumo do Pedido */}
         <Card className="rounded-xl shadow-md">
           <div className="p-4">
-            <div className="flex items-center justify-between mb-4 gap-2">
-              <h2 className="text-[15px] font-semibold text-neutral-800 whitespace-nowrap">Resumo do Pedido</h2>
-              {/* Seletor compacto de quantidade total de pizzas */}
-              {(() => {
-                // Filtra apenas pizzas
-                const pizzaItems = state.items?.filter(i => i.tipo !== "bebida") || [];
-                if (pizzaItems.length === 0) return null;
-                // Soma total de pizzas
-                const totalPizzas = pizzaItems.reduce((sum, item) => sum + item.quantidade, 0);
-                // O seletor controla a quantidade do primeiro item de pizza
-                const firstPizza = pizzaItems[0];
-                return (
-                  <div className="flex items-center gap-1 bg-neutral-100 rounded px-2 py-1 min-w-[90px] max-w-full">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleUpdateQuantity(firstPizza.id, firstPizza.quantidade - 1)}
-                      className="h-6 w-6 p-0 rounded-full bg-neutral-200 hover:bg-neutral-300 text-xs"
-                      aria-label="Diminuir quantidade de pizza"
-                    >
-                      <Minus className="h-3 w-3" />
-                    </Button>
-                    <span className="w-8 text-center font-medium text-xs select-none">
-                      {totalPizzas}x
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleUpdateQuantity(firstPizza.id, firstPizza.quantidade + 1)}
-                      className="h-6 w-6 p-0 rounded-full bg-neutral-200 hover:bg-neutral-300 text-xs"
-                      aria-label="Aumentar quantidade de pizza"
-                    >
-                      <Plus className="h-3 w-3" />
-                    </Button>
-                  </div>
-                );
-              })()}
+            <div className="mb-4">
+              <h2 className="text-[15px] font-semibold text-neutral-800">Resumo do Pedido</h2>
             </div>
             <div className="space-y-2">
               {state.items?.map((item, index) => {
@@ -878,46 +843,46 @@ export default function CheckoutPage() {
                   {/* Header do item */}
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex-1">
-                      {/* Nome do produto com Stepper para bebidas */}
-                      <div className="flex items-center gap-3">
-                        {/* Stepper para bebidas */}
-                        {item.tipo === "bebida" && (
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-8 w-8 p-0 rounded-full"
-                              onClick={() => handleUpdateQuantity(item.id, item.quantidade - 1)}
-                            >
-                              <Minus className="h-4 w-4" />
-                            </Button>
-                            <span className="font-semibold text-sm min-w-[20px] text-center">
-                              {item.quantidade}
-                            </span>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-8 w-8 p-0 rounded-full"
-                              onClick={() => handleUpdateQuantity(item.id, item.quantidade + 1)}
-                            >
-                              <Plus className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        )}
+                      {/* Nome do produto com Stepper para bebidas e pizzas */}
+                      <div className="flex items-start gap-3">
+                        {/* Stepper para bebidas e pizzas */}
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 w-8 p-0 rounded-full"
+                            onClick={() => handleUpdateQuantity(item.id, item.quantidade - 1)}
+                          >
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                          <span className="font-semibold text-sm min-w-[20px] text-center">
+                            {item.quantidade}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 w-8 p-0 rounded-full"
+                            onClick={() => handleUpdateQuantity(item.id, item.quantidade + 1)}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
                         
                         {/* Nome do produto */}
                         <div className="flex-1">
                           {item.sabores && item.sabores.length === 2 ? (
                             <div>
-                              <span className="text-[15px] font-bold text-red-600">
-                                Pizza 1/2 {item.sabores[0]} + 1/2 {item.sabores[1]}
-                              </span>
-                              {item.tipo !== "bebida" && (
-                                <span className="text-sm text-gray-600 ml-2">
-                                  - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
+                              <div className="mb-2">
+                                <span className="text-[15px] font-bold text-red-600">
+                                  Pizza 1/2 {item.sabores[0]} + 1/2 {item.sabores[1]}
                                 </span>
-                              )}
-                              <div className="mt-1 space-y-1">
+                                {item.tipo !== "bebida" && (
+                                  <span className="text-sm text-gray-600 ml-2">
+                                    - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="space-y-1">
                                 {item.sabores.map((sabor, index) => {
                                   const ingredientes = getIngredientesForSabor(sabor)
                                   return ingredientes ? (
@@ -930,15 +895,17 @@ export default function CheckoutPage() {
                             </div>
                           ) : item.sabores && item.sabores.length === 3 ? (
                             <div>
-                              <span className="text-[15px] font-bold text-red-600">
-                                Pizza {item.sabores.join(" + ")}
-                              </span>
-                              {item.tipo !== "bebida" && (
-                                <span className="text-sm text-gray-600 ml-2">
-                                  - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
+                              <div className="mb-2">
+                                <span className="text-[15px] font-bold text-red-600">
+                                  Pizza {item.sabores.join(" + ")}
                                 </span>
-                              )}
-                              <div className="mt-1 space-y-1">
+                                {item.tipo !== "bebida" && (
+                                  <span className="text-sm text-gray-600 ml-2">
+                                    - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="space-y-1">
                                 {item.sabores.map((sabor, index) => {
                                   const ingredientes = getIngredientesForSabor(sabor)
                                   return ingredientes ? (
@@ -951,16 +918,18 @@ export default function CheckoutPage() {
                             </div>
                           ) : item.sabores && item.sabores.length === 1 ? (
                             <div>
-                              <span className="text-[15px] font-bold text-red-600">{item.nome}</span>
-                              {item.tipo !== "bebida" && (
-                                <span className="text-sm text-gray-600 ml-2">
-                                  - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
-                                </span>
-                              )}
+                              <div className="mb-2">
+                                <span className="text-[15px] font-bold text-red-600">{item.nome}</span>
+                                {item.tipo !== "bebida" && (
+                                  <span className="text-sm text-gray-600 ml-2">
+                                    - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
+                                  </span>
+                                )}
+                              </div>
                               {(() => {
                                 const ingredientes = getIngredientesForSabor(item.sabores[0])
                                 return ingredientes ? (
-                                  <p className="text-sm text-gray-500 mt-1">{ingredientes}</p>
+                                  <p className="text-sm text-gray-500">{ingredientes}</p>
                                 ) : null
                               })()}
                             </div>
