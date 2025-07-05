@@ -583,48 +583,15 @@ export default function CheckoutPage() {
       }
       
       // Verificar tamanho da mensagem (WhatsApp tem limite de ~2048 caracteres na URL)
-      if (message.length > 1800) {
+      let mensagemFinal = message
+      if (mensagemFinal.length > 1800) {
         console.warn("⚠️ Mensagem muito longa, truncando...")
-        const mensagemTruncada = message.substring(0, 1750) + "\n\n... (mensagem truncada)"
-        var whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(mensagemTruncada)}`
-      } else {
-        var whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+        mensagemFinal = mensagemFinal.substring(0, 1750) + "\n\n... (mensagem truncada)"
       }
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(mensagemFinal)}`
       
-      console.log("🔗 URL do WhatsApp montada:", {
-        tamanho: whatsappUrl.length,
-        preview: whatsappUrl.substring(0, 100) + "..."
-      })
-      
-      // Tentar abrir o WhatsApp imediatamente
-      try {
-        const popup = window.open(whatsappUrl, "_blank", "noopener,noreferrer")
-        
-        if (popup && !popup.closed) {
-          console.log("✅ Redirecionamento para WhatsApp realizado com sucesso!")
-          // Verificar se o popup ainda está aberto após um pequeno delay
-          setTimeout(() => {
-            if (popup.closed) {
-              console.log("✅ Usuário interagiu com o WhatsApp e retornou")
-            }
-          }, 1000)
-        } else {
-          console.warn("⚠️ Popup bloqueado ou falhou. Tentando método alternativo...")
-          // Método alternativo: criar link temporário e clicar
-          const tempLink = document.createElement('a')
-          tempLink.href = whatsappUrl
-          tempLink.target = '_blank'
-          tempLink.rel = 'noopener noreferrer'
-          document.body.appendChild(tempLink)
-          tempLink.click()
-          document.body.removeChild(tempLink)
-          console.log("✅ Redirecionamento alternativo executado")
-        }
-      } catch (popupError) {
-        console.error("❌ Erro ao abrir popup:", popupError)
-        // Último recurso: redirecionamento direto
-        window.location.href = whatsappUrl
-      }
+      // Redirecionamento direto para o WhatsApp (sem intermediários, sem iframe)
+      window.location.href = whatsappUrl
       
       // Resetar estado após um pequeno delay
       setTimeout(() => {
