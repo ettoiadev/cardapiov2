@@ -878,77 +878,105 @@ export default function CheckoutPage() {
                   {/* Header do item */}
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex-1">
-                      {/* Nome do produto */}
-                      <div>
-                        {item.sabores && item.sabores.length === 2 ? (
-                          <div>
-                            <span className="text-[15px] font-bold text-red-600">
-                              Pizza 1/2 {item.sabores[0]} + 1/2 {item.sabores[1]}
+                      {/* Nome do produto com Stepper para bebidas */}
+                      <div className="flex items-center gap-3">
+                        {/* Stepper para bebidas */}
+                        {item.tipo === "bebida" && (
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 w-8 p-0 rounded-full"
+                              onClick={() => handleUpdateQuantity(item.id, item.quantidade - 1)}
+                            >
+                              <Minus className="h-4 w-4" />
+                            </Button>
+                            <span className="font-semibold text-sm min-w-[20px] text-center">
+                              {item.quantidade}
                             </span>
-                            {item.tipo !== "bebida" && (
-                              <span className="text-sm text-gray-600 ml-2">
-                                - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
-                              </span>
-                            )}
-                            <div className="mt-1 space-y-1">
-                              {item.sabores.map((sabor, index) => {
-                                const ingredientes = getIngredientesForSabor(sabor)
-                                return ingredientes ? (
-                                  <p key={index} className="text-sm text-gray-500">
-                                    1/2 {sabor}: {ingredientes}
-                                  </p>
-                                ) : null
-                              })}
-                            </div>
-                          </div>
-                        ) : item.sabores && item.sabores.length === 3 ? (
-                          <div>
-                            <span className="text-[15px] font-bold text-red-600">
-                              Pizza {item.sabores.join(" + ")}
-                            </span>
-                            {item.tipo !== "bebida" && (
-                              <span className="text-sm text-gray-600 ml-2">
-                                - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
-                              </span>
-                            )}
-                            <div className="mt-1 space-y-1">
-                              {item.sabores.map((sabor, index) => {
-                                const ingredientes = getIngredientesForSabor(sabor)
-                                return ingredientes ? (
-                                  <p key={index} className="text-sm text-gray-500">
-                                    {sabor}: {ingredientes}
-                                  </p>
-                                ) : null
-                              })}
-                            </div>
-                          </div>
-                        ) : item.sabores && item.sabores.length === 1 ? (
-                          <div>
-                            <span className="text-[15px] font-bold text-red-600">{item.nome}</span>
-                            {item.tipo !== "bebida" && (
-                              <span className="text-sm text-gray-600 ml-2">
-                                - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
-                              </span>
-                            )}
-                            {(() => {
-                              const ingredientes = getIngredientesForSabor(item.sabores[0])
-                              return ingredientes ? (
-                                <p className="text-sm text-gray-500 mt-1">{ingredientes}</p>
-                              ) : null
-                            })()}
-                          </div>
-                        ) : (
-                          <div>
-                            <span className="text-[15px] font-bold text-red-600">{item.nome}</span>
-                            {item.tipo !== "bebida" && (
-                              <span className="text-sm text-gray-600 ml-2">
-                                - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
-                              </span>
-                            )}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 w-8 p-0 rounded-full"
+                              onClick={() => handleUpdateQuantity(item.id, item.quantidade + 1)}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
                           </div>
                         )}
+                        
+                        {/* Nome do produto */}
+                        <div className="flex-1">
+                          {item.sabores && item.sabores.length === 2 ? (
+                            <div>
+                              <span className="text-[15px] font-bold text-red-600">
+                                Pizza 1/2 {item.sabores[0]} + 1/2 {item.sabores[1]}
+                              </span>
+                              {item.tipo !== "bebida" && (
+                                <span className="text-sm text-gray-600 ml-2">
+                                  - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
+                                </span>
+                              )}
+                              <div className="mt-1 space-y-1">
+                                {item.sabores.map((sabor, index) => {
+                                  const ingredientes = getIngredientesForSabor(sabor)
+                                  return ingredientes ? (
+                                    <p key={index} className="text-sm text-gray-500">
+                                      1/2 {sabor}: {ingredientes}
+                                    </p>
+                                  ) : null
+                                })}
+                              </div>
+                            </div>
+                          ) : item.sabores && item.sabores.length === 3 ? (
+                            <div>
+                              <span className="text-[15px] font-bold text-red-600">
+                                Pizza {item.sabores.join(" + ")}
+                              </span>
+                              {item.tipo !== "bebida" && (
+                                <span className="text-sm text-gray-600 ml-2">
+                                  - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
+                                </span>
+                              )}
+                              <div className="mt-1 space-y-1">
+                                {item.sabores.map((sabor, index) => {
+                                  const ingredientes = getIngredientesForSabor(sabor)
+                                  return ingredientes ? (
+                                    <p key={index} className="text-sm text-gray-500">
+                                      {sabor}: {ingredientes}
+                                    </p>
+                                  ) : null
+                                })}
+                              </div>
+                            </div>
+                          ) : item.sabores && item.sabores.length === 1 ? (
+                            <div>
+                              <span className="text-[15px] font-bold text-red-600">{item.nome}</span>
+                              {item.tipo !== "bebida" && (
+                                <span className="text-sm text-gray-600 ml-2">
+                                  - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
+                                </span>
+                              )}
+                              {(() => {
+                                const ingredientes = getIngredientesForSabor(item.sabores[0])
+                                return ingredientes ? (
+                                  <p className="text-sm text-gray-500 mt-1">{ingredientes}</p>
+                                ) : null
+                              })()}
+                            </div>
+                          ) : (
+                            <div>
+                              <span className="text-[15px] font-bold text-red-600">{item.nome}</span>
+                              {item.tipo !== "bebida" && (
+                                <span className="text-sm text-gray-600 ml-2">
+                                  - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
+                    </div>
                       
                       {/* Valor total do item */}
                       <div className="flex items-center gap-3">
