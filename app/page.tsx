@@ -308,10 +308,19 @@ function HomePageContent() {
   }
 
   const toggleSection = (section: string) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }))
+    setExpandedSections((prev) => {
+      const newState = {
+        ...prev,
+        [section]: !prev[section],
+      }
+      
+      // Se a seção de pizzas estiver sendo aberta, abrir também a seção de bebidas
+      if (section === "pizzas" && !prev[section]) {
+        newState.bebidas = true
+      }
+      
+      return newState
+    })
   }
 
   const scrollToNextCategory = () => {
