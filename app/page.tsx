@@ -223,10 +223,18 @@ function HomePageContent() {
 
   // Processamento automático APENAS para múltiplos sabores (2 ou 3)
   useEffect(() => {
+    // Remover do carrinho se ambos os sabores forem desmarcados (apenas para 2 sabores)
+    if (flavorMode === 2 && selectedFlavorsForMulti.length === 0) {
+      // Monta o id do item de 2 sabores que pode estar no carrinho
+      const cartItemId = cartState.items.find(item => item.sabores.length === 2 && item.id.startsWith('multi-'))?.id
+      if (cartItemId) {
+        dispatch({ type: 'REMOVE_ITEM', payload: cartItemId })
+      }
+    }
+    // Adiciona ao carrinho apenas quando dois sabores forem selecionados
     if (flavorMode > 1 && selectedFlavorsForMulti.length === flavorMode) {
       const timer = setTimeout(() => {
         // Para múltiplos sabores, usar o primeiro tamanho comum ou tradicional como padrão
-        // Se todos os sabores têm o mesmo tamanho selecionado, usar esse tamanho
         const tamanhosSelecionados = selectedFlavorsForMulti.map(pizza => getSelectedSize(pizza.id))
         const tamanhoComum = tamanhosSelecionados.every(t => t === tamanhosSelecionados[0]) 
           ? tamanhosSelecionados[0] 
@@ -250,16 +258,14 @@ function HomePageContent() {
             tipo: selectedFlavorsForMulti[0].tipo,
           },
         })
-        
         // Rolar para a próxima categoria SEM resetar as seleções
         setTimeout(() => {
           scrollToNextCategory()
         }, 500)
-      }, 1000) // Aguardar 1 segundo para o usuário ver a seleção completa
-      
+      }, 1000)
       return () => clearTimeout(timer)
     }
-  }, [flavorMode, selectedFlavorsForMulti, dispatch, selectedSizes])
+  }, [flavorMode, selectedFlavorsForMulti, dispatch, selectedSizes, cartState.items])
 
   const loadData = async () => {
     try {
