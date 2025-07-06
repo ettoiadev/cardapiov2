@@ -218,6 +218,21 @@ export default function AdminProdutosPage() {
     }
   }
 
+  const handleTogglePromocao = async (produtoId: string, novoStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('produtos')
+        .update({ promocao: novoStatus })
+        .eq('id', produtoId)
+
+      if (error) throw error
+      await loadData()
+    } catch (error) {
+      console.error('Erro ao atualizar promoção:', error)
+      alert('Erro ao atualizar promoção. Tente novamente.')
+    }
+  }
+
   const handleSaveCategoria = async (categoria: Partial<Categoria>) => {
     try {
       if (editingCategoria?.id) {
@@ -603,6 +618,22 @@ export default function AdminProdutosPage() {
                               </label>
                             </div>
 
+                            {/* Toggle de promoção no card */}
+                            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100">
+                              <span className="text-xs text-muted-foreground font-medium">
+                                {produto.promocao ? "Promoção" : "Sem promoção"}
+                              </span>
+                              <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={produto.promocao}
+                                  onChange={(e) => handleTogglePromocao(produto.id, e.target.checked)}
+                                  className="sr-only peer"
+                                />
+                                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
+                              </label>
+                            </div>
+
                             <div className="flex items-center justify-between text-xs text-muted-foreground">
                               <span className="flex items-center gap-1">
                                 <ArrowUpDown className="h-3 w-3" />
@@ -702,6 +733,38 @@ export default function AdminProdutosPage() {
                                   {formatCurrency(produto.preco_tradicional)}
                                 </span>
                               </div>
+                            </div>
+
+                            {/* Toggle de disponibilidade no card */}
+                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-purple-100">
+                              <span className="text-xs text-muted-foreground font-medium">
+                                {produto.ativo ? "Disponível" : "Indisponível"}
+                              </span>
+                              <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={produto.ativo}
+                                  onChange={(e) => handleToggleDisponibilidade(produto.id, e.target.checked)}
+                                  className="sr-only peer"
+                                />
+                                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+                              </label>
+                            </div>
+
+                            {/* Toggle de promoção no card */}
+                            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100">
+                              <span className="text-xs text-muted-foreground font-medium">
+                                {produto.promocao ? "Promoção" : "Sem promoção"}
+                              </span>
+                              <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={produto.promocao}
+                                  onChange={(e) => handleTogglePromocao(produto.id, e.target.checked)}
+                                  className="sr-only peer"
+                                />
+                                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
+                              </label>
                             </div>
 
                             <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -820,6 +883,38 @@ export default function AdminProdutosPage() {
                             {formatCurrency(produto.preco_tradicional)}
                           </span>
                         </div>
+                      </div>
+
+                      {/* Toggle de disponibilidade no card */}
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-blue-100">
+                        <span className="text-xs text-muted-foreground font-medium">
+                          {produto.ativo ? "Disponível" : "Indisponível"}
+                        </span>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={produto.ativo}
+                            onChange={(e) => handleToggleDisponibilidade(produto.id, e.target.checked)}
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                      </div>
+
+                      {/* Toggle de promoção no card */}
+                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100">
+                        <span className="text-xs text-muted-foreground font-medium">
+                          {produto.promocao ? "Promoção" : "Sem promoção"}
+                        </span>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={produto.promocao}
+                            onChange={(e) => handleTogglePromocao(produto.id, e.target.checked)}
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
+                        </label>
                       </div>
 
                       <div className="flex items-center justify-between text-xs text-muted-foreground">
