@@ -44,6 +44,8 @@ interface Produto {
   descricao: string | null
   preco_tradicional: number | null
   preco_broto: number | null
+  preco_promocional_tradicional: number | null
+  preco_promocional_broto: number | null
   tipo: string
   ativo: boolean
   promocao: boolean
@@ -101,6 +103,11 @@ function HomePageContent() {
 
   // Função para obter o preço baseado no tamanho selecionado
   const getPriceBySize = (pizza: Produto, size: "tradicional" | "broto"): number => {
+    // Se o produto está em promoção, usar preços promocionais
+    if (pizza.promocao) {
+      return size === "broto" ? (pizza.preco_promocional_broto || 0) : (pizza.preco_promocional_tradicional || 0)
+    }
+    // Caso contrário, usar preços normais
     return size === "broto" ? (pizza.preco_broto || 0) : (pizza.preco_tradicional || 0)
   }
 
@@ -517,7 +524,7 @@ function HomePageContent() {
           nome: produto.nome,
           tamanho: "tradicional", // Produtos não-pizza não têm variação de tamanho
           sabores: [produto.nome],
-          preco: produto.preco_tradicional || 0,
+          preco: produto.promocao ? (produto.preco_promocional_tradicional || 0) : (produto.preco_tradicional || 0),
           tipo: produto.tipo,
         },
       })
@@ -549,13 +556,13 @@ function HomePageContent() {
               <h3 className="font-medium">{produto.nome}</h3>
               {produto.promocao && (
                 <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded">
-                  PROMOÇÃO
+                  PROMOÇÃO BALCÃO
                 </span>
               )}
             </div>
             {produto.descricao && <p className="text-sm text-gray-600 mt-1">{produto.descricao}</p>}
             <span className="text-sm font-medium text-red-600">
-              {formatCurrency(produto.preco_tradicional)}
+              {formatCurrency(produto.promocao ? produto.preco_promocional_tradicional : produto.preco_tradicional)}
             </span>
           </div>
           {isInCart ? (
@@ -837,7 +844,7 @@ function HomePageContent() {
                             </div>
                             {pizza.promocao && (
                               <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded">
-                                PROMOÇÃO
+                                PROMOÇÃO BALCÃO
                               </span>
                             )}
                           </div>
@@ -862,7 +869,7 @@ function HomePageContent() {
                                     <div className="font-semibold">Tradicional</div>
                                     <div className="text-xs opacity-75">8 fatias</div>
                                     <div className="font-bold text-black mt-1">
-                                      {formatCurrency(pizza.preco_tradicional)}
+                                      {formatCurrency(pizza.promocao ? pizza.preco_promocional_tradicional : pizza.preco_tradicional)}
                                     </div>
                                   </div>
                                 </button>
@@ -881,7 +888,7 @@ function HomePageContent() {
                                     <div className="font-semibold">Broto</div>
                                     <div className="text-xs opacity-75">4 fatias</div>
                                     <div className="font-bold text-black mt-1">
-                                      {formatCurrency(pizza.preco_broto)}
+                                      {formatCurrency(pizza.promocao ? pizza.preco_promocional_broto : pizza.preco_broto)}
                                     </div>
                                   </div>
                                 </button>
@@ -890,11 +897,13 @@ function HomePageContent() {
                           ) : (
                             <div className="flex items-center space-x-4 mt-2">
                               {pizzariaConfig.habilitar_broto && pizza.preco_broto && (
-                                <span className="text-sm text-black font-bold">Broto: {formatCurrency(pizza.preco_broto)}</span>
+                                <span className="text-sm text-black font-bold">
+                                  Broto: {formatCurrency(pizza.promocao ? pizza.preco_promocional_broto : pizza.preco_broto)}
+                                </span>
                               )}
                               {pizza.preco_tradicional && (
                                 <span className="text-sm font-bold text-black">
-                                  Tradicional: {formatCurrency(pizza.preco_tradicional)}
+                                  Tradicional: {formatCurrency(pizza.promocao ? pizza.preco_promocional_tradicional : pizza.preco_tradicional)}
                                 </span>
                               )}
                             </div>

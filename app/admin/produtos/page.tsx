@@ -47,6 +47,8 @@ interface Produto {
   descricao: string | null
   preco_tradicional: number | null
   preco_broto: number | null
+  preco_promocional_tradicional: number | null
+  preco_promocional_broto: number | null
   tipo: string
   ativo: boolean
   promocao: boolean
@@ -1304,6 +1306,8 @@ function ProdutoForm({
     tipo: produto?.tipo || "salgada",
     preco_tradicional: produto?.preco_tradicional || null,
     preco_broto: produto?.preco_broto || null,
+    preco_promocional_tradicional: produto?.preco_promocional_tradicional || null,
+    preco_promocional_broto: produto?.preco_promocional_broto || null,
     ativo: produto?.ativo ?? true,
     promocao: produto?.promocao ?? false,
     ordem: produto?.ordem || proximaOrdem,
@@ -1316,6 +1320,12 @@ function ProdutoForm({
   )
   const [precoBrotoFormatado, setPrecoBrotoFormatado] = useState(
     produto?.preco_broto ? formatCurrencyInput((produto.preco_broto * 100).toString()) : ""
+  )
+  const [precoPromocionalTradicionalFormatado, setPrecoPromocionalTradicionalFormatado] = useState(
+    produto?.preco_promocional_tradicional ? formatCurrencyInput((produto.preco_promocional_tradicional * 100).toString()) : ""
+  )
+  const [precoPromocionalBrotoFormatado, setPrecoPromocionalBrotoFormatado] = useState(
+    produto?.preco_promocional_broto ? formatCurrencyInput((produto.preco_promocional_broto * 100).toString()) : ""
   )
 
   // Estado para controlar adicionais
@@ -1360,6 +1370,19 @@ function ProdutoForm({
     if (!formData.categoria_id) {
       alert("Categoria é obrigatória")
       return
+    }
+    
+    // Validação dos preços promocionais (quando em promoção)
+    if (formData.promocao) {
+      if (formData.preco_promocional_tradicional === null || formData.preco_promocional_tradicional === undefined || formData.preco_promocional_tradicional <= 0) {
+        alert("Preço promocional tradicional deve ser maior que zero quando produto está em promoção")
+        return
+      }
+      
+      if (brotoHabilitado && (formData.preco_promocional_broto === null || formData.preco_promocional_broto === undefined || formData.preco_promocional_broto <= 0)) {
+        alert("Preço promocional broto deve ser maior que zero quando produto está em promoção e broto habilitado")
+        return
+      }
     }
     
     // Validação dos adicionais (se houver, devem ter nome e preço válidos)
@@ -1482,7 +1505,10 @@ function ProdutoForm({
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="preco_tradicional" className="text-sm font-medium text-foreground">Preço Tradicional *</Label>
+              <Label htmlFor="preco_tradicional" className="text-sm font-medium text-foreground">
+                Preço Tradicional *
+                {formData.promocao && <span className="text-xs text-muted-foreground ml-2">(desabilitado - produto em promoção)</span>}
+              </Label>
               <Input
                 id="preco_tradicional"
                 type="text"
@@ -1495,12 +1521,20 @@ function ProdutoForm({
                 }}
                 placeholder="R$ 0,00"
                 required
-                className="bg-muted border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
+                disabled={formData.promocao}
+                className={`rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors ${
+                  formData.promocao 
+                    ? 'bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed' 
+                    : 'bg-muted border border-input'
+                }`}
               />
             </div>
             {brotoHabilitado && (
               <div className="space-y-2">
-                <Label htmlFor="preco_broto" className="text-sm font-medium text-foreground">Preço Broto *</Label>
+                <Label htmlFor="preco_broto" className="text-sm font-medium text-foreground">
+                  Preço Broto *
+                  {formData.promocao && <span className="text-xs text-muted-foreground ml-2">(desabilitado - produto em promoção)</span>}
+                </Label>
                 <Input
                   id="preco_broto"
                   type="text"
@@ -1513,7 +1547,12 @@ function ProdutoForm({
                   }}
                   placeholder="R$ 0,00"
                   required
-                  className="bg-muted border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
+                  disabled={formData.promocao}
+                  className={`rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors ${
+                    formData.promocao 
+                      ? 'bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed' 
+                      : 'bg-muted border border-input'
+                  }`}
                 />
               </div>
             )}
@@ -1562,6 +1601,56 @@ function ProdutoForm({
             </label>
           </div>
         </div>
+
+        {/* Preços Promocionais - Mostrar apenas quando promoção está ativada */}
+        {formData.promocao && (
+          <div className="bg-card rounded-xl p-4 shadow-sm space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Label className="text-sm font-medium text-foreground">Preços Promocionais</Label>
+              <span className="text-xs text-muted-foreground">(válidos apenas para retirada no balcão)</span>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="preco_promocional_tradicional" className="text-sm font-medium text-foreground">Preço da Pizza em Promoção (Tradicional) *</Label>
+                <Input
+                  id="preco_promocional_tradicional"
+                  type="text"
+                  value={precoPromocionalTradicionalFormatado}
+                  onChange={(e) => {
+                    const valorFormatado = formatCurrencyInput(e.target.value)
+                    setPrecoPromocionalTradicionalFormatado(valorFormatado)
+                    const valorNumerico = parseCurrencyInput(valorFormatado)
+                    setFormData({ ...formData, preco_promocional_tradicional: valorNumerico > 0 ? valorNumerico : null })
+                  }}
+                  placeholder="R$ 0,00"
+                  required
+                  className="bg-muted border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
+                />
+              </div>
+              
+              {brotoHabilitado && (
+                <div className="space-y-2">
+                  <Label htmlFor="preco_promocional_broto" className="text-sm font-medium text-foreground">Preço da Pizza em Promoção (Broto) *</Label>
+                  <Input
+                    id="preco_promocional_broto"
+                    type="text"
+                    value={precoPromocionalBrotoFormatado}
+                    onChange={(e) => {
+                      const valorFormatado = formatCurrencyInput(e.target.value)
+                      setPrecoPromocionalBrotoFormatado(valorFormatado)
+                      const valorNumerico = parseCurrencyInput(valorFormatado)
+                      setFormData({ ...formData, preco_promocional_broto: valorNumerico > 0 ? valorNumerico : null })
+                    }}
+                    placeholder="R$ 0,00"
+                    required
+                    className="bg-muted border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Seção de Adicionais */}
         <div className="bg-card rounded-xl p-4 shadow-sm space-y-4">

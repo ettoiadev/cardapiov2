@@ -46,6 +46,8 @@ interface Produto {
   descricao: string | null
   preco_tradicional: number | null
   preco_broto: number | null
+  preco_promocional_tradicional: number | null
+  preco_promocional_broto: number | null
   tipo: string
   ativo: boolean
   promocao: boolean
@@ -1010,7 +1012,15 @@ export default function CheckoutPage() {
                       <span className="text-sm text-gray-700">
                         {item.tamanho === "broto" ? "Broto" : "Tradicional"} · {item.tamanho === "broto" ? "4" : "8"} fatias · {(() => {
                           const pizza = produtos.find(p => item.sabores?.includes(p.nome))
-                          const preco = item.tamanho === "broto" ? pizza?.preco_broto : pizza?.preco_tradicional
+                          let preco: number | null = null
+                          
+                          // Se o produto está em promoção, usar preços promocionais
+                          if (pizza?.promocao) {
+                            preco = item.tamanho === "broto" ? pizza.preco_promocional_broto : pizza.preco_promocional_tradicional
+                          } else {
+                            preco = item.tamanho === "broto" ? pizza?.preco_broto : pizza?.preco_tradicional
+                          }
+                          
                           return preco ? formatCurrency(preco) : "-"
                         })()}
                       </span>
