@@ -262,6 +262,12 @@ export default function CheckoutPage() {
     }) || false
   }
 
+  // Função para verificar se um item específico está em promoção
+  const isItemPromocao = (itemId: string) => {
+    const produto = produtos.find(p => p.id === itemId)
+    return produto?.promocao === true
+  }
+
   // Função para lidar com a seleção de delivery
   const handleDeliveryTypeChange = (type: "balcao" | "delivery") => {
     if (type === "delivery" && hasPromocaoPizzas()) {
@@ -270,9 +276,6 @@ export default function CheckoutPage() {
     }
     setDeliveryType(type)
   }
-
-  // Verificar se os campos devem estar desabilitados
-  const isFieldsDisabled = deliveryType === "delivery" && hasPromocaoPizzas()
   
   // Buscar CEP
   const searchCep = async (cep: string) => {
@@ -737,118 +740,133 @@ export default function CheckoutPage() {
             <h2 className="text-[15px] font-semibold mb-4 text-neutral-800">
               {deliveryType === "delivery" ? "Dados para Entrega" : "Dados do Cliente"}
             </h2>
-            <div className="space-y-4">
-              {/* Nome */}
-              <div>
-                <Label htmlFor="name" className="text-[15px]">Nome Completo *</Label>
-                <div className="relative mt-1">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="name"
-                    placeholder="Ex: João Silva"
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    className="pl-10"
-                    disabled={isFieldsDisabled}
-                    required
-                  />
+            
+            {/* Verificar se delivery está selecionado e há pizzas em promoção */}
+            {deliveryType === "delivery" && hasPromocaoPizzas() ? (
+              /* Mensagem de restrição para promoções */
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Pizza className="w-8 h-8 text-yellow-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Pizzas em Promoção</h3>
+                <p className="text-gray-600 text-center leading-relaxed">
+                  As promoções de pizzas são exclusivas para pedidos com retirada no balcão.
+                </p>
+                <div className="mt-6 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                  <p className="text-orange-800 text-sm font-medium">
+                    💡 Para continuar, selecione "Balcão" como tipo de entrega
+                  </p>
                 </div>
               </div>
-              
-              {/* Telefone */}
-              <div>
-                <Label htmlFor="phone" className="text-[15px]">Telefone *</Label>
-                <div className="relative mt-1">
-                  <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="phone"
-                    placeholder="Ex: (11) 99999-9999"
-                    value={customerPhone}
-                    onChange={(e) => handlePhoneChange(e.target.value)}
-                    className="pl-10"
-                    disabled={isFieldsDisabled}
-                    required
-                  />
-                </div>
-              </div>
-              
-              {/* Campos específicos para Delivery */}
-              {deliveryType === "delivery" && (
-                <>
-                  {/* CEP */}
-                  <div>
-                    <Label htmlFor="cep">CEP *</Label>
-                    <div className="relative mt-1">
-                      <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="cep"
-                        placeholder="00000-000"
-                        value={customerCep}
-                        onChange={(e) => handleCepChange(e.target.value)}
-                        className="pl-10"
-                        disabled={isFieldsDisabled}
-                        required
-                      />
-                      {searchingCep && (
-                        <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-gray-400" />
-                      )}
-                    </div>
-                    {cepError && <p className="text-red-600 text-sm mt-1">{cepError}</p>}
-                    {addressData && (
-                      <div className="mt-2 p-3 bg-green-50 rounded-lg text-sm">
-                        <p className="font-medium text-green-800">Endereço encontrado:</p>
-                        <p className="text-green-700">
-                          {addressData.logradouro}, {addressData.bairro} - {addressData.localidade}/{addressData.uf}
-                        </p>
-                      </div>
-                    )}
+            ) : (
+              /* Formulário normal */
+              <div className="space-y-4">
+                {/* Nome */}
+                <div>
+                  <Label htmlFor="name" className="text-[15px]">Nome Completo *</Label>
+                  <div className="relative mt-1">
+                    <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="name"
+                      placeholder="Ex: João Silva"
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
                   </div>
-                  
-                  {/* Campos adicionais após CEP */}
-                  {addressData && (
-                    <>
-                      <div>
-                        <Label htmlFor="number">Número *</Label>
+                </div>
+                
+                {/* Telefone */}
+                <div>
+                  <Label htmlFor="phone" className="text-[15px]">Telefone *</Label>
+                  <div className="relative mt-1">
+                    <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="phone"
+                      placeholder="Ex: (11) 99999-9999"
+                      value={customerPhone}
+                      onChange={(e) => handlePhoneChange(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+                
+                {/* Campos específicos para Delivery */}
+                {deliveryType === "delivery" && (
+                  <>
+                    {/* CEP */}
+                    <div>
+                      <Label htmlFor="cep">CEP *</Label>
+                      <div className="relative mt-1">
+                        <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                         <Input
-                          id="number"
-                          placeholder="123"
-                          value={addressNumber}
-                          onChange={(e) => setAddressNumber(e.target.value)}
-                          className="mt-1"
-                          disabled={isFieldsDisabled}
+                          id="cep"
+                          placeholder="00000-000"
+                          value={customerCep}
+                          onChange={(e) => handleCepChange(e.target.value)}
+                          className="pl-10"
                           required
                         />
+                        {searchingCep && (
+                          <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-gray-400" />
+                        )}
                       </div>
-                      
-                      <div>
-                        <Label htmlFor="complement">Complemento</Label>
-                        <Input
-                          id="complement"
-                          placeholder="Apto 101, Bloco A..."
-                          value={addressComplement}
-                          onChange={(e) => setAddressComplement(e.target.value)}
-                          className="mt-1"
-                          disabled={isFieldsDisabled}
-                        />
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="delivery-notes">Observações de Entrega</Label>
-                        <Textarea
-                          id="delivery-notes"
-                          placeholder="Ponto de referência, instruções..."
-                          value={deliveryNotes}
-                          onChange={(e) => setDeliveryNotes(e.target.value)}
-                          className="mt-1"
-                          disabled={isFieldsDisabled}
-                          rows={2}
-                        />
-                      </div>
-                    </>
-                  )}
-                </>
-              )}
-            </div>
+                      {cepError && <p className="text-red-600 text-sm mt-1">{cepError}</p>}
+                      {addressData && (
+                        <div className="mt-2 p-3 bg-green-50 rounded-lg text-sm">
+                          <p className="font-medium text-green-800">Endereço encontrado:</p>
+                          <p className="text-green-700">
+                            {addressData.logradouro}, {addressData.bairro} - {addressData.localidade}/{addressData.uf}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Campos adicionais após CEP */}
+                    {addressData && (
+                      <>
+                        <div>
+                          <Label htmlFor="number">Número *</Label>
+                          <Input
+                            id="number"
+                            placeholder="123"
+                            value={addressNumber}
+                            onChange={(e) => setAddressNumber(e.target.value)}
+                            className="mt-1"
+                            required
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="complement">Complemento</Label>
+                          <Input
+                            id="complement"
+                            placeholder="Apto 101, Bloco A..."
+                            value={addressComplement}
+                            onChange={(e) => setAddressComplement(e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="delivery-notes">Observações de Entrega</Label>
+                          <Textarea
+                            id="delivery-notes"
+                            placeholder="Ponto de referência, instruções..."
+                            value={deliveryNotes}
+                            onChange={(e) => setDeliveryNotes(e.target.value)}
+                            className="mt-1"
+                            rows={2}
+                          />
+                        </div>
+                      </>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </Card>
         
@@ -903,13 +921,18 @@ export default function CheckoutPage() {
                         <div className="flex-1">
                           {item.sabores && item.sabores.length === 2 ? (
                             <div>
-                              <div className="mb-2">
+                              <div className="mb-2 flex items-center gap-2">
                                 <span className="text-[15px] font-bold text-red-600">
                                   Pizza 1/2 {item.sabores[0]} + 1/2 {item.sabores[1]}
                                 </span>
                                 {item.tipo !== "bebida" && (
-                                  <span className="text-sm text-gray-600 ml-2">
+                                  <span className="text-sm text-gray-600">
                                     - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
+                                  </span>
+                                )}
+                                {isItemPromocao(item.id) && (
+                                  <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                    PROMOÇÃO
                                   </span>
                                 )}
                               </div>
@@ -926,13 +949,18 @@ export default function CheckoutPage() {
                             </div>
                           ) : item.sabores && item.sabores.length === 3 ? (
                             <div>
-                              <div className="mb-2">
+                              <div className="mb-2 flex items-center gap-2">
                                 <span className="text-[15px] font-bold text-red-600">
                                   Pizza {item.sabores.join(" + ")}
                                 </span>
                                 {item.tipo !== "bebida" && (
-                                  <span className="text-sm text-gray-600 ml-2">
+                                  <span className="text-sm text-gray-600">
                                     - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
+                                  </span>
+                                )}
+                                {isItemPromocao(item.id) && (
+                                  <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                    PROMOÇÃO
                                   </span>
                                 )}
                               </div>
@@ -949,11 +977,16 @@ export default function CheckoutPage() {
                             </div>
                           ) : item.sabores && item.sabores.length === 1 ? (
                             <div>
-                              <div className="mb-2">
+                              <div className="mb-2 flex items-center gap-2">
                                 <span className="text-[15px] font-bold text-red-600">{item.nome}</span>
                                 {item.tipo !== "bebida" && (
-                                  <span className="text-sm text-gray-600 ml-2">
+                                  <span className="text-sm text-gray-600">
                                     - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
+                                  </span>
+                                )}
+                                {isItemPromocao(item.id) && (
+                                  <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                    PROMOÇÃO
                                   </span>
                                 )}
                               </div>
@@ -965,11 +998,16 @@ export default function CheckoutPage() {
                               })()}
                             </div>
                           ) : (
-                            <div>
+                            <div className="flex items-center gap-2">
                               <span className="text-[15px] font-bold text-red-600">{item.nome}</span>
                               {item.tipo !== "bebida" && (
-                                <span className="text-sm text-gray-600 ml-2">
+                                <span className="text-sm text-gray-600">
                                   - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
+                                </span>
+                              )}
+                              {isItemPromocao(item.id) && (
+                                <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                  PROMOÇÃO
                                 </span>
                               )}
                             </div>
