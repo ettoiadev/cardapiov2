@@ -46,6 +46,7 @@ interface Produto {
   preco_broto: number | null
   tipo: string
   ativo: boolean
+  promocao: boolean
   ordem: number
   adicionais?: Adicional[]
 }
@@ -544,7 +545,14 @@ function HomePageContent() {
           onClick={() => handleToggleProductInCart(produto)}
         >
           <div className="flex-1">
-            <h3 className="font-medium">{produto.nome}</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium">{produto.nome}</h3>
+              {produto.promocao && (
+                <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded">
+                  PROMOÇÃO
+                </span>
+              )}
+            </div>
             {produto.descricao && <p className="text-sm text-gray-600 mt-1">{produto.descricao}</p>}
             <span className="text-sm font-medium text-red-600">
               {formatCurrency(produto.preco_tradicional)}
@@ -818,12 +826,19 @@ function HomePageContent() {
                           }}
                         >
                         <div className="flex-1">
-                          <div className="flex items-center space-x-2">
-                            <h3 className="font-bold text-red-600">{pizzaNumber}. {pizza.nome}</h3>
-                            {pizza.tipo === "doce" && (
-                              <Badge variant="secondary" className="text-xs">
-                                Doce
-                              </Badge>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <h3 className="font-bold text-red-600">{pizzaNumber}. {pizza.nome}</h3>
+                              {pizza.tipo === "doce" && (
+                                <Badge variant="secondary" className="text-xs">
+                                  Doce
+                                </Badge>
+                              )}
+                            </div>
+                            {pizza.promocao && (
+                              <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded">
+                                PROMOÇÃO
+                              </span>
                             )}
                           </div>
                           {pizza.descricao && <p className="text-sm text-gray-600 mt-1">{pizza.descricao}</p>}

@@ -49,6 +49,7 @@ interface Produto {
   preco_broto: number | null
   tipo: string
   ativo: boolean
+  promocao: boolean
   ordem: number
   adicionais?: Adicional[]
 }
@@ -1209,6 +1210,7 @@ function ProdutoForm({
     preco_tradicional: produto?.preco_tradicional || null,
     preco_broto: produto?.preco_broto || null,
     ativo: produto?.ativo ?? true,
+    promocao: produto?.promocao ?? false,
     ordem: produto?.ordem || proximaOrdem,
     adicionais: produto?.adicionais || []
   })
@@ -1439,6 +1441,29 @@ function ProdutoForm({
                 className="sr-only peer"
               />
               <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ring/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-input after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+            </label>
+          </div>
+        </div>
+
+        {/* Toggle Promoção */}
+        <div className="bg-card rounded-xl p-4 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-foreground">
+                {formData.promocao ? "Produto em promoção" : "Produto sem promoção"}
+              </span>
+              {formData.promocao && (
+                <span className="text-xs text-muted-foreground">(válido apenas para retirada)</span>
+              )}
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.promocao}
+                onChange={(e) => setFormData({ ...formData, promocao: e.target.checked })}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ring/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-input after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
             </label>
           </div>
         </div>

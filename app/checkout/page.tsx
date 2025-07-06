@@ -48,6 +48,7 @@ interface Produto {
   preco_broto: number | null
   tipo: string
   ativo: boolean
+  promocao: boolean
   adicionais?: Adicional[]
 }
 
@@ -73,6 +74,9 @@ export default function CheckoutPage() {
   
   // Tipo de entrega
   const [deliveryType, setDeliveryType] = useState<"balcao" | "delivery">("balcao")
+  
+  // Toast para promoção
+  const [showPromocaoToast, setShowPromocaoToast] = useState(false)
   
   // Dados do cliente
   const [customerName, setCustomerName] = useState("")
@@ -247,6 +251,24 @@ export default function CheckoutPage() {
     } catch (error) {
       console.error("Erro ao carregar bordas recheadas:", error)
     }
+  }
+
+  // Função para verificar se há pizzas em promoção no carrinho
+  const hasPromocaoPizzas = () => {
+    return state.items?.some(item => {
+      // Encontrar o produto correspondente
+      const produto = produtos.find(p => p.id === item.id)
+      return produto?.promocao === true
+    }) || false
+  }
+
+  // Função para lidar com a seleção de delivery
+  const handleDeliveryTypeChange = (type: "balcao" | "delivery") => {
+    if (type === "delivery" && hasPromocaoPizzas()) {
+      setShowPromocaoToast(true)
+      return
+    }
+    setDeliveryType(type)
   }
   
   // Buscar CEP
@@ -672,7 +694,7 @@ export default function CheckoutPage() {
                     ? "border-orange-300 bg-orange-50" 
                     : "border-gray-200 bg-white hover:border-orange-200"
                 }`}
-                onClick={() => setDeliveryType("balcao")}
+                onClick={() => handleDeliveryTypeChange("balcao")}
               >
                 <div className="flex flex-col items-center text-center space-y-3">
                   <div className="bg-orange-600 text-white rounded-full p-3">
@@ -690,7 +712,7 @@ export default function CheckoutPage() {
                     ? "border-blue-300 bg-blue-50" 
                     : "border-gray-200 bg-white hover:border-blue-200"
                 }`}
-                onClick={() => setDeliveryType("delivery")}
+                onClick={() => handleDeliveryTypeChange("delivery")}
               >
                 <div className="flex flex-col items-center text-center space-y-3">
                   <div className="bg-blue-600 text-white rounded-full p-3">
@@ -1243,6 +1265,29 @@ export default function CheckoutPage() {
           Você será redirecionado ao WhatsApp da pizzaria
         </p>
       </div>
+
+      {/* Toast de Promoção */}
+      {showPromocaoToast && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-lg">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Pizza className="w-8 h-8 text-yellow-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Pizzas em Promoção</h3>
+              <p className="text-gray-600 mb-6">
+                As Pizzas em <strong>PROMOÇÃO</strong> são válidas apenas para retirada no balcão.
+              </p>
+              <Button
+                onClick={() => setShowPromocaoToast(false)}
+                className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg"
+              >
+                Entendi
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
