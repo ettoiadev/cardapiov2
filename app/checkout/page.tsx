@@ -258,9 +258,8 @@ export default function CheckoutPage() {
   // Função para verificar se há pizzas em promoção no carrinho
   const hasPromocaoPizzas = () => {
     return state.items?.some(item => {
-      // Encontrar o produto correspondente
-      const produto = produtos.find(p => p.id === item.id)
-      return produto?.promocao === true
+      // Usar a mesma lógica da função isItemPromocao
+      return isItemPromocao(item.id)
     }) || false
   }
 
