@@ -923,14 +923,16 @@ export default function CheckoutPage() {
                         <div className="flex-1">
                           {item.sabores && item.sabores.length === 2 ? (
                             <div>
-                              <div className="mb-2 flex items-center gap-2">
+                              <div className="mb-2">
                                 <span className="text-[15px] font-bold text-red-600">
                                   Pizza 1/2 {item.sabores[0]} + 1/2 {item.sabores[1]}
                                 </span>
                                 {isItemPromocao(item.id) && (
-                                  <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                                    PROMOÇÃO BALCÃO
-                                  </span>
+                                  <div className="mt-1">
+                                    <span className="text-xs font-bold text-green-600">
+                                      PROMOÇÃO BALCÃO
+                                    </span>
+                                  </div>
                                 )}
                               </div>
                               <div className="space-y-1">
@@ -946,14 +948,16 @@ export default function CheckoutPage() {
                             </div>
                           ) : item.sabores && item.sabores.length === 3 ? (
                             <div>
-                              <div className="mb-2 flex items-center gap-2">
+                              <div className="mb-2">
                                 <span className="text-[15px] font-bold text-red-600">
                                   Pizza {item.sabores.join(" + ")}
                                 </span>
                                 {isItemPromocao(item.id) && (
-                                  <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                                    PROMOÇÃO BALCÃO
-                                  </span>
+                                  <div className="mt-1">
+                                    <span className="text-xs font-bold text-green-600">
+                                      PROMOÇÃO BALCÃO
+                                    </span>
+                                  </div>
                                 )}
                               </div>
                               <div className="space-y-1">
@@ -969,12 +973,14 @@ export default function CheckoutPage() {
                             </div>
                           ) : item.sabores && item.sabores.length === 1 ? (
                             <div>
-                              <div className="mb-2 flex items-center gap-2">
+                              <div className="mb-2">
                                 <span className="text-[15px] font-bold text-red-600">{item.nome}</span>
                                 {isItemPromocao(item.id) && (
-                                  <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                                    PROMOÇÃO BALCÃO
-                                  </span>
+                                  <div className="mt-1">
+                                    <span className="text-xs font-bold text-green-600">
+                                      PROMOÇÃO BALCÃO
+                                    </span>
+                                  </div>
                                 )}
                               </div>
                               {(() => {
@@ -985,12 +991,14 @@ export default function CheckoutPage() {
                               })()}
                             </div>
                           ) : (
-                            <div className="flex items-center gap-2">
+                            <div>
                               <span className="text-[15px] font-bold text-red-600">{item.nome}</span>
                               {isItemPromocao(item.id) && (
-                                <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                                  PROMOÇÃO BALCÃO
-                                </span>
+                                <div className="mt-1">
+                                  <span className="text-xs font-bold text-green-600">
+                                    PROMOÇÃO BALCÃO
+                                  </span>
+                                </div>
                               )}
                             </div>
                           )}
@@ -1016,9 +1024,9 @@ export default function CheckoutPage() {
                           
                           // Se o produto está em promoção, usar preços promocionais
                           if (pizza?.promocao) {
-                            preco = item.tamanho === "broto" ? pizza.preco_promocional_broto : pizza.preco_promocional_tradicional
+                            preco = item.tamanho === "broto" ? (pizza.preco_promocional_broto || null) : (pizza.preco_promocional_tradicional || null)
                           } else {
-                            preco = item.tamanho === "broto" ? pizza?.preco_broto : pizza?.preco_tradicional
+                            preco = item.tamanho === "broto" ? (pizza?.preco_broto || null) : (pizza?.preco_tradicional || null)
                           }
                           
                           return preco ? formatCurrency(preco) : "-"
