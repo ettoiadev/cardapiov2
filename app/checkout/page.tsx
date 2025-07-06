@@ -925,11 +925,6 @@ export default function CheckoutPage() {
                                 <span className="text-[15px] font-bold text-red-600">
                                   Pizza 1/2 {item.sabores[0]} + 1/2 {item.sabores[1]}
                                 </span>
-                                {item.tipo !== "bebida" && (
-                                  <span className="text-sm text-gray-600">
-                                    - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
-                                  </span>
-                                )}
                                 {isItemPromocao(item.id) && (
                                   <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                                     PROMOÇÃO
@@ -953,11 +948,6 @@ export default function CheckoutPage() {
                                 <span className="text-[15px] font-bold text-red-600">
                                   Pizza {item.sabores.join(" + ")}
                                 </span>
-                                {item.tipo !== "bebida" && (
-                                  <span className="text-sm text-gray-600">
-                                    - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
-                                  </span>
-                                )}
                                 {isItemPromocao(item.id) && (
                                   <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                                     PROMOÇÃO
@@ -979,11 +969,6 @@ export default function CheckoutPage() {
                             <div>
                               <div className="mb-2 flex items-center gap-2">
                                 <span className="text-[15px] font-bold text-red-600">{item.nome}</span>
-                                {item.tipo !== "bebida" && (
-                                  <span className="text-sm text-gray-600">
-                                    - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
-                                  </span>
-                                )}
                                 {isItemPromocao(item.id) && (
                                   <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                                     PROMOÇÃO
@@ -1000,11 +985,6 @@ export default function CheckoutPage() {
                           ) : (
                             <div className="flex items-center gap-2">
                               <span className="text-[15px] font-bold text-red-600">{item.nome}</span>
-                              {item.tipo !== "bebida" && (
-                                <span className="text-sm text-gray-600">
-                                  - {item.tamanho === "broto" ? "Broto" : "Tradicional"}
-                                </span>
-                              )}
                               {isItemPromocao(item.id) && (
                                 <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                                   PROMOÇÃO
