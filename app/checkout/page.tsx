@@ -266,6 +266,28 @@ export default function CheckoutPage() {
 
   // Função para verificar se um item específico está em promoção
   const isItemPromocao = (itemId: string) => {
+    // Para pizzas de 1 sabor: ID no carrinho é {produto.id}-{tamanho}
+    if (itemId.includes('-tradicional') || itemId.includes('-broto')) {
+      const produtoId = itemId.replace(/-tradicional$|-broto$/, '')
+      const produto = produtos.find(p => p.id === produtoId)
+      return produto?.promocao === true
+    }
+    
+    // Para pizzas múltiplos sabores: ID no carrinho é multi-{sabores}-{tamanho}
+    if (itemId.startsWith('multi-')) {
+      // Extrair sabores do ID
+      const saboresString = itemId.replace(/^multi-/, '').replace(/-tradicional$|-broto$/, '')
+      const sabores = saboresString.split('-')
+      
+      // Verificar se algum dos sabores está em promoção
+      const temPromocao = sabores.some(sabor => {
+        const produto = produtos.find(p => p.nome === sabor)
+        return produto?.promocao === true
+      })
+      return temPromocao
+    }
+    
+    // Para bebidas e outros produtos: ID no carrinho é igual ao ID do produto
     const produto = produtos.find(p => p.id === itemId)
     return produto?.promocao === true
   }
