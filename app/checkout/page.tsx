@@ -270,6 +270,9 @@ export default function CheckoutPage() {
     }
     setDeliveryType(type)
   }
+
+  // Verificar se os campos devem estar desabilitados
+  const isFieldsDisabled = deliveryType === "delivery" && hasPromocaoPizzas()
   
   // Buscar CEP
   const searchCep = async (cep: string) => {
@@ -746,6 +749,7 @@ export default function CheckoutPage() {
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     className="pl-10"
+                    disabled={isFieldsDisabled}
                     required
                   />
                 </div>
@@ -762,6 +766,7 @@ export default function CheckoutPage() {
                     value={customerPhone}
                     onChange={(e) => handlePhoneChange(e.target.value)}
                     className="pl-10"
+                    disabled={isFieldsDisabled}
                     required
                   />
                 </div>
@@ -781,6 +786,7 @@ export default function CheckoutPage() {
                         value={customerCep}
                         onChange={(e) => handleCepChange(e.target.value)}
                         className="pl-10"
+                        disabled={isFieldsDisabled}
                         required
                       />
                       {searchingCep && (
@@ -809,6 +815,7 @@ export default function CheckoutPage() {
                           value={addressNumber}
                           onChange={(e) => setAddressNumber(e.target.value)}
                           className="mt-1"
+                          disabled={isFieldsDisabled}
                           required
                         />
                       </div>
@@ -821,6 +828,7 @@ export default function CheckoutPage() {
                           value={addressComplement}
                           onChange={(e) => setAddressComplement(e.target.value)}
                           className="mt-1"
+                          disabled={isFieldsDisabled}
                         />
                       </div>
                       
@@ -832,6 +840,7 @@ export default function CheckoutPage() {
                           value={deliveryNotes}
                           onChange={(e) => setDeliveryNotes(e.target.value)}
                           className="mt-1"
+                          disabled={isFieldsDisabled}
                           rows={2}
                         />
                       </div>
@@ -1269,14 +1278,25 @@ export default function CheckoutPage() {
       {/* Toast de Promoção */}
       {showPromocaoToast && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-lg">
+          <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-lg relative">
+            {/* Botão X para fechar */}
+            <button
+              onClick={() => setShowPromocaoToast(false)}
+              className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100 transition-colors"
+              aria-label="Fechar"
+            >
+              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
             <div className="text-center">
               <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Pizza className="w-8 h-8 text-yellow-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Pizzas em Promoção</h3>
               <p className="text-gray-600 mb-6">
-                As Pizzas em <strong>PROMOÇÃO</strong> são válidas apenas para retirada no balcão.
+                As promoções de pizzas são exclusivas para pedidos com retirada no balcão.
               </p>
               <Button
                 onClick={() => setShowPromocaoToast(false)}
