@@ -31,6 +31,7 @@ interface PizzariaConfig {
   telefone: string | null
   whatsapp: string | null
   horario_funcionamento: any
+  descricao_pizzas?: string
 }
 
 interface Adicional {
@@ -733,7 +734,7 @@ function HomePageContent() {
               {expandedSections.pizzas && (
                 <div className="mt-4 space-y-4">
                   <div className="text-sm text-gray-600">
-                    Pizzas doces e salgadas (Tradicional 8 fatias / Broto 4 fatias)
+                    {config?.descricao_pizzas || "Pizzas doces e salgadas (Tradicional 8 fatias / Broto 4 fatias)"}
                   </div>
                   <div className="text-sm text-green-600 font-semibold">
                     Você pode escolher até {Math.max(...opcoesSabores.filter(o => o.ativo).map(o => o.maximo_sabores))} sabores

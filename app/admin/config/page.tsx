@@ -69,6 +69,7 @@ interface PizzariaConfig {
   maps_ativo: boolean
   maps_link: string
   compartilhar_ativo: boolean
+  descricao_pizzas: string
 }
 
 export default function AdminConfigPage() {
@@ -108,6 +109,7 @@ export default function AdminConfigPage() {
     maps_ativo: false,
     maps_link: "",
     compartilhar_ativo: true,
+    descricao_pizzas: "Pizzas doces e salgadas (Tradicional 8 fatias / Broto 4 fatias)",
   })
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
@@ -478,6 +480,7 @@ export default function AdminConfigPage() {
           maps_ativo: data.maps_ativo !== undefined ? data.maps_ativo : false,
           maps_link: data.maps_link || "",
           compartilhar_ativo: data.compartilhar_ativo !== undefined ? data.compartilhar_ativo : true,
+          descricao_pizzas: data.descricao_pizzas || "Pizzas doces e salgadas (Tradicional 8 fatias / Broto 4 fatias)",
         }
         setConfig(configData)
         
@@ -1108,6 +1111,23 @@ export default function AdminConfigPage() {
                     className="mt-1 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200"
                   />
                 </div>
+              </div>
+
+              <div>
+                <Label htmlFor="descricao_pizzas" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <UtensilsCrossed className="h-4 w-4" />
+                  Descrição das Pizzas
+                </Label>
+                <Input
+                  id="descricao_pizzas"
+                  value={config.descricao_pizzas}
+                  onChange={(e) => setConfig({ ...config, descricao_pizzas: e.target.value })}
+                  placeholder="Pizzas doces e salgadas (Tradicional 8 fatias / Broto 4 fatias)"
+                  className="mt-1 rounded-lg border-gray-200 focus:border-blue-300 focus:ring-blue-200"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Texto exibido na seção de pizzas da homepage
+                </p>
               </div>
 
               {/* Seção Redes Sociais do Rodapé */}
