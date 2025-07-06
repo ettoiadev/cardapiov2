@@ -927,7 +927,7 @@ export default function CheckoutPage() {
                                 </span>
                                 {isItemPromocao(item.id) && (
                                   <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                                    PROMOÇÃO
+                                    PROMOÇÃO BALCÃO
                                   </span>
                                 )}
                               </div>
@@ -950,7 +950,7 @@ export default function CheckoutPage() {
                                 </span>
                                 {isItemPromocao(item.id) && (
                                   <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                                    PROMOÇÃO
+                                    PROMOÇÃO BALCÃO
                                   </span>
                                 )}
                               </div>
@@ -971,7 +971,7 @@ export default function CheckoutPage() {
                                 <span className="text-[15px] font-bold text-red-600">{item.nome}</span>
                                 {isItemPromocao(item.id) && (
                                   <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                                    PROMOÇÃO
+                                    PROMOÇÃO BALCÃO
                                   </span>
                                 )}
                               </div>
@@ -987,7 +987,7 @@ export default function CheckoutPage() {
                               <span className="text-[15px] font-bold text-red-600">{item.nome}</span>
                               {isItemPromocao(item.id) && (
                                 <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                                  PROMOÇÃO
+                                  PROMOÇÃO BALCÃO
                                 </span>
                               )}
                             </div>
