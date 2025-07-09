@@ -588,7 +588,10 @@ export default function AdminProdutosPage() {
                                   Tradicional
                                 </span>
                                 <span className="font-semibold text-green-600">
-                                  {formatCurrency(produto.preco_tradicional)}
+                                  {produto.promocao && produto.preco_promocional_tradicional 
+                                    ? formatCurrency(produto.preco_promocional_tradicional)
+                                    : formatCurrency(produto.preco_tradicional)
+                                  }
                                 </span>
                               </div>
                               {config.habilitar_broto && produto.preco_broto && (
@@ -598,7 +601,10 @@ export default function AdminProdutosPage() {
                                     Broto
                                   </span>
                                   <span className="font-semibold text-green-600">
-                                    {formatCurrency(produto.preco_broto)}
+                                    {produto.promocao && produto.preco_promocional_broto 
+                                      ? formatCurrency(produto.preco_promocional_broto)
+                                      : formatCurrency(produto.preco_broto)
+                                    }
                                   </span>
                                 </div>
                               )}
@@ -732,7 +738,10 @@ export default function AdminProdutosPage() {
                                   Preço
                                 </span>
                                 <span className="font-semibold text-green-600">
-                                  {formatCurrency(produto.preco_tradicional)}
+                                  {produto.promocao && produto.preco_promocional_tradicional 
+                                    ? formatCurrency(produto.preco_promocional_tradicional)
+                                    : formatCurrency(produto.preco_tradicional)
+                                  }
                                 </span>
                               </div>
                             </div>
@@ -882,7 +891,10 @@ export default function AdminProdutosPage() {
                             Preço
                           </span>
                           <span className="font-semibold text-green-600">
-                            {formatCurrency(produto.preco_tradicional)}
+                            {produto.promocao && produto.preco_promocional_tradicional 
+                              ? formatCurrency(produto.preco_promocional_tradicional)
+                              : formatCurrency(produto.preco_tradicional)
+                            }
                           </span>
                         </div>
                       </div>
