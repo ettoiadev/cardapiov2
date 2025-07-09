@@ -358,25 +358,51 @@ export default function AdminProdutosPage() {
 
   // Função para organizar produtos por categoria com prioridade
   const organizeProductsByCategory = () => {
-    const pizzasCategories = ['salgada', 'doce']
-    const pizzas = filteredProdutos.filter(produto => pizzasCategories.includes(produto.tipo))
-    const bebidas = filteredProdutos.filter(produto => produto.tipo === 'bebida')
-    const outros = filteredProdutos.filter(produto => !pizzasCategories.includes(produto.tipo) && produto.tipo !== 'bebida')
+    // Organizar produtos por categoria real do banco de dados
+    const produtosPorCategoria = categorias.reduce((acc, categoria) => {
+      const produtosDaCategoria = filteredProdutos.filter(p => p.categoria_id === categoria.id)
+      if (produtosDaCategoria.length > 0) {
+        acc[categoria.id] = {
+          categoria,
+          produtos: produtosDaCategoria
+        }
+      }
+      return acc
+    }, {} as Record<string, { categoria: any, produtos: Produto[] }>)
+
+    // Para compatibilidade com a interface existente, identificar categorias específicas
+    const pizzasCategoria = categorias.find(c => c.nome.toLowerCase() === 'pizzas')
+    const bebidasCategoria = categorias.find(c => c.nome.toLowerCase() === 'bebidas')
     
-    // Adicionar numeração sequencial para pizzas
-    const pizzasComNumeracao = pizzas.map((pizza, index) => ({
+    // Pizzas (categoria "Pizzas") com numeração sequencial
+    const pizzasProdutos = pizzasCategoria ? produtosPorCategoria[pizzasCategoria.id]?.produtos || [] : []
+    const pizzasComNumeracao = pizzasProdutos.map((pizza, index) => ({
       ...pizza,
       numeroSequencial: String(index + 1).padStart(2, '0')
     }))
 
+    // Bebidas (categoria "Bebidas") 
+    const bebidas = bebidasCategoria ? produtosPorCategoria[bebidasCategoria.id]?.produtos || [] : []
+
+    // Outras categorias (exceto Pizzas e Bebidas)
+    const outrasCategoriasData = Object.values(produtosPorCategoria)
+      .filter(({ categoria }) => 
+        categoria.nome.toLowerCase() !== 'pizzas' && 
+        categoria.nome.toLowerCase() !== 'bebidas'
+      )
+
+    // Para compatibilidade, flatten dos produtos de outras categorias
+    const outros = outrasCategoriasData.flatMap(({ produtos }) => produtos)
+
     return {
       pizzas: pizzasComNumeracao,
       bebidas,
-      outros
+      outros,
+      outrasCategoriasData // Nova propriedade para acessar categorias com seus produtos separadamente
     }
   }
 
-  const { pizzas, bebidas, outros } = organizeProductsByCategory()
+  const { pizzas, bebidas, outros, outrasCategoriasData } = organizeProductsByCategory()
 
   const getProductIcon = (tipo: string) => {
     switch (tipo) {
@@ -950,6 +976,147 @@ export default function AdminProdutosPage() {
             </CardContent>
           </Card>
         )}
+
+        {/* Seções Dinâmicas para Outras Categorias */}
+        {outrasCategoriasData && outrasCategoriasData.map(({ categoria, produtos }) => (
+          <Card key={categoria.id} className="border-muted/30 shadow-sm rounded-2xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-teal-50/50 to-cyan-50/30 border-b border-muted/20 p-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-teal-100/80 rounded-xl">
+                  <Package className="h-5 w-5 text-teal-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl font-semibold text-foreground">
+                    {categoria.nome}
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {produtos.length} produto{produtos.length !== 1 ? 's' : ''} cadastrado{produtos.length !== 1 ? 's' : ''}
+                    {categoria.descricao && ` • ${categoria.descricao}`}
+                  </p>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {produtos.map((produto) => (
+                  <div
+                    key={produto.id}
+                    className="group bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-100 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-teal-200"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        {getProductIcon(produto.tipo)}
+                        <div>
+                          <h3 className="font-semibold text-foreground text-lg leading-tight">
+                            {produto.nome}
+                          </h3>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge 
+                              variant={produto.ativo ? "default" : "secondary"}
+                              className="text-xs"
+                            >
+                              {produto.ativo ? "Ativo" : "Inativo"}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground capitalize">
+                              {produto.tipo}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 rounded-lg"
+                          onClick={() => {
+                            setEditingProduto(produto)
+                            setIsDialogOpen(true)
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
+                          onClick={() => handleDelete(produto.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {produto.descricao && (
+                      <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                        {produto.descricao}
+                      </p>
+                    )}
+
+                    <div className="space-y-3">
+                      <div className="bg-white rounded-lg p-3 border border-teal-100">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground flex items-center gap-2">
+                            <Package className="h-4 w-4" />
+                            Preço
+                          </span>
+                          <span className="font-semibold text-green-600">
+                            {produto.promocao && produto.preco_promocional_tradicional 
+                              ? formatCurrency(produto.preco_promocional_tradicional)
+                              : formatCurrency(produto.preco_tradicional)
+                            }
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Toggle de disponibilidade no card */}
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-teal-100">
+                        <span className="text-xs text-muted-foreground font-medium">
+                          {produto.ativo ? "Disponível" : "Indisponível"}
+                        </span>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={produto.ativo}
+                            onChange={(e) => handleToggleDisponibilidade(produto.id, e.target.checked)}
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-600"></div>
+                        </label>
+                      </div>
+
+                      {/* Toggle de promoção no card */}
+                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100">
+                        <span className="text-xs text-muted-foreground font-medium">
+                          {produto.promocao ? "Promoção" : "Sem promoção"}
+                        </span>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={produto.promocao}
+                            onChange={(e) => handleTogglePromocao(produto.id, e.target.checked)}
+                            className="sr-only peer"
+                          />
+                          <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
+                        </label>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <ArrowUpDown className="h-3 w-3" />
+                          Ordem: {produto.ordem}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Tag className="h-3 w-3" />
+                          {categoria.nome}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
 
         {/* 4. Bordas Recheadas */}
         <Card className="border-muted/30 shadow-sm rounded-2xl overflow-hidden">
