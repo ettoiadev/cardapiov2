@@ -41,6 +41,7 @@ interface Adicional {
 
 interface Produto {
   id: string
+  categoria_id: string | null
   nome: string
   descricao: string | null
   preco_tradicional: number | null
@@ -78,6 +79,7 @@ function HomePageContent() {
   const [loading, setLoading] = useState(true)
   const [config, setConfig] = useState<PizzariaConfig | null>(null)
   const [produtos, setProdutos] = useState<Produto[]>([])
+  const [categorias, setCategorias] = useState<any[]>([])
   const [opcoesSabores, setOpcoesSabores] = useState<any[]>([])
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({})
   const [hasError, setHasError] = useState(false)
@@ -257,9 +259,10 @@ function HomePageContent() {
       console.log("🔄 Carregando dados de produção...")
       
       // Carregar dados do Supabase
-      const [configResult, produtosResult, opcoesResult] = await Promise.all([
+      const [configResult, produtosResult, categoriasResult, opcoesResult] = await Promise.all([
         supabase.from("pizzaria_config").select("*").single(),
         supabase.from("produtos").select("*").eq("ativo", true).order("ordem"),
+        supabase.from("categorias").select("*").eq("ativo", true).order("ordem"),
         supabase.from("opcoes_sabores").select("*").eq("ativo", true).order("ordem"),
       ])
 
@@ -284,6 +287,15 @@ function HomePageContent() {
       
       setProdutos(produtosResult.data)
       console.log(`✅ ${produtosResult.data.length} produtos carregados`)
+
+      // Categorias são opcionais - usar padrão se não existir
+      if (categoriasResult.data && categoriasResult.data.length > 0) {
+        setCategorias(categoriasResult.data)
+        console.log(`✅ ${categoriasResult.data.length} categorias carregadas`)
+      } else {
+        console.warn("⚠️ Nenhuma categoria encontrada")
+        setCategorias([])
+      }
 
       // Opções de sabores - usar padrão se não existir
       if (opcoesResult.data && opcoesResult.data.length > 0) {
@@ -578,16 +590,26 @@ function HomePageContent() {
     })
   }
 
-  const pizzasSalgadas = produtos.filter((p) => p.tipo === "salgada")
-  const pizzasDoces = produtos.filter((p) => p.tipo === "doce")
-  const bebidas = produtos.filter((p) => p.tipo === "bebida")
-  
-  // Obter outras categorias dinamicamente (que não sejam pizza)
-  const outrasCategoriasTypes = Array.from(new Set(produtos.map(p => p.tipo).filter(tipo => !["salgada", "doce", "bebida"].includes(tipo))))
-  const outrasCategoriasMap = outrasCategoriasTypes.reduce((acc, tipo) => {
-    acc[tipo] = produtos.filter(p => p.tipo === tipo)
+  // Organizar produtos por categoria real do banco de dados
+  const produtosPorCategoria = categorias.reduce((acc, categoria) => {
+    const produtosDaCategoria = produtos.filter(p => p.categoria_id === categoria.id)
+    if (produtosDaCategoria.length > 0) {
+      acc[categoria.id] = {
+        categoria,
+        produtos: produtosDaCategoria
+      }
+    }
     return acc
-  }, {} as Record<string, Produto[]>)
+  }, {} as Record<string, { categoria: any, produtos: Produto[] }>)
+
+  // Para compatibilidade com código existente (especialmente a seção de pizzas que tem lógica especial)
+  const pizzasCategoria = categorias.find(c => c.nome.toLowerCase() === 'pizzas')
+  const pizzasProdutos = pizzasCategoria ? produtosPorCategoria[pizzasCategoria.id]?.produtos || [] : []
+  const pizzasSalgadas = pizzasProdutos.filter((p: Produto) => p.tipo === "salgada")
+  const pizzasDoces = pizzasProdutos.filter((p: Produto) => p.tipo === "doce")
+  
+  // Bebidas continuam sendo filtradas por tipo (para compatibilidade)
+  const bebidas = produtos.filter((p) => p.tipo === "bebida")
 
   // Tela de carregamento
   if (loading) {
@@ -969,31 +991,36 @@ function HomePageContent() {
           </Card>
 
           {/* Seções Dinâmicas para Outras Categorias */}
-          {outrasCategoriasTypes.map((tipo) => {
-            const produtos = outrasCategoriasMap[tipo]
-            const sectionKey = tipo.toLowerCase()
-            const categoryName = tipo.charAt(0).toUpperCase() + tipo.slice(1)
-            
-            return (
-              <Card key={tipo} data-section={sectionKey}>
-                <CardContent className="p-4">
-                  <div
-                    className="flex items-center justify-between cursor-pointer"
-                    onClick={() => toggleSection(sectionKey)}
-                  >
-                    <h2 className="text-lg font-semibold">{categoryName}</h2>
-                    {expandedSections[sectionKey] ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-                  </div>
-
-                  {expandedSections[sectionKey] && (
-                    <div className="mt-4 space-y-3">
-                      {renderCategoryProducts(produtos, categoryName)}
+          {Object.values(produtosPorCategoria)
+            .filter(({ categoria }) => categoria.nome.toLowerCase() !== 'pizzas' && categoria.nome.toLowerCase() !== 'bebidas')
+            .map(({ categoria, produtos }) => {
+              const sectionKey = categoria.nome.toLowerCase().replace(/\s+/g, '-')
+              
+              return (
+                <Card key={categoria.id} data-section={sectionKey}>
+                  <CardContent className="p-4">
+                    <div
+                      className="flex items-center justify-between cursor-pointer"
+                      onClick={() => toggleSection(sectionKey)}
+                    >
+                      <h2 className="text-lg font-semibold">{categoria.nome}</h2>
+                      {expandedSections[sectionKey] ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            )
-          })}
+
+                    {expandedSections[sectionKey] && (
+                      <div className="mt-4 space-y-3">
+                        {categoria.descricao && (
+                          <div className="text-sm text-gray-600 mb-3">
+                            {categoria.descricao}
+                          </div>
+                        )}
+                        {renderCategoryProducts(produtos, categoria.nome)}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
 
           {/* Modals */}
