@@ -497,13 +497,13 @@ export default function AdminProdutosPage() {
                     placeholder="Buscar produtos..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 w-64 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
+                    className="pl-10 w-64 rounded-xl border-gray-300 focus:border-primary/80 focus:ring-primary/20 bg-white text-gray-800"
                   />
                 </div>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
                     <Button
-                      className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl shadow-sm hover:shadow-md transition-all"
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl shadow-sm hover:shadow-md transition-all border border-transparent"
                       onClick={() => {
                         setEditingProduto(null)
                         setIsDialogOpen(true)
@@ -599,7 +599,7 @@ export default function AdminProdutosPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 rounded-lg"
+                                className="h-8 w-8 p-0 hover:bg-gray-100 text-gray-700 hover:text-gray-900 rounded-lg border border-gray-200"
                                 onClick={() => {
                                   setEditingProduto(produto)
                                   setIsDialogOpen(true)
@@ -610,7 +610,7 @@ export default function AdminProdutosPage() {
                               <Button 
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
+                                className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg border border-gray-200"
                                 onClick={() => handleDelete(produto.id)}
                               >
                                 <Trash2 className="h-4 w-4" />
@@ -766,7 +766,7 @@ export default function AdminProdutosPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 rounded-lg"
+                                className="h-8 w-8 p-0 hover:bg-gray-100 text-gray-700 hover:text-gray-900 rounded-lg border border-gray-200"
                                 onClick={() => {
                                   setEditingProduto(produto)
                                   setIsDialogOpen(true)
@@ -777,7 +777,7 @@ export default function AdminProdutosPage() {
                               <Button 
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
+                                className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg border border-gray-200"
                                 onClick={() => handleDelete(produto.id)}
                               >
                                 <Trash2 className="h-4 w-4" />
@@ -919,7 +919,7 @@ export default function AdminProdutosPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 rounded-lg"
+                          className="h-8 w-8 p-0 hover:bg-gray-100 text-gray-700 hover:text-gray-900 rounded-lg border border-gray-200"
                           onClick={() => {
                             setEditingProduto(produto)
                             setIsDialogOpen(true)
@@ -930,7 +930,7 @@ export default function AdminProdutosPage() {
                         <Button 
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
+                          className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg border border-gray-200"
                           onClick={() => handleDelete(produto.id)}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -1062,7 +1062,7 @@ export default function AdminProdutosPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 rounded-lg"
+                          className="h-8 w-8 p-0 hover:bg-gray-100 text-gray-700 hover:text-gray-900 rounded-lg border border-gray-200"
                           onClick={() => {
                             setEditingProduto(produto)
                             setIsDialogOpen(true)
@@ -1073,7 +1073,7 @@ export default function AdminProdutosPage() {
                         <Button 
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
+                          className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg border border-gray-200"
                           onClick={() => handleDelete(produto.id)}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -1271,7 +1271,7 @@ export default function AdminProdutosPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 rounded-lg"
+                            className="h-8 w-8 p-0 hover:bg-gray-100 text-gray-700 hover:text-gray-900 rounded-lg border border-gray-200"
                             onClick={() => {
                               setEditingBorda(borda)
                               setIsBordaDialogOpen(true)
@@ -1282,7 +1282,7 @@ export default function AdminProdutosPage() {
                           <Button 
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
+                            className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg border border-gray-200"
                             onClick={() => handleDeleteBorda(borda.id)}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -1390,7 +1390,7 @@ export default function AdminProdutosPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0 hover:bg-blue-50 text-blue-600 rounded-lg"
+                              className="h-8 w-8 p-0 hover:bg-gray-100 text-gray-700 hover:text-gray-900 rounded-lg border border-gray-200"
                               onClick={() => {
                                 setEditingCategoria(categoria)
                                 setIsCategoriaDialogOpen(true)
@@ -1401,7 +1401,7 @@ export default function AdminProdutosPage() {
                             <Button 
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg"
+                              className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg border border-gray-200"
                               onClick={() => handleDeleteCategoria(categoria.id)}
                             >
                               <Trash2 className="h-4 w-4" />
@@ -1513,51 +1513,39 @@ function ProdutoForm({
   onSave: (produto: Partial<Produto>) => void
   onCancel: () => void
 }) {
-  const [formData, setFormData] = useState({
-    nome: produto?.nome || "",
-    descricao: produto?.descricao || "",
-    categoria_id: produto?.categoria_id || "",
-    tipo: produto?.tipo || "salgada",
-    preco_tradicional: produto?.preco_tradicional || null,
-    preco_broto: produto?.preco_broto || null,
-    preco_promocional_tradicional: produto?.preco_promocional_tradicional || null,
-    preco_promocional_broto: produto?.preco_promocional_broto || null,
-    ativo: produto?.ativo ?? true,
-    promocao: produto?.promocao ?? false,
-    ordem: produto?.ordem || proximaOrdem,
-    adicionais: produto?.adicionais || []
+  const [formData, setFormData] = useState<Partial<Produto>>({
+    ...produto,
+    // Garante que o array de adicionais não seja nulo
+    adicionais: produto.adicionais || [] 
+  } : {
+    nome: "",
+    categoria_id: null,
+    descricao: "",
+    preco_tradicional: null,
+    preco_broto: null,
+    preco_promocional_tradicional: null,
+    preco_promocional_broto: null,
+    tipo: "salgada", // valor padrão
+    ativo: true,
+    promocao: false,
+    ordem: proximaOrdem, // Usar a próxima ordem disponível
+    adicionais: []
   })
 
-  // Estados para os valores formatados dos preços
-  const [precoTradicionalFormatado, setPrecoTradicionalFormatado] = useState(
-    produto?.preco_tradicional ? formatCurrencyInput((produto.preco_tradicional * 100).toString()) : ""
-  )
-  const [precoBrotoFormatado, setPrecoBrotoFormatado] = useState(
-    produto?.preco_broto ? formatCurrencyInput((produto.preco_broto * 100).toString()) : ""
-  )
-  const [precoPromocionalTradicionalFormatado, setPrecoPromocionalTradicionalFormatado] = useState(
-    produto?.preco_promocional_tradicional ? formatCurrencyInput((produto.preco_promocional_tradicional * 100).toString()) : ""
-  )
-  const [precoPromocionalBrotoFormatado, setPrecoPromocionalBrotoFormatado] = useState(
-    produto?.preco_promocional_broto ? formatCurrencyInput((produto.preco_promocional_broto * 100).toString()) : ""
-  )
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
 
-  // Estado para controlar adicionais
-  const [adicionais, setAdicionais] = useState<Adicional[]>(produto?.adicionais || [])
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
   
-  // Estados para valores formatados dos adicionais
-  const [adicionaisFormatados, setAdicionaisFormatados] = useState<string[]>(
-    produto?.adicionais?.map(adicional => 
-      adicional.preco ? formatCurrencyInput((adicional.preco * 100).toString()) : ""
-    ) || []
-  )
-
-  // Atualizar ordem quando proximaOrdem mudar para novos produtos
-  useEffect(() => {
-    if (!produto) {
-      setFormData(prev => ({ ...prev, ordem: proximaOrdem }))
-    }
-  }, [proximaOrdem, produto])
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    const parsedValue = parseFloat(value)
+    setFormData(prev => ({ ...prev, [name]: parsedValue }))
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -1600,8 +1588,8 @@ function ProdutoForm({
     }
     
     // Validação dos adicionais (se houver, devem ter nome e preço válidos)
-    for (let i = 0; i < adicionais.length; i++) {
-      const adicional = adicionais[i]
+    for (let i = 0; i < formData.adicionais.length; i++) {
+      const adicional = formData.adicionais[i]
       if (!adicional.nome.trim()) {
         alert(`Nome do adicional ${i + 1} é obrigatório`)
         return
@@ -1615,346 +1603,194 @@ function ProdutoForm({
     // Preparar dados para envio
     const dadosParaEnvio = { 
       ...formData, 
-      adicionais,
+      adicionais: formData.adicionais,
       // Se broto não está habilitado, garantir que preco_broto seja null
       preco_broto: brotoHabilitado ? formData.preco_broto : null
     }
     
+    // Remove o campo temporário antes de salvar
+    delete dadosParaEnvio.numeroSequencial
     onSave(dadosParaEnvio)
   }
 
   const adicionarAdicional = () => {
-    setAdicionais([...adicionais, { nome: "", preco: 0 }])
-    setAdicionaisFormatados([...adicionaisFormatados, ""])
+    setFormData(prev => ({ ...prev, adicionais: [...prev.adicionais, { nome: "", preco: 0 }] }))
   }
 
   const removerAdicional = (index: number) => {
-    setAdicionais(adicionais.filter((_, i) => i !== index))
-    setAdicionaisFormatados(adicionaisFormatados.filter((_, i) => i !== index))
+    setFormData(prev => ({ ...prev, adicionais: prev.adicionais.filter((_, i) => i !== index) }))
   }
 
   const atualizarAdicional = (index: number, campo: keyof Adicional, valor: string | number) => {
-    const novosAdicionais = [...adicionais]
-    if (campo === 'preco') {
-      const precoNumerico = typeof valor === 'string' ? parseFloat(valor) : valor
-      novosAdicionais[index][campo] = isNaN(precoNumerico) ? 0 : precoNumerico
-    } else {
-      novosAdicionais[index][campo] = valor as string
-    }
-    setAdicionais(novosAdicionais)
+    const novosAdicionais = [...formData.adicionais]
+    novosAdicionais[index] = { ...novosAdicionais[index], [campo]: valor }
+    setFormData(prev => ({ ...prev, adicionais: novosAdicionais }))
   }
 
   const atualizarPrecoAdicional = (index: number, valorFormatado: string) => {
-    const novosFormatados = [...adicionaisFormatados]
+    const novosFormatados = [...formData.adicionais.map(adicional => 
+      adicional.preco ? formatCurrencyInput((adicional.preco * 100).toString()) : ""
+    )]
     novosFormatados[index] = valorFormatado
-    setAdicionaisFormatados(novosFormatados)
+    setFormData(prev => ({ ...prev, adicionais: formData.adicionais.map((adicional, i) => ({ ...adicional, preco: parseFloat(novosFormatados[i]) })) }))
     
     const valorNumerico = parseCurrencyInput(valorFormatado)
     atualizarAdicional(index, 'preco', valorNumerico > 0 ? valorNumerico : 0)
   }
 
   return (
-    <div className="bg-background rounded-xl shadow-md">
-      <form onSubmit={handleSubmit} className="p-6 space-y-6">
-        <div className="bg-card rounded-xl p-4 shadow-sm">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="nome" className="text-sm font-medium text-foreground">Nome *</Label>
-              <Input
-                id="nome"
-                value={formData.nome}
-                onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                required
-                className="bg-muted border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
-                placeholder="Digite o nome do produto"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="categoria" className="text-sm font-medium text-foreground">Categoria *</Label>
-              <Select
-                value={formData.categoria_id}
-                onValueChange={(value) => setFormData({ ...formData, categoria_id: value })}
-                required
-              >
-                <SelectTrigger className="bg-muted border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors">
-                  <SelectValue placeholder="Selecione uma categoria" />
-                </SelectTrigger>
-                <SelectContent className="bg-background border border-input rounded-xl shadow-md">
-                  {categorias.map((categoria) => (
-                    <SelectItem key={categoria.id} value={categoria.id} className="focus:bg-muted">
-                      {categoria.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <Label htmlFor="nome" className="text-sm font-medium text-gray-700">Nome do Produto</Label>
+          <Input
+            id="nome"
+            name="nome"
+            value={formData.nome}
+            onChange={handleChange}
+            className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80"
+            placeholder="Ex: Pizza de Calabresa"
+            required
+          />
         </div>
+        <div className="space-y-2">
+          <Label htmlFor="categoria_id" className="text-sm font-medium text-gray-700">Categoria</Label>
+          <Select name="categoria_id" value={formData.categoria_id || ""} onValueChange={(value) => handleSelectChange('categoria_id', value)}>
+            <SelectTrigger className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80">
+              <SelectValue placeholder="Selecione a categoria" />
+            </SelectTrigger>
+            <SelectContent>
+              {categorias.map((c) => (
+                <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="descricao" className="text-sm font-medium text-gray-700">Descrição</Label>
+        <Textarea
+          id="descricao"
+          name="descricao"
+          value={formData.descricao || ""}
+          onChange={handleChange}
+          className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80 min-h-[80px]"
+          placeholder="Ingredientes e detalhes do produto"
+        />
+      </div>
 
-        <div className="bg-card rounded-xl p-4 shadow-sm space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="descricao" className="text-sm font-medium text-foreground">Descrição</Label>
-            <Textarea
-              id="descricao"
-              value={formData.descricao}
-              onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-              className="bg-muted border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
-              placeholder="Descreva o produto (opcional)"
-              rows={3}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="space-y-2">
+          <Label htmlFor="preco_tradicional" className="text-sm font-medium text-gray-700">Preço Tradicional</Label>
+          <Input
+            id="preco_tradicional"
+            name="preco_tradicional"
+            value={formatCurrencyInput(String(formData.preco_tradicional || ''))}
+            onChange={handlePriceChange}
+            className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80"
+            placeholder="R$ 0,00"
+          />
+        </div>
+        
+        {brotoHabilitado && (
+           <div className="space-y-2">
+            <Label htmlFor="preco_broto" className="text-sm font-medium text-gray-700">Preço Broto</Label>
+            <Input
+              id="preco_broto"
+              name="preco_broto"
+              value={formatCurrencyInput(String(formData.preco_broto || ''))}
+              onChange={handlePriceChange}
+              className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80"
+              placeholder="R$ 0,00"
             />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="tipo" className="text-sm font-medium text-foreground">Tipo</Label>
-              <Select value={formData.tipo} onValueChange={(value) => setFormData({ ...formData, tipo: value })}>
-                <SelectTrigger className="bg-muted border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-background border border-input rounded-xl shadow-md">
-                  <SelectItem value="salgada" className="focus:bg-muted">Salgada</SelectItem>
-                  <SelectItem value="doce" className="focus:bg-muted">Doce</SelectItem>
-                  <SelectItem value="bebida" className="focus:bg-muted">Bebida</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="preco_tradicional" className="text-sm font-medium text-foreground">
-                Preço Tradicional *
-                {formData.promocao && <span className="text-xs text-muted-foreground ml-2">(desabilitado - produto em promoção)</span>}
-              </Label>
-              <Input
-                id="preco_tradicional"
-                type="text"
-                value={precoTradicionalFormatado}
-                onChange={(e) => {
-                  const valorFormatado = formatCurrencyInput(e.target.value)
-                  setPrecoTradicionalFormatado(valorFormatado)
-                  const valorNumerico = parseCurrencyInput(valorFormatado)
-                  setFormData({ ...formData, preco_tradicional: valorNumerico > 0 ? valorNumerico : null })
-                }}
-                placeholder="R$ 0,00"
-                required
-                disabled={formData.promocao}
-                className={`rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors ${
-                  formData.promocao 
-                    ? 'bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed' 
-                    : 'bg-muted border border-input'
-                }`}
-              />
-            </div>
-            {brotoHabilitado && (
-              <div className="space-y-2">
-                <Label htmlFor="preco_broto" className="text-sm font-medium text-foreground">
-                  Preço Broto *
-                  {formData.promocao && <span className="text-xs text-muted-foreground ml-2">(desabilitado - produto em promoção)</span>}
-                </Label>
-                <Input
-                  id="preco_broto"
-                  type="text"
-                  value={precoBrotoFormatado}
-                  onChange={(e) => {
-                    const valorFormatado = formatCurrencyInput(e.target.value)
-                    setPrecoBrotoFormatado(valorFormatado)
-                    const valorNumerico = parseCurrencyInput(valorFormatado)
-                    setFormData({ ...formData, preco_broto: valorNumerico > 0 ? valorNumerico : null })
-                  }}
-                  placeholder="R$ 0,00"
-                  required
-                  disabled={formData.promocao}
-                  className={`rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors ${
-                    formData.promocao 
-                      ? 'bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed' 
-                      : 'bg-muted border border-input'
-                  }`}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Toggle Produto Disponível */}
-        <div className="bg-card rounded-xl p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-foreground">
-                {formData.ativo ? "Produto disponível" : "Produto indisponível"}
-              </span>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formData.ativo}
-                onChange={(e) => setFormData({ ...formData, ativo: e.target.checked })}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ring/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-input after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-            </label>
-          </div>
-        </div>
-
-        {/* Toggle Promoção */}
-        <div className="bg-card rounded-xl p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-foreground">
-                {formData.promocao ? "Produto em promoção" : "Produto sem promoção"}
-              </span>
-              {formData.promocao && (
-                <span className="text-xs text-muted-foreground">(válido apenas para retirada)</span>
-              )}
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formData.promocao}
-                onChange={(e) => setFormData({ ...formData, promocao: e.target.checked })}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ring/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-input after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-            </label>
-          </div>
-        </div>
-
-        {/* Preços Promocionais - Mostrar apenas quando promoção está ativada */}
-        {formData.promocao && (
-          <div className="bg-card rounded-xl p-4 shadow-sm space-y-4">
-            <div className="flex items-center gap-2 mb-4">
-              <Label className="text-sm font-medium text-foreground">Preços Promocionais</Label>
-              <span className="text-xs text-muted-foreground">(válidos apenas para retirada no balcão)</span>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="preco_promocional_tradicional" className="text-sm font-medium text-foreground">Preço da Pizza em Promoção (Tradicional) *</Label>
-                <Input
-                  id="preco_promocional_tradicional"
-                  type="text"
-                  value={precoPromocionalTradicionalFormatado}
-                  onChange={(e) => {
-                    const valorFormatado = formatCurrencyInput(e.target.value)
-                    setPrecoPromocionalTradicionalFormatado(valorFormatado)
-                    const valorNumerico = parseCurrencyInput(valorFormatado)
-                    setFormData({ ...formData, preco_promocional_tradicional: valorNumerico > 0 ? valorNumerico : null })
-                  }}
-                  placeholder="R$ 0,00"
-                  required
-                  className="bg-muted border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
-                />
-              </div>
-              
-              {brotoHabilitado && (
-                <div className="space-y-2">
-                  <Label htmlFor="preco_promocional_broto" className="text-sm font-medium text-foreground">Preço da Pizza em Promoção (Broto) *</Label>
-                  <Input
-                    id="preco_promocional_broto"
-                    type="text"
-                    value={precoPromocionalBrotoFormatado}
-                    onChange={(e) => {
-                      const valorFormatado = formatCurrencyInput(e.target.value)
-                      setPrecoPromocionalBrotoFormatado(valorFormatado)
-                      const valorNumerico = parseCurrencyInput(valorFormatado)
-                      setFormData({ ...formData, preco_promocional_broto: valorNumerico > 0 ? valorNumerico : null })
-                    }}
-                    placeholder="R$ 0,00"
-                    required
-                    className="bg-muted border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
-                  />
-                </div>
-              )}
-            </div>
           </div>
         )}
 
-        {/* Seção de Adicionais */}
-        <div className="bg-card rounded-xl p-4 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium text-foreground">Adicionais (Opcional)</Label>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={adicionarAdicional}
-              className="border border-input hover:bg-muted rounded-xl transition-colors"
-            >
-              <Plus className="h-4 w-4 mr-1" />
-              Adicionar Adicional
-            </Button>
-          </div>
-          
-          {adicionais.length > 0 && (
-            <div className="space-y-3">
-              {adicionais.map((adicional, index) => (
-                <div key={index} className="flex items-center gap-3 p-3 bg-muted rounded-xl border border-input">
-                  <div className="flex-1">
-                    <Input
-                      placeholder="Ex: Queijo Extra, Azeitona"
-                      value={adicional.nome}
-                      onChange={(e) => atualizarAdicional(index, 'nome', e.target.value)}
-                      className="bg-background border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
-                    />
-                  </div>
-                  <div className="w-32">
-                    <Input
-                      type="text"
-                      placeholder="R$ 0,00"
-                      value={adicionaisFormatados[index] || ""}
-                      onChange={(e) => {
-                        const valorFormatado = formatCurrencyInput(e.target.value)
-                        atualizarPrecoAdicional(index, valorFormatado)
-                      }}
-                      className="bg-background border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removerAdicional(index)}
-                    className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg border border-input"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
+        <div className="space-y-2">
+          <Label htmlFor="preco_promocional_tradicional" className="text-sm font-medium text-gray-700">Preço Promocional</Label>
+          <Input
+            id="preco_promocional_tradicional"
+            name="preco_promocional_tradicional"
+            value={formatCurrencyInput(String(formData.preco_promocional_tradicional || ''))}
+            onChange={handlePriceChange}
+            className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80"
+            placeholder="R$ 0,00"
+          />
         </div>
 
-        {/* Campo Ordem */}
-        <div className="bg-card rounded-xl p-4 shadow-sm">
-          <div className="flex items-center justify-end gap-4">
-            <Label htmlFor="ordem" className="text-sm font-medium text-muted-foreground">Ordem de exibição</Label>
+        {brotoHabilitado && (
+          <div className="space-y-2">
+            <Label htmlFor="preco_promocional_broto" className="text-sm font-medium text-gray-700">Preço Promo Broto</Label>
             <Input
-              id="ordem"
-              type="number"
-              value={formData.ordem}
-              onChange={(e) => setFormData({ ...formData, ordem: Number.parseInt(e.target.value) || 0 })}
-              className="w-20 bg-muted border border-input rounded-xl focus:ring-2 focus:ring-ring focus:border-ring transition-colors"
-              placeholder="0"
+              id="preco_promocional_broto"
+              name="preco_promocional_broto"
+              value={formatCurrencyInput(String(formData.preco_promocional_broto || ''))}
+              onChange={handlePriceChange}
+              className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80"
+              placeholder="R$ 0,00"
             />
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* Botões de Ação */}
-        <div className="flex justify-end space-x-3 pt-6 border-t border-border">
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={onCancel}
-            className="px-6 py-2 rounded-xl border border-input hover:bg-muted transition-colors"
-          >
-            Cancelar
-          </Button>
-          <Button 
-            type="submit"
-            className="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl shadow-md transition-colors"
-          >
-            Salvar
-          </Button>
-        </div>
-      </form>
-    </div>
+      {/* Adicionais */}
+      <div className="space-y-4">
+        <h4 className="text-md font-medium text-gray-800 border-b pb-2">Adicionais</h4>
+        {formData.adicionais?.map((adicional, index) => (
+          <div key={index} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg border">
+            <div className="flex-1 space-y-2">
+              <Label htmlFor={`adicional-nome-${index}`} className="text-xs font-medium text-gray-600">Nome do Adicional</Label>
+              <Input
+                id={`adicional-nome-${index}`}
+                value={adicional.nome}
+                onChange={(e) => atualizarAdicional(index, 'nome', e.target.value)}
+                placeholder="Ex: Borda de Catupiry"
+                className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80"
+              />
+            </div>
+            <div className="w-40 space-y-2">
+              <Label htmlFor={`adicional-preco-${index}`} className="text-xs font-medium text-gray-600">Preço do Adicional</Label>
+              <Input
+                id={`adicional-preco-${index}`}
+                value={formatCurrencyInput(String(adicional.preco || ''))}
+                onChange={(e) => atualizarPrecoAdicional(index, e.target.value)}
+                placeholder="R$ 0,00"
+                className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80"
+              />
+            </div>
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              onClick={() => removerAdicional(index)}
+              className="self-end !px-3 !py-2 border border-red-300 bg-red-50 text-red-600 hover:bg-red-100"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        ))}
+        <Button
+          type="button"
+          onClick={adicionarAdicional}
+          variant="outline"
+          className="w-full border-dashed border-gray-400 text-gray-600 hover:bg-gray-50 hover:text-gray-800"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Adicionar Opcional
+        </Button>
+      </div>
+
+
+      <div className="flex justify-end gap-4 pt-4 border-t">
+        <Button type="button" onClick={onCancel} variant="outline" className="text-gray-700 bg-white border border-gray-300 hover:bg-gray-100">
+          Cancelar
+        </Button>
+        <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90">
+          Salvar Produto
+        </Button>
+      </div>
+    </form>
   )
 }
 
@@ -1967,7 +1803,7 @@ function CategoriaForm({
   onSave: (categoria: Partial<Categoria>) => void
   onCancel: () => void
 }) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Partial<Categoria>>({
     nome: categoria?.nome || "",
     descricao: categoria?.descricao || "",
     ordem: categoria?.ordem || 0,
@@ -1984,45 +1820,49 @@ function CategoriaForm({
     onSave(formData)
   }
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
-        <Label htmlFor="nome" className="text-sm font-medium text-foreground">Nome da Categoria *</Label>
+      <div className="space-y-2">
+        <Label htmlFor="nome-categoria" className="text-sm font-medium text-gray-700">Nome da Categoria</Label>
         <Input
-          id="nome"
-          value={formData.nome}
-          onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-          placeholder="Digite o nome da categoria"
+          id="nome-categoria"
+          name="nome"
+          value={formData.nome || ""}
+          onChange={handleChange}
+          className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80"
+          placeholder="Ex: Pizzas Salgadas"
           required
-          className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
         />
       </div>
-
-      <div>
-        <Label htmlFor="descricao" className="text-sm font-medium text-foreground">Descrição</Label>
+      <div className="space-y-2">
+        <Label htmlFor="descricao-categoria" className="text-sm font-medium text-gray-700">Descrição</Label>
         <Textarea
-          id="descricao"
-          value={formData.descricao}
-          onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-          placeholder="Digite uma descrição opcional"
-          rows={3}
-          className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
+          id="descricao-categoria"
+          name="descricao"
+          value={formData.descricao || ""}
+          onChange={handleChange}
+          className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80 min-h-[80px]"
+          placeholder="Uma breve descrição da categoria"
         />
       </div>
-
-      <div>
-        <Label htmlFor="ordem" className="text-sm font-medium text-foreground">Ordem</Label>
+      <div className="space-y-2">
+        <Label htmlFor="ordem-categoria" className="text-sm font-medium text-gray-700">Ordem de Exibição</Label>
         <Input
-          id="ordem"
+          id="ordem-categoria"
+          name="ordem"
           type="number"
-          value={formData.ordem}
-          onChange={(e) => setFormData({ ...formData, ordem: Number.parseInt(e.target.value) || 0 })}
-          placeholder="0"
-          className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
+          value={formData.ordem || ""}
+          onChange={handleChange}
+          className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80"
+          placeholder="Ex: 1"
         />
       </div>
-
-      <div className="space-y-4">
+      <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <input
             type="checkbox"
@@ -2051,20 +1891,12 @@ function CategoriaForm({
         </p>
       </div>
 
-      <div className="flex justify-end space-x-3 pt-6 border-t border-muted/30">
-        <Button 
-          type="button" 
-          variant="outline" 
-          onClick={onCancel}
-          className="px-6 py-2 rounded-xl border-muted/40 hover:bg-muted/10"
-        >
+      <div className="flex justify-end gap-4 pt-4 border-t">
+        <Button type="button" onClick={onCancel} variant="outline" className="text-gray-700 bg-white border border-gray-300 hover:bg-gray-100">
           Cancelar
         </Button>
-        <Button 
-          type="submit"
-          className="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl"
-        >
-          {categoria ? "Atualizar" : "Criar"} Categoria
+        <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90">
+          Salvar Categoria
         </Button>
       </div>
     </form>
@@ -2080,7 +1912,7 @@ function BordaForm({
   onSave: (borda: Partial<BordaRecheada>) => void
   onCancel: () => void
 }) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Partial<BordaRecheada>>({
     nome: borda?.nome || "",
     preco: borda?.preco || 0,
     ordem: borda?.ordem || 0,
@@ -2105,77 +1937,70 @@ function BordaForm({
     onSave(formData)
   }
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    const parsedValue = parseFloat(value)
+    setFormData(prev => ({ ...prev, [name]: parsedValue }))
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
-        <Label htmlFor="nome" className="text-sm font-medium text-foreground">Nome da Borda *</Label>
-        <Input
-          id="nome"
-          value={formData.nome}
-          onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-          placeholder="Ex: Catupiry, Cheddar, Cream Cheese"
-          required
-          className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="preco" className="text-sm font-medium text-foreground">Preço Adicional *</Label>
-        <Input
-          id="preco"
-          type="text"
-          value={precoFormatado}
-          onChange={(e) => {
-            const valorFormatado = formatCurrencyInput(e.target.value)
-            setPrecoFormatado(valorFormatado)
-            const valorNumerico = parseCurrencyInput(valorFormatado)
-            setFormData({ ...formData, preco: valorNumerico })
-          }}
-          placeholder="R$ 0,00"
-          required
-          className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="ordem" className="text-sm font-medium text-foreground">Ordem</Label>
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <Label htmlFor="nome-borda" className="text-sm font-medium text-gray-700">Nome da Borda</Label>
           <Input
-            id="ordem"
-            type="number"
-            value={formData.ordem}
-            onChange={(e) => setFormData({ ...formData, ordem: Number.parseInt(e.target.value) || 0 })}
-            placeholder="0"
-            className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
+            id="nome-borda"
+            name="nome"
+            value={formData.nome || ""}
+            onChange={handleChange}
+            className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80"
+            placeholder="Ex: Catupiry"
+            required
           />
         </div>
-        <div className="flex items-end">
-          <label className="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              checked={formData.ativo}
-              onChange={(e) => setFormData({ ...formData, ativo: e.target.checked })}
-              className="w-4 h-4 text-primary border-muted rounded focus:ring-primary/20"
-            />
-            <span className="text-sm font-medium text-foreground">Borda disponível</span>
-          </label>
+        <div className="space-y-2">
+          <Label htmlFor="preco-borda" className="text-sm font-medium text-gray-700">Preço</Label>
+          <Input
+            id="preco-borda"
+            name="preco"
+            value={formatCurrencyInput(String(formData.preco || ''))}
+            onChange={handleChange}
+            className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80"
+            placeholder="R$ 0,00"
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <Label htmlFor="ordem-borda" className="text-sm font-medium text-gray-700">Ordem</Label>
+          <Input
+            id="ordem-borda"
+            name="ordem"
+            type="number"
+            value={formData.ordem || ""}
+            onChange={handleChange}
+            className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80"
+            placeholder="1"
+          />
+        </div>
+        <div className="flex items-center gap-2 pt-6">
+          <input
+            type="checkbox"
+            id="ativo-borda"
+            checked={formData.ativo}
+            onChange={(e) => setFormData({ ...formData, ativo: e.target.checked })}
+            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+          />
+          <Label htmlFor="ativo-borda" className="text-sm font-medium text-gray-700">Borda Ativa</Label>
         </div>
       </div>
 
-      <div className="flex justify-end space-x-3 pt-6 border-t border-muted/30">
-        <Button 
-          type="button" 
-          variant="outline" 
-          onClick={onCancel}
-          className="px-6 py-2 rounded-xl border-muted/40 hover:bg-muted/10"
-        >
+      <div className="flex justify-end gap-4 pt-4 border-t">
+        <Button type="button" onClick={onCancel} variant="outline" className="text-gray-700 bg-white border border-gray-300 hover:bg-gray-100">
           Cancelar
         </Button>
-        <Button 
-          type="submit"
-          className="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl"
-        >
-          {borda ? "Atualizar" : "Criar"} Borda
+        <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90">
+          Salvar Borda
         </Button>
       </div>
     </form>
