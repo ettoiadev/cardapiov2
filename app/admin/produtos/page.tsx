@@ -391,9 +391,40 @@ export default function AdminProdutosPage() {
       bebidasCategoria?.id
     ].filter(Boolean))
 
-    // Outras categorias (exceto Pizzas Tradicionais e Bebidas)
-    const outrasCategoriasData = Object.values(produtosPorCategoria)
+    // Outras categorias (exceto Pizzas Tradicionais e Bebidas) com ordenação específica
+    const outrasCategoriasDataUnsorted = Object.values(produtosPorCategoria)
       .filter(({ categoria }) => !categoriasEspeciais.has(categoria.id))
+
+    // Definir ordem específica das categorias
+    const ordemCategorias = [
+      'pizzas promocionais',
+      'mega promoção',
+      'maga promoção', // Incluir variação com erro de digitação
+      'pizzas veganas',
+      'pizzas doces',
+      'bordas recheadas'
+    ]
+
+    // Ordenar as categorias conforme a ordem especificada
+    const outrasCategoriasData = outrasCategoriasDataUnsorted.sort((a, b) => {
+      const nomeA = a.categoria.nome.toLowerCase()
+      const nomeB = b.categoria.nome.toLowerCase()
+      
+      const indexA = ordemCategorias.findIndex(ordem => nomeA.includes(ordem))
+      const indexB = ordemCategorias.findIndex(ordem => nomeB.includes(ordem))
+      
+      // Se ambas estão na lista de ordem, ordenar por índice
+      if (indexA !== -1 && indexB !== -1) {
+        return indexA - indexB
+      }
+      
+      // Se apenas uma está na lista, ela vem primeiro
+      if (indexA !== -1) return -1
+      if (indexB !== -1) return 1
+      
+      // Se nenhuma está na lista, manter ordem alfabética
+      return nomeA.localeCompare(nomeB)
+    })
 
     // Para compatibilidade, flatten dos produtos de outras categorias
     const outros = outrasCategoriasData.flatMap(({ produtos }) => produtos)
