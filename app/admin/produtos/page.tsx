@@ -415,7 +415,7 @@ export default function AdminProdutosPage() {
       case 'bebida':
         return <Coffee className="h-5 w-5 text-blue-500" />
       default:
-        return <Package className="h-5 w-5 text-gray-500" />
+        return <Package className="h-5 w-5 text-muted-foreground" />
     }
   }
 
@@ -423,16 +423,16 @@ export default function AdminProdutosPage() {
     <AdminLayout>
       <div className="container mx-auto p-6 space-y-6">
         {/* 1. Header Section - Gerenciamento de Produtos */}
-        <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+        <div className="bg-card rounded-2xl p-8 border border-border shadow-sm">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                <div className="p-2 bg-blue-100 rounded-xl">
-                  <Package className="h-8 w-8 text-blue-600" />
+              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+                <div className="p-2 bg-secondary rounded-xl">
+                  <Package className="h-8 w-8 text-primary" />
                 </div>
                 Gerenciamento de Produtos
               </h1>
-              <p className="text-gray-600 max-w-2xl text-lg">
+              <p className="text-muted-foreground max-w-2xl text-lg">
                 Gerencie produtos, categorias e configurações do seu cardápio digital.
               </p>
             </div>
@@ -440,18 +440,18 @@ export default function AdminProdutosPage() {
         </div>
 
         {/* 2. Lista de Produtos (exceto bebidas) */}
-        <Card className="border-gray-200 shadow-sm rounded-2xl overflow-hidden">
-          <CardHeader className="bg-white border-b border-gray-200 p-6">
+        <Card className="border-border shadow-sm rounded-2xl overflow-hidden">
+          <CardHeader className="bg-card border-b border-border p-6">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 rounded-xl">
-                  <Package className="h-5 w-5 text-blue-600" />
+                <div className="p-2 bg-secondary rounded-xl">
+                  <Package className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl font-semibold text-gray-900">
+                  <CardTitle className="text-xl font-semibold text-foreground">
                     Lista de Produtos
                   </CardTitle>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     {filteredProdutos.filter(p => p.tipo !== 'bebida').length} produto{filteredProdutos.filter(p => p.tipo !== 'bebida').length !== 1 ? 's' : ''} encontrado{filteredProdutos.filter(p => p.tipo !== 'bebida').length !== 1 ? 's' : ''}
                   </p>
                 </div>

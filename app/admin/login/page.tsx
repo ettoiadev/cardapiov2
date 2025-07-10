@@ -102,36 +102,39 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-card shadow-xl border-border rounded-2xl">
         <CardHeader>
-          <CardTitle className="text-center">Painel Administrativo</CardTitle>
+          <CardTitle className="text-center text-2xl font-bold text-foreground">
+            Painel Administrativo
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="email">Email</Label>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-muted-foreground">Email</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="Email do administrador"
+                placeholder="seu@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="rounded-xl"
+                className="rounded-lg py-6"
                 required
-                disabled={!isConfigured}
+                disabled={!isConfigured || loading}
               />
             </div>
-            <div>
-              <Label htmlFor="senha">Senha</Label>
+            <div className="space-y-2">
+              <Label htmlFor="senha" className="text-muted-foreground">Senha</Label>
               <Input
                 id="senha"
                 type="password"
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
-                placeholder="Digite sua senha"
+                placeholder="Sua senha"
+                className="rounded-lg py-6"
                 required
-                disabled={!isConfigured}
+                disabled={!isConfigured || loading}
               />
             </div>
             
@@ -139,15 +142,15 @@ export default function AdminLoginPage() {
             {connectionStatus && (
               <div className={`p-3 rounded-lg text-sm ${
                 connectionStatus.startsWith('✅') 
-                  ? 'bg-green-50 text-green-700 border border-green-200' 
-                  : 'bg-red-50 text-red-700 border border-red-200'
+                  ? 'bg-primary/10 text-primary border border-primary/20' 
+                  : 'bg-destructive/10 text-destructive border border-destructive/20'
               }`}>
                 {connectionStatus}
               </div>
             )}
 
             {error && (
-              <div className="flex items-center space-x-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg">
+              <div className="flex items-center space-x-2 text-destructive text-sm bg-destructive/10 p-3 rounded-lg border border-destructive/20">
                 <AlertCircle className="h-4 w-4 flex-shrink-0" />
                 <span className="flex-1">{error}</span>
                 {!isConfigured && (
@@ -156,7 +159,7 @@ export default function AdminLoginPage() {
                     variant="ghost"
                     size="sm"
                     onClick={handleRetry}
-                    className="text-red-600 hover:text-red-700 p-1"
+                    className="text-destructive hover:bg-destructive/20 p-1 h-auto"
                   >
                     <RefreshCw className="h-3 w-3" />
                   </Button>
@@ -164,20 +167,25 @@ export default function AdminLoginPage() {
               </div>
             )}
 
-            <div className="space-y-2">
+            <div className="space-y-3 pt-4">
               <Button 
                 type="submit" 
-                className="w-full" 
+                className="w-full py-6 text-base font-semibold" 
                 disabled={loading || !isConfigured}
               >
-                {loading ? "Entrando..." : "Entrar"}
+                {loading ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Entrando...
+                  </>
+                ) : "Entrar"}
               </Button>
 
               {/* Botão de teste de conectividade */}
               <Button
                 type="button"
                 variant="outline"
-                className="w-full"
+                className="w-full py-6 text-base"
                 onClick={handleTestConnection}
                 disabled={testingConnection}
               >
@@ -198,20 +206,24 @@ export default function AdminLoginPage() {
                 )}
               </Button>
             </div>
-          </form>
-          
-          <div className="text-center mt-4">
-            <p className="text-sm text-gray-600 mb-2">
-              Acesse com suas credenciais de administrador
-            </p>
-            {!isConfigured && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-4">
-                <p className="text-xs text-yellow-800">
-                  <strong>Para desenvolvedores:</strong> Configure as variáveis de ambiente NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY
-                </p>
+
+            {/* Informações adicionais */}
+            <div className="text-center space-y-2 pt-4 border-t border-border">
+              <p className="text-xs text-muted-foreground">
+                Sistema de gerenciamento de cardápio digital
+              </p>
+              <div className="flex justify-center items-center gap-2 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  {isConfigured ? (
+                    <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  ) : (
+                    <div className="w-2 h-2 bg-destructive rounded-full"></div>
+                  )}
+                  {isConfigured ? "Sistema configurado" : "Sistema não configurado"}
+                </span>
               </div>
-            )}
-          </div>
+            </div>
+          </form>
         </CardContent>
       </Card>
     </div>

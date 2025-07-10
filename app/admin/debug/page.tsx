@@ -69,7 +69,7 @@ export default function DebugPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-background p-8">
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle>🧪 Debug - Consultas Admin</CardTitle>
@@ -116,7 +116,7 @@ export default function DebugPage() {
                       <div className="flex justify-between items-center">
                         <span className="font-medium">{result.test}</span>
                         <div className="flex gap-2 text-sm">
-                          <span className="text-gray-500">{result.timestamp}</span>
+                          <span className="text-muted-foreground">{result.timestamp}</span>
                           <span className={result.success ? "text-green-600" : "text-red-600"}>
                             {result.success ? "✅ Sucesso" : "❌ Erro"}
                           </span>

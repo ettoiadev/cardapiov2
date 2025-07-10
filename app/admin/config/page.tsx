@@ -890,13 +890,13 @@ export default function AdminConfigPage() {
     <AdminLayout>
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header Section */}
-        <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-2xl p-5 border border-gray-100 shadow-sm">
+        <div className="bg-secondary rounded-2xl p-5 border border-border shadow-sm">
           <div className="space-y-2">
-            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <Settings className="h-7 w-7 lg:h-8 lg:w-8 text-gray-600" />
+            <h1 className="text-2xl lg:text-3xl font-bold text-foreground flex items-center gap-3">
+              <Settings className="h-7 w-7 lg:h-8 lg:w-8 text-primary" />
               Configurações da Pizzaria
             </h1>
-            <p className="text-sm text-gray-500 max-w-2xl">
+            <p className="text-sm text-muted-foreground max-w-2xl">
               Configure todas as informações da sua pizzaria, horários de funcionamento, entrega e formas de pagamento.
             </p>
           </div>

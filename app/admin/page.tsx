@@ -49,20 +49,20 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout>
-      <div className="max-w-7xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto space-y-8 p-4 md:p-8">
         {/* Header Section */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100 shadow-sm">
+        <div className="bg-secondary rounded-2xl p-8 border border-border shadow-sm">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                <BarChart3 className="h-8 w-8 text-blue-600" />
+              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+                <BarChart3 className="h-8 w-8 text-primary" />
                 Dashboard
               </h1>
-              <p className="text-gray-600 max-w-2xl">
-                Visão geral do seu negócio com estatísticas e métricas importantes para acompanhar o desempenho.
+              <p className="text-muted-foreground max-w-2xl">
+                Visão geral do seu negócio com estatísticas e métricas importantes.
               </p>
             </div>
-            <div className="flex items-center gap-2 text-sm text-blue-600 bg-blue-100 px-4 py-2 rounded-lg">
+            <div className="flex items-center gap-2 text-sm text-primary-foreground bg-primary px-4 py-2 rounded-lg">
               <Activity className="h-4 w-4" />
               Sistema Operacional
             </div>
@@ -71,31 +71,31 @@ export default function AdminDashboard() {
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="shadow-lg border-0 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl overflow-hidden hover:shadow-xl transition-shadow">
+          <Card className="shadow-lg border-0 bg-card rounded-2xl overflow-hidden hover:shadow-xl transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-orange-600">Total de Produtos</p>
-                  <p className="text-3xl font-bold text-gray-900">{stats.totalProdutos}</p>
-                  <p className="text-xs text-orange-500">produtos ativos</p>
+                  <p className="text-sm font-medium text-primary">Total de Produtos</p>
+                  <p className="text-3xl font-bold text-foreground">{stats.totalProdutos}</p>
+                  <p className="text-xs text-muted-foreground">produtos ativos</p>
                 </div>
-                <div className="p-3 bg-orange-200 rounded-xl">
-                  <Package className="h-8 w-8 text-orange-600" />
+                <div className="p-3 bg-secondary rounded-xl">
+                  <Package className="h-8 w-8 text-primary" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg border-0 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl overflow-hidden hover:shadow-xl transition-shadow">
+          <Card className="shadow-lg border-0 bg-card rounded-2xl overflow-hidden hover:shadow-xl transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-green-600">Categorias Ativas</p>
-                  <p className="text-3xl font-bold text-gray-900">{stats.totalCategorias}</p>
-                  <p className="text-xs text-green-500">categorias do cardápio</p>
+                  <p className="text-sm font-medium text-primary">Categorias Ativas</p>
+                  <p className="text-3xl font-bold text-foreground">{stats.totalCategorias}</p>
+                  <p className="text-xs text-muted-foreground">categorias do cardápio</p>
                 </div>
-                <div className="p-3 bg-green-200 rounded-xl">
-                  <ChefHat className="h-8 w-8 text-green-600" />
+                <div className="p-3 bg-secondary rounded-xl">
+                  <ChefHat className="h-8 w-8 text-primary" />
                 </div>
               </div>
             </CardContent>
@@ -104,17 +104,17 @@ export default function AdminDashboard() {
 
         {/* Detailed Information Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-100 p-6">
+          <Card className="shadow-lg border-0 bg-card rounded-2xl overflow-hidden">
+            <CardHeader className="bg-secondary border-b border-border p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-gray-200 rounded-lg">
-                  <BarChart3 className="h-6 w-6 text-gray-600" />
+                <div className="p-2 bg-muted rounded-lg">
+                  <BarChart3 className="h-6 w-6 text-muted-foreground" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl font-semibold text-gray-900">
+                  <CardTitle className="text-xl font-semibold text-foreground">
                     Resumo do Sistema
                   </CardTitle>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Principais métricas do seu negócio
                   </p>
                 </div>
@@ -122,36 +122,36 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100">
+                <div className="flex items-center justify-between p-3 bg-accent rounded-lg border border-border">
                   <div className="flex items-center gap-3">
-                    <Package className="h-5 w-5 text-orange-600" />
-                    <span className="font-medium text-gray-900">Produtos ativos</span>
+                    <Package className="h-5 w-5 text-primary" />
+                    <span className="font-medium text-foreground">Produtos ativos</span>
                   </div>
-                  <span className="text-xl font-bold text-orange-600">{stats.totalProdutos}</span>
+                  <span className="text-xl font-bold text-primary">{stats.totalProdutos}</span>
                 </div>
                 
-                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100">
+                <div className="flex items-center justify-between p-3 bg-accent rounded-lg border border-border">
                   <div className="flex items-center gap-3">
-                    <ChefHat className="h-5 w-5 text-green-600" />
-                    <span className="font-medium text-gray-900">Categorias ativas</span>
+                    <ChefHat className="h-5 w-5 text-primary" />
+                    <span className="font-medium text-foreground">Categorias ativas</span>
                   </div>
-                  <span className="text-xl font-bold text-green-600">{stats.totalCategorias}</span>
+                  <span className="text-xl font-bold text-primary">{stats.totalCategorias}</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg border-0 bg-white rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-indigo-100 p-6">
+          <Card className="shadow-lg border-0 bg-card rounded-2xl overflow-hidden">
+            <CardHeader className="bg-secondary border-b border-border p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-indigo-100 rounded-lg">
-                  <ChefHat className="h-6 w-6 text-indigo-600" />
+                <div className="p-2 bg-muted rounded-lg">
+                  <ChefHat className="h-6 w-6 text-muted-foreground" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl font-semibold text-gray-900">
+                  <CardTitle className="text-xl font-semibold text-foreground">
                     Gestão Rápida
                   </CardTitle>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Principais funcionalidades do sistema
                   </p>
                 </div>
@@ -159,24 +159,24 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-4">
-                <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg border border-orange-200 hover:shadow-md transition-shadow">
-                  <div className="p-2 bg-orange-200 rounded-lg">
-                    <Package className="h-5 w-5 text-orange-600" />
+                <div className="flex items-center gap-4 p-4 bg-accent rounded-lg border border-border hover:shadow-md transition-shadow">
+                  <div className="p-2 bg-muted rounded-lg">
+                    <Package className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">Gerenciar Produtos</h3>
-                    <p className="text-sm text-gray-600">Organize produtos e categorias do cardápio</p>
+                    <h3 className="font-semibold text-foreground">Gerenciar Produtos</h3>
+                    <p className="text-sm text-muted-foreground">Organize produtos e categorias do cardápio</p>
                   </div>
                 </div>
 
                 
-                <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
-                  <div className="p-2 bg-gray-200 rounded-lg">
-                    <Activity className="h-5 w-5 text-gray-600" />
+                <div className="flex items-center gap-4 p-4 bg-accent rounded-lg border border-border hover:shadow-md transition-shadow">
+                  <div className="p-2 bg-muted rounded-lg">
+                    <Activity className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">Configurar Sistema</h3>
-                    <p className="text-sm text-gray-600">Ajuste informações da pizzaria</p>
+                    <h3 className="font-semibold text-foreground">Configurar Sistema</h3>
+                    <p className="text-sm text-muted-foreground">Ajuste informações da pizzaria</p>
                   </div>
                 </div>
               </div>
