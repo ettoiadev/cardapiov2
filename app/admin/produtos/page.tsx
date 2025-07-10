@@ -439,6 +439,65 @@ export default function AdminProdutosPage() {
 
   const { pizzas, bebidas, outros, outrasCategoriasData } = organizeProductsByCategory()
 
+  const getCategoryAppearance = (categoryName: string) => {
+    const name = categoryName.toLowerCase()
+    if (name.includes('tradicionais')) {
+      return {
+        header: "bg-red-600 text-white",
+        card: "bg-red-50 border-red-100 hover:border-red-200",
+        iconContainer: "bg-red-100",
+        icon: "text-red-600",
+      }
+    }
+    if (name.includes('promoção')) {
+      return {
+        header: "bg-amber-500 text-white",
+        card: "bg-amber-50 border-amber-100 hover:border-amber-200",
+        iconContainer: "bg-amber-100",
+        icon: "text-amber-600",
+      }
+    }
+    if (name.includes('veganas')) {
+      return {
+        header: "bg-green-600 text-white",
+        card: "bg-green-50 border-green-100 hover:border-green-200",
+        iconContainer: "bg-green-100",
+        icon: "text-green-600",
+      }
+    }
+    if (name.includes('doces')) {
+      return {
+        header: "bg-pink-500 text-white",
+        card: "bg-pink-50 border-pink-100 hover:border-pink-200",
+        iconContainer: "bg-pink-100",
+        icon: "text-pink-600",
+      }
+    }
+     if (name.includes('bebidas')) {
+      return {
+        header: "bg-blue-600 text-white",
+        card: "bg-blue-50 border-blue-100 hover:border-blue-200",
+        iconContainer: "bg-blue-100",
+        icon: "text-blue-600",
+      }
+    }
+    if (name.includes('bordas')) {
+      return {
+        header: "bg-gray-700 text-white",
+        card: "bg-gray-100 border-gray-200 hover:border-gray-300",
+        iconContainer: "bg-gray-200",
+        icon: "text-gray-700",
+      }
+    }
+    // Default/fallback
+    return {
+      header: "bg-slate-600 text-white",
+      card: "bg-slate-50 border-slate-100 hover:border-slate-200",
+      iconContainer: "bg-slate-100",
+      icon: "text-slate-600",
+    }
+  }
+
   const getProductIcon = (tipo: string) => {
     switch (tipo) {
       case 'pizza':
@@ -535,328 +594,424 @@ export default function AdminProdutosPage() {
           <CardContent className="p-6">
             {filteredProdutos.filter(p => p.tipo !== 'bebida').length > 0 ? (
               <div className="space-y-8">
-                {/* Seção de Pizzas */}
-                {pizzas.length > 0 && (
-                  <div>
-                    <div className="bg-white rounded-xl p-4 mb-6 border border-gray-200 shadow-sm">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-orange-100 rounded-xl">
-                            <Pizza className="h-5 w-5 text-orange-600" />
+                {/* Seção de Pizzas Tradicionais */}
+                {pizzas.length > 0 && (() => {
+                  const appearance = getCategoryAppearance('Pizzas Tradicionais');
+                  return (
+                    <div>
+                      <div className={`${appearance.header} rounded-xl p-4 mb-6 shadow-md`}>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className={`${appearance.iconContainer} p-2 rounded-xl`}>
+                              <Pizza className={`h-6 w-6 ${appearance.icon}`} />
+                            </div>
+                            <div>
+                              <h2 className="text-xl font-bold">Pizzas Tradicionais</h2>
+                              <p className="text-sm opacity-80">{pizzas.length} pizza{pizzas.length !== 1 ? 's' : ''} cadastrada{pizzas.length !== 1 ? 's' : ''}</p>
+                            </div>
                           </div>
-                          <div>
-                            <h2 className="text-xl font-bold text-foreground">Pizzas Tradicionais</h2>
-                            <p className="text-sm text-gray-600">{pizzas.length} pizza{pizzas.length !== 1 ? 's' : ''} cadastrada{pizzas.length !== 1 ? 's' : ''}</p>
+                          <div className="flex items-center gap-3 bg-white/10 rounded-xl p-3">
+                            <div className="flex items-center gap-2">
+                              <Pizza className="h-4 w-4" />
+                              <span className="text-sm font-medium">Habilitar Pizza Broto</span>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={config.habilitar_broto}
+                                onChange={(e) => handleToggleBroto(e.target.checked)}
+                                className="sr-only peer"
+                              />
+                              <div className="w-11 h-6 bg-white/30 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-white/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-400"></div>
+                            </label>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-3 bg-card/50 rounded-xl p-3 border border-muted/30">
-                          <div className="flex items-center gap-2">
-                            <Pizza className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium text-foreground">Habilitar Pizza Broto</span>
-                          </div>
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={config.habilitar_broto}
-                              onChange={(e) => handleToggleBroto(e.target.checked)}
-                              className="sr-only peer"
-                            />
-                            <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-muted after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                          </label>
                         </div>
                       </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                      {pizzas.map((produto) => (
-                        <div
-                          key={produto.id}
-                          className="group bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-gray-300 shadow-sm"
-                        >
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-3">
-                              {getProductIcon(produto.tipo)}
-                              <div>
-                                <h3 className="font-semibold text-gray-900 text-lg leading-tight">
-                                  <span className="inline-block bg-orange-100 text-orange-900 text-sm font-bold px-2 py-1 rounded-md mr-2">
-                                    {produto.numeroSequencial}
-                                  </span>
-                                  {produto.nome}
-                                </h3>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Badge 
-                                    variant={produto.ativo ? "default" : "secondary"}
-                                    className={`text-xs font-medium ${produto.ativo ? 'bg-green-700 hover:bg-green-800 text-white' : 'bg-gray-200 text-gray-700'}`}
-                                  >
-                                    {produto.ativo ? "Disponível" : "Indisponível"}
-                                  </Badge>
-                                  <span className="text-xs text-gray-600 capitalize font-medium">
-                                    {produto.tipo}
-                                  </span>
+                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        {pizzas.map((produto) => (
+                          <div
+                            key={produto.id}
+                            className={`group ${appearance.card} rounded-xl p-6 hover:shadow-lg transition-all duration-300 shadow-sm`}
+                          >
+                            <div className="flex items-start justify-between mb-4">
+                              <div className="flex items-center gap-3">
+                                <div className={`${appearance.iconContainer} p-1.5 rounded-full`}>
+                                  {getProductIcon(produto.tipo)}
+                                </div>
+                                <div>
+                                  <h3 className="font-semibold text-gray-900 text-lg leading-tight">
+                                    <span className={`inline-block ${appearance.iconContainer} ${appearance.icon} text-sm font-bold px-2 py-1 rounded-md mr-2`}>
+                                      {produto.numeroSequencial}
+                                    </span>
+                                    {produto.nome}
+                                  </h3>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <Badge 
+                                      variant={produto.ativo ? "default" : "secondary"}
+                                      className={`text-xs font-medium ${produto.ativo ? 'bg-green-700 hover:bg-green-800 text-white' : 'bg-gray-200 text-gray-700'}`}
+                                    >
+                                      {produto.ativo ? "Disponível" : "Indisponível"}
+                                    </Badge>
+                                    {produto.promocao && <Badge variant="destructive" className="bg-orange-500 text-white">Promo</Badge>}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 hover:bg-gray-100 text-gray-700 hover:text-gray-900 rounded-lg border border-gray-200"
-                                onClick={() => {
-                                  setEditingProduto(produto)
-                                  setIsDialogOpen(true)
-                                }}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg border border-gray-200"
-                                onClick={() => handleDelete(produto.id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-
-                          {produto.descricao && (
-                            <p className="text-sm text-gray-700 mb-4 leading-relaxed">
-                              {produto.descricao}
-                            </p>
-                          )}
-
-                          {/* Exibir adicionais se existirem */}
-                          {produto.adicionais && produto.adicionais.length > 0 && (
-                            <div className="mb-4">
-                              <div className="text-xs text-gray-700 mb-2 font-medium">Adicionais:</div>
-                              <div className="space-y-1">
-                                {produto.adicionais.map((adicional, index) => (
-                                  <div key={index} className="flex justify-between items-center text-xs text-gray-700 bg-gray-50 px-2 py-1 rounded border">
-                                    <span>{adicional.nome}</span>
-                                    <span className="font-medium text-green-700">
-                                      +{formatCurrency(adicional.preco)}
-                                    </span>
-                                  </div>
-                                ))}
+                              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0 hover:bg-gray-100 text-gray-700 hover:text-gray-900 rounded-lg border border-gray-200"
+                                  onClick={() => {
+                                    setEditingProduto(produto)
+                                    setIsDialogOpen(true)
+                                  }}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg border border-gray-200"
+                                  onClick={() => handleDelete(produto.id)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
                               </div>
                             </div>
-                          )}
-
-                          <div className="space-y-3">
-                            <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                              <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-700 flex items-center gap-2 font-medium">
-                                  <Pizza className="h-4 w-4" />
-                                  Tradicional
-                                </span>
-                                <span className="font-bold text-green-700 text-base">
-                                  {produto.promocao && produto.preco_promocional_tradicional 
-                                    ? formatCurrency(produto.preco_promocional_tradicional)
-                                    : formatCurrency(produto.preco_tradicional)
-                                  }
+                          
+                            {produto.descricao && <p className="text-sm text-gray-600 mb-4">{produto.descricao}</p>}
+                            
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between items-center bg-white/60 p-2 rounded-lg">
+                                <span className="font-medium text-gray-600">Preço</span>
+                                <span className="font-bold text-gray-800">
+                                  {formatCurrency(produto.preco_tradicional)}
                                 </span>
                               </div>
                               {config.habilitar_broto && produto.preco_broto && (
-                                <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-200">
-                                  <span className="text-sm text-gray-700 flex items-center gap-2 font-medium">
-                                    <Pizza className="h-3 w-3" />
-                                    Broto
+                                <div className="flex justify-between items-center bg-white/60 p-2 rounded-lg">
+                                  <span className="font-medium text-gray-600">Broto</span>
+                                  <span className="font-bold text-gray-800">
+                                    {formatCurrency(produto.preco_broto)}
                                   </span>
-                                  <span className="font-bold text-green-700 text-base">
-                                    {produto.promocao && produto.preco_promocional_broto 
-                                      ? formatCurrency(produto.preco_promocional_broto)
-                                      : formatCurrency(produto.preco_broto)
-                                    }
+                                </div>
+                              )}
+                              {produto.promocao && produto.preco_promocional_tradicional && (
+                                <div className="flex justify-between items-center bg-orange-100 p-2 rounded-lg ring-1 ring-orange-300">
+                                  <span className="font-medium text-orange-700">Promo</span>
+                                  <span className="font-bold text-orange-800">
+                                    {formatCurrency(produto.preco_promocional_tradicional)}
                                   </span>
                                 </div>
                               )}
                             </div>
 
-                            {/* Toggle de disponibilidade no card */}
-                            <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
-                              <span className="text-sm text-gray-800 font-medium">
-                                {produto.ativo ? "Disponível" : "Indisponível"}
-                              </span>
-                              <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={produto.ativo}
-                                  onChange={(e) => handleToggleDisponibilidade(produto.id, e.target.checked)}
-                                  className="sr-only peer"
-                                />
-                                <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
-                              </label>
-                            </div>
+                            <div className="border-t border-gray-200 mt-4 pt-4 space-y-3">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium text-gray-600">Disponível</span>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                  <input
+                                    type="checkbox"
+                                    checked={produto.ativo}
+                                    onChange={(e) => handleToggleDisponibilidade(produto.id, e.target.checked)}
+                                    className="sr-only peer"
+                                  />
+                                  <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[0.5px] after:left-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-500"></div>
+                                </label>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium text-gray-600">Promoção</span>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                  <input
+                                    type="checkbox"
+                                    checked={produto.promocao}
+                                    onChange={(e) => handleTogglePromocao(produto.id, e.target.checked)}
+                                    className="sr-only peer"
+                                  />
+                                  <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[0.5px] after:left-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-500"></div>
+                                </label>
+                              </div>
 
-                            {/* Toggle de promoção no card */}
-                            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100">
-                              <span className="text-xs text-muted-foreground font-medium">
-                                {produto.promocao ? "Promoção" : "Sem promoção"}
-                              </span>
-                              <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={produto.promocao}
-                                  onChange={(e) => handleTogglePromocao(produto.id, e.target.checked)}
-                                  className="sr-only peer"
-                                />
-                                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
-                              </label>
-                            </div>
-
-                            <div className="flex items-center justify-between text-xs text-muted-foreground">
-                              <span className="flex items-center gap-1">
-                                <ArrowUpDown className="h-3 w-3" />
-                                Ordem: {produto.ordem}
-                              </span>
-                              {produto.categoria_id && (
+                              <div className="flex items-center justify-between text-xs text-muted-foreground pt-2">
                                 <span className="flex items-center gap-1">
-                                  <Tag className="h-3 w-3" />
-                                  {categorias.find(c => c.id === produto.categoria_id)?.nome || 'Sem categoria'}
+                                  <ArrowUpDown className="h-3 w-3" />
+                                  Ordem: {produto.ordem}
                                 </span>
-                              )}
+                                {produto.categoria_id && (
+                                  <span className="flex items-center gap-1">
+                                    <Tag className="h-3 w-3" />
+                                    {categorias.find(c => c.id === produto.categoria_id)?.nome || 'Sem categoria'}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Seção de Outras Categorias */}
-                {outros.length > 0 && (
-                  <div>
-                    <div className="bg-white rounded-xl p-4 mb-6 border border-gray-200 shadow-sm">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-purple-100 rounded-lg">
-                          <Package className="h-6 w-6 text-purple-700" />
-                        </div>
-                        <div>
-                          <h2 className="text-xl font-bold text-gray-900">Outras Categorias</h2>
-                          <p className="text-sm text-gray-600">{outros.length} produto{outros.length !== 1 ? 's' : ''} cadastrado{outros.length !== 1 ? 's' : ''}</p>
-                        </div>
+                        ))}
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                      {outros.map((produto) => (
-                        <div
-                          key={produto.id}
-                          className="group bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-gray-300 shadow-sm"
-                        >
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-3">
-                              {getProductIcon(produto.tipo)}
-                              <div>
-                                <h3 className="font-semibold text-gray-900 text-lg leading-tight">
-                                  {produto.nome}
-                                </h3>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Badge 
-                                    variant={produto.ativo ? "default" : "secondary"}
-                                    className={`text-xs font-medium ${produto.ativo ? 'bg-green-700 hover:bg-green-800 text-white' : 'bg-gray-200 text-gray-700'}`}
+                  )
+                })()}
+                
+                {/* Seção de Bebidas */}
+                {bebidas.length > 0 && (() => {
+                  const appearance = getCategoryAppearance('Bebidas');
+                  return (
+                    <Card className="border-border shadow-sm rounded-2xl overflow-hidden">
+                      <CardHeader className={`${appearance.header} p-6`}>
+                        <div className="flex items-center gap-3">
+                          <div className={`${appearance.iconContainer} p-2 rounded-xl`}>
+                            <Coffee className={`h-6 w-6 ${appearance.icon}`} />
+                          </div>
+                          <div>
+                            <CardTitle className="text-xl font-semibold">
+                              Bebidas
+                            </CardTitle>
+                            <p className="text-sm opacity-80 mt-1">
+                              {bebidas.length} bebida{bebidas.length !== 1 ? 's' : ''} cadastrada{bebidas.length !== 1 ? 's' : ''}
+                            </p>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="p-6 bg-gray-50">
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                          {bebidas.map((produto) => (
+                            <div
+                              key={produto.id}
+                              className={`group ${appearance.card} rounded-xl p-6 hover:shadow-lg transition-all duration-300 shadow-sm`}
+                            >
+                              <div className="flex items-start justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                  <div className={`${appearance.iconContainer} p-1.5 rounded-full`}>
+                                    {getProductIcon(produto.tipo)}
+                                  </div>
+                                  <div>
+                                    <h3 className="font-semibold text-gray-900 text-lg leading-tight">
+                                      {produto.nome}
+                                    </h3>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <Badge 
+                                        variant={produto.ativo ? "default" : "secondary"}
+                                        className={`text-xs font-medium ${produto.ativo ? 'bg-green-700 hover:bg-green-800 text-white' : 'bg-gray-200 text-gray-700'}`}
+                                      >
+                                        {produto.ativo ? "Ativo" : "Inativo"}
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 hover:bg-gray-100 text-gray-700 hover:text-gray-900 rounded-lg border border-gray-200"
+                                    onClick={() => {
+                                      setEditingProduto(produto)
+                                      setIsDialogOpen(true)
+                                    }}
                                   >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button 
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg border border-gray-200"
+                                    onClick={() => handleDelete(produto.id)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+
+                              {produto.descricao && (
+                                <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                                  {produto.descricao}
+                                </p>
+                              )}
+
+                              <div className="space-y-3">
+                                <div className="bg-white/60 rounded-lg p-3 border border-gray-200">
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-sm text-gray-700 flex items-center gap-2 font-medium">
+                                      <Coffee className="h-4 w-4" />
+                                      Preço
+                                    </span>
+                                    <span className="font-bold text-green-700 text-base">
+                                      {produto.promocao && produto.preco_promocional_tradicional 
+                                        ? formatCurrency(produto.preco_promocional_tradicional)
+                                        : formatCurrency(produto.preco_tradicional)
+                                      }
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Toggle de disponibilidade no card */}
+                                <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+                                  <span className="text-sm text-gray-800 font-medium">
                                     {produto.ativo ? "Disponível" : "Indisponível"}
-                                  </Badge>
-                                  <span className="text-xs text-gray-600 capitalize font-medium">
-                                    {produto.tipo}
+                                  </span>
+                                  <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                      type="checkbox"
+                                      checked={produto.ativo}
+                                      onChange={(e) => handleToggleDisponibilidade(produto.id, e.target.checked)}
+                                      className="sr-only peer"
+                                    />
+                                    <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
+                                  </label>
+                                </div>
+
+                                {/* Toggle de promoção no card */}
+                                <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+                                  <span className="text-sm text-gray-800 font-medium">
+                                    {produto.promocao ? "Em Promoção" : "Preço Normal"}
+                                  </span>
+                                  <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                      type="checkbox"
+                                      checked={produto.promocao}
+                                      onChange={(e) => handleTogglePromocao(produto.id, e.target.checked)}
+                                      className="sr-only peer"
+                                    />
+                                    <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-600"></div>
+                                  </label>
+                                </div>
+
+                                <div className="flex items-center justify-between text-xs text-gray-600 pt-2">
+                                  <span className="flex items-center gap-1 font-medium">
+                                    <ArrowUpDown className="h-3 w-3" />
+                                    Ordem: {produto.ordem}
+                                  </span>
+                                  {produto.categoria_id && (
+                                    <span className="flex items-center gap-1 font-medium">
+                                      <Tag className="h-3 w-3" />
+                                      {categorias.find(c => c.id === produto.categoria_id)?.nome || 'Sem categoria'}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )
+                })()}
+
+                {/* Seções Dinâmicas para Outras Categorias */}
+                {outrasCategoriasData && outrasCategoriasData.map(({ categoria, produtos }) => {
+                  const appearance = getCategoryAppearance(categoria.nome);
+                  return (
+                    <Card key={categoria.id} className="border-border shadow-sm rounded-2xl overflow-hidden">
+                      <CardHeader className={`${appearance.header} p-6`}>
+                        <div className="flex items-center gap-3">
+                          <div className={`${appearance.iconContainer} p-2 rounded-xl`}>
+                            <Package className={`h-6 w-6 ${appearance.icon}`} />
+                          </div>
+                          <div>
+                            <CardTitle className="text-xl font-semibold">
+                              {categoria.nome}
+                            </CardTitle>
+                            <p className="text-sm opacity-80 mt-1">
+                              {produtos.length} produto{produtos.length !== 1 ? 's' : ''} cadastrado{produtos.length !== 1 ? 's' : ''}
+                              {categoria.descricao && ` • ${categoria.descricao}`}
+                            </p>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="p-6 bg-gray-50">
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                          {produtos.map((produto) => (
+                            <div
+                              key={produto.id}
+                              className={`group ${appearance.card} rounded-xl p-6 hover:shadow-lg transition-all duration-300 shadow-sm`}
+                            >
+                              <div className="flex items-start justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                  <div className={`${appearance.iconContainer} p-1.5 rounded-full`}>
+                                    {getProductIcon(produto.tipo)}
+                                  </div>
+                                  <div>
+                                    <h3 className="font-semibold text-gray-900 text-lg leading-tight">
+                                      {produto.nome}
+                                    </h3>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <Badge 
+                                        variant={produto.ativo ? "default" : "secondary"}
+                                        className={`text-xs font-medium ${produto.ativo ? 'bg-green-700 hover:bg-green-800 text-white' : 'bg-gray-200 text-gray-700'}`}
+                                      >
+                                        {produto.ativo ? "Ativo" : "Inativo"}
+                                      </Badge>
+                                      <span className="text-xs text-muted-foreground capitalize">
+                                        {produto.tipo}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 hover:bg-gray-100 text-gray-700 hover:text-gray-900 rounded-lg border border-gray-200"
+                                    onClick={() => {
+                                      setEditingProduto(produto)
+                                      setIsDialogOpen(true)
+                                    }}
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button 
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg border border-gray-200"
+                                    onClick={() => handleDelete(produto.id)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                              {produto.descricao && <p className="text-sm text-gray-600 mb-4">{produto.descricao}</p>}
+                              <div className="space-y-2">
+                                <div className="bg-white/60 rounded-lg p-3 border border-gray-200">
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-sm text-gray-700 flex items-center gap-2 font-medium">
+                                      <Package className="h-4 w-4" />
+                                      Preço
+                                    </span>
+                                    <span className="font-bold text-green-700 text-base">
+                                      {produto.promocao && produto.preco_promocional_tradicional 
+                                        ? formatCurrency(produto.preco_promocional_tradicional)
+                                        : formatCurrency(produto.preco_tradicional)
+                                      }
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+                                  <span className="text-sm text-gray-800 font-medium">
+                                    {produto.ativo ? "Disponível" : "Indisponível"}
+                                  </span>
+                                  <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                      type="checkbox"
+                                      checked={produto.ativo}
+                                      onChange={(e) => handleToggleDisponibilidade(produto.id, e.target.checked)}
+                                      className="sr-only peer"
+                                    />
+                                    <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
+                                  </label>
+                                </div>
+                                <div className="flex items-center justify-between text-xs text-gray-600 pt-2">
+                                  <span className="flex items-center gap-1 font-medium">
+                                    <ArrowUpDown className="h-3 w-3" />
+                                    Ordem: {produto.ordem}
                                   </span>
                                 </div>
                               </div>
                             </div>
-                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 hover:bg-gray-100 text-gray-700 hover:text-gray-900 rounded-lg border border-gray-200"
-                                onClick={() => {
-                                  setEditingProduto(produto)
-                                  setIsDialogOpen(true)
-                                }}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg border border-gray-200"
-                                onClick={() => handleDelete(produto.id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-
-                          {produto.descricao && (
-                            <p className="text-sm text-gray-700 mb-4 leading-relaxed">
-                              {produto.descricao}
-                            </p>
-                          )}
-
-                          <div className="space-y-3">
-                            <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                              <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-700 flex items-center gap-2 font-medium">
-                                  <Package className="h-4 w-4" />
-                                  Preço
-                                </span>
-                                <span className="font-bold text-green-700 text-base">
-                                  {produto.promocao && produto.preco_promocional_tradicional 
-                                    ? formatCurrency(produto.preco_promocional_tradicional)
-                                    : formatCurrency(produto.preco_tradicional)
-                                  }
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Toggle de disponibilidade no card */}
-                            <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
-                              <span className="text-sm text-gray-800 font-medium">
-                                {produto.ativo ? "Disponível" : "Indisponível"}
-                              </span>
-                              <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={produto.ativo}
-                                  onChange={(e) => handleToggleDisponibilidade(produto.id, e.target.checked)}
-                                  className="sr-only peer"
-                                />
-                                <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
-                              </label>
-                            </div>
-
-                            {/* Toggle de promoção no card */}
-                            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100">
-                              <span className="text-xs text-muted-foreground font-medium">
-                                {produto.promocao ? "Promoção" : "Sem promoção"}
-                              </span>
-                              <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={produto.promocao}
-                                  onChange={(e) => handleTogglePromocao(produto.id, e.target.checked)}
-                                  className="sr-only peer"
-                                />
-                                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
-                              </label>
-                            </div>
-
-                            <div className="flex items-center justify-between text-xs text-muted-foreground">
-                              <span className="flex items-center gap-1">
-                                <ArrowUpDown className="h-3 w-3" />
-                                Ordem: {produto.ordem}
-                              </span>
-                              {produto.categoria_id && (
-                                <span className="flex items-center gap-1">
-                                  <Tag className="h-3 w-3" />
-                                  {categorias.find(c => c.id === produto.categoria_id)?.nome || 'Sem categoria'}
-                                </span>
-                              )}
-                            </div>
-                          </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                      </CardContent>
+                    </Card>
+                  )
+                })}
               </div>
             ) : (
               <div className="text-center py-12">
@@ -869,289 +1024,6 @@ export default function AdminProdutosPage() {
             )}
           </CardContent>
         </Card>
-
-        {/* 3. Bebidas */}
-        {bebidas.length > 0 && (
-          <Card className="border-gray-200 shadow-sm rounded-2xl overflow-hidden">
-            <CardHeader className="bg-white border-b border-gray-200 p-6">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 rounded-xl">
-                  <Coffee className="h-5 w-5 text-blue-600" />
-                </div>
-                <div>
-                  <CardTitle className="text-xl font-semibold text-gray-900">
-                    Bebidas
-                  </CardTitle>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {bebidas.length} bebida{bebidas.length !== 1 ? 's' : ''} cadastrada{bebidas.length !== 1 ? 's' : ''}
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {bebidas.map((produto) => (
-                  <div
-                    key={produto.id}
-                    className="group bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-gray-300 shadow-sm"
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        {getProductIcon(produto.tipo)}
-                        <div>
-                          <h3 className="font-semibold text-foreground text-lg leading-tight">
-                            {produto.nome}
-                          </h3>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge 
-                              variant={produto.ativo ? "default" : "secondary"}
-                              className="text-xs"
-                            >
-                              {produto.ativo ? "Ativo" : "Inativo"}
-                            </Badge>
-                            <span className="text-xs text-muted-foreground capitalize">
-                              {produto.tipo}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 hover:bg-gray-100 text-gray-700 hover:text-gray-900 rounded-lg border border-gray-200"
-                          onClick={() => {
-                            setEditingProduto(produto)
-                            setIsDialogOpen(true)
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg border border-gray-200"
-                          onClick={() => handleDelete(produto.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-
-                    {produto.descricao && (
-                      <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                        {produto.descricao}
-                      </p>
-                    )}
-
-                    <div className="space-y-3">
-                      <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-700 flex items-center gap-2 font-medium">
-                            <Coffee className="h-4 w-4" />
-                            Preço
-                          </span>
-                          <span className="font-bold text-green-700 text-base">
-                            {produto.promocao && produto.preco_promocional_tradicional 
-                              ? formatCurrency(produto.preco_promocional_tradicional)
-                              : formatCurrency(produto.preco_tradicional)
-                            }
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Toggle de disponibilidade no card */}
-                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
-                        <span className="text-sm text-gray-800 font-medium">
-                          {produto.ativo ? "Disponível" : "Indisponível"}
-                        </span>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={produto.ativo}
-                            onChange={(e) => handleToggleDisponibilidade(produto.id, e.target.checked)}
-                            className="sr-only peer"
-                          />
-                          <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
-                        </label>
-                      </div>
-
-                      {/* Toggle de promoção no card */}
-                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
-                        <span className="text-sm text-gray-800 font-medium">
-                          {produto.promocao ? "Em Promoção" : "Preço Normal"}
-                        </span>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={produto.promocao}
-                            onChange={(e) => handleTogglePromocao(produto.id, e.target.checked)}
-                            className="sr-only peer"
-                          />
-                          <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-600"></div>
-                        </label>
-                      </div>
-
-                      <div className="flex items-center justify-between text-xs text-gray-600">
-                        <span className="flex items-center gap-1 font-medium">
-                          <ArrowUpDown className="h-3 w-3" />
-                          Ordem: {produto.ordem}
-                        </span>
-                        {produto.categoria_id && (
-                          <span className="flex items-center gap-1 font-medium">
-                            <Tag className="h-3 w-3" />
-                            {categorias.find(c => c.id === produto.categoria_id)?.nome || 'Sem categoria'}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Seções Dinâmicas para Outras Categorias */}
-        {outrasCategoriasData && outrasCategoriasData.map(({ categoria, produtos }) => (
-          <Card key={categoria.id} className="border-muted/30 shadow-sm rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-teal-50/50 to-cyan-50/30 border-b border-muted/20 p-6">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-teal-100/80 rounded-xl">
-                  <Package className="h-5 w-5 text-teal-600" />
-                </div>
-                <div>
-                  <CardTitle className="text-xl font-semibold text-foreground">
-                    {categoria.nome}
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {produtos.length} produto{produtos.length !== 1 ? 's' : ''} cadastrado{produtos.length !== 1 ? 's' : ''}
-                    {categoria.descricao && ` • ${categoria.descricao}`}
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {produtos.map((produto) => (
-                  <div
-                    key={produto.id}
-                    className="group bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-100 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-teal-200"
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        {getProductIcon(produto.tipo)}
-                        <div>
-                          <h3 className="font-semibold text-foreground text-lg leading-tight">
-                            {produto.nome}
-                          </h3>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge 
-                              variant={produto.ativo ? "default" : "secondary"}
-                              className="text-xs"
-                            >
-                              {produto.ativo ? "Ativo" : "Inativo"}
-                            </Badge>
-                            <span className="text-xs text-muted-foreground capitalize">
-                              {produto.tipo}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 hover:bg-gray-100 text-gray-700 hover:text-gray-900 rounded-lg border border-gray-200"
-                          onClick={() => {
-                            setEditingProduto(produto)
-                            setIsDialogOpen(true)
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0 hover:bg-red-50 text-red-600 rounded-lg border border-gray-200"
-                          onClick={() => handleDelete(produto.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-
-                    {produto.descricao && (
-                      <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                        {produto.descricao}
-                      </p>
-                    )}
-
-                    <div className="space-y-3">
-                      <div className="bg-white rounded-lg p-3 border border-teal-100">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-muted-foreground flex items-center gap-2">
-                            <Package className="h-4 w-4" />
-                            Preço
-                          </span>
-                          <span className="font-semibold text-green-600">
-                            {produto.promocao && produto.preco_promocional_tradicional 
-                              ? formatCurrency(produto.preco_promocional_tradicional)
-                              : formatCurrency(produto.preco_tradicional)
-                            }
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Toggle de disponibilidade no card */}
-                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-teal-100">
-                        <span className="text-xs text-muted-foreground font-medium">
-                          {produto.ativo ? "Disponível" : "Indisponível"}
-                        </span>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={produto.ativo}
-                            onChange={(e) => handleToggleDisponibilidade(produto.id, e.target.checked)}
-                            className="sr-only peer"
-                          />
-                          <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-600"></div>
-                        </label>
-                      </div>
-
-                      {/* Toggle de promoção no card */}
-                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100">
-                        <span className="text-xs text-muted-foreground font-medium">
-                          {produto.promocao ? "Promoção" : "Sem promoção"}
-                        </span>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={produto.promocao}
-                            onChange={(e) => handleTogglePromocao(produto.id, e.target.checked)}
-                            className="sr-only peer"
-                          />
-                          <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
-                        </label>
-                      </div>
-
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <ArrowUpDown className="h-3 w-3" />
-                          Ordem: {produto.ordem}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Tag className="h-3 w-3" />
-                          {categoria.nome}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
 
         {/* 4. Bordas Recheadas */}
         <Card className="border-muted/30 shadow-sm rounded-2xl overflow-hidden">
@@ -1204,11 +1076,11 @@ export default function AdminProdutosPage() {
                   <DialogContent className="max-w-md rounded-2xl">
                     <DialogHeader>
                       <DialogTitle className="text-xl font-semibold">
-                        {editingBorda ? "Editar Borda Recheada" : "Nova Borda Recheada"}
+                        {editingBorda ? "Editar Borda" : "Nova Borda"}
                       </DialogTitle>
                     </DialogHeader>
-                    <BordaForm
-                      borda={editingBorda}
+                    <BordaForm 
+                      borda={editingBorda} 
                       onSave={handleSaveBorda}
                       onCancel={() => setIsBordaDialogOpen(false)}
                     />
@@ -1513,130 +1385,101 @@ function ProdutoForm({
   onSave: (produto: Partial<Produto>) => void
   onCancel: () => void
 }) {
-  const [formData, setFormData] = useState<Partial<Produto>>({
-    ...produto,
-    // Garante que o array de adicionais não seja nulo
-    adicionais: produto.adicionais || [] 
-  } : {
-    nome: "",
-    categoria_id: null,
-    descricao: "",
-    preco_tradicional: null,
-    preco_broto: null,
-    preco_promocional_tradicional: null,
-    preco_promocional_broto: null,
-    tipo: "salgada", // valor padrão
-    ativo: true,
-    promocao: false,
-    ordem: proximaOrdem, // Usar a próxima ordem disponível
-    adicionais: []
-  })
+  const [formData, setFormData] = useState<Partial<Produto>>(
+    produto || {
+      nome: "",
+      categoria_id: null,
+      descricao: "",
+      preco_tradicional: 0,
+      preco_broto: 0,
+      preco_promocional_tradicional: 0,
+      preco_promocional_broto: 0,
+      tipo: "salgada",
+      ativo: true,
+      promocao: false,
+      ordem: proximaOrdem,
+      adicionais: [],
+    }
+  );
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
+  useEffect(() => {
+    if (produto) {
+      setFormData({ ...produto, adicionais: produto.adicionais || [] });
+    } else {
+      setFormData({
+        nome: "",
+        categoria_id: null,
+        descricao: "",
+        preco_tradicional: 0,
+        preco_broto: 0,
+        preco_promocional_tradicional: 0,
+        preco_promocional_broto: 0,
+        tipo: "salgada",
+        ativo: true,
+        promocao: false,
+        ordem: proximaOrdem,
+        adicionais: [],
+      });
+    }
+  }, [produto, proximaOrdem]);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value, type } = e.target;
+    // @ts-ignore
+    const isCheckbox = type === "checkbox" ? e.target.checked : value;
+    setFormData((prev) => ({ ...prev, [name]: isCheckbox }));
+  };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
   
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    const parsedValue = parseFloat(value)
+    const parsedValue = parseCurrencyInput(value)
     setFormData(prev => ({ ...prev, [name]: parsedValue }))
   }
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    // Validação do nome (obrigatório)
-    if (!formData.nome.trim()) {
-      alert("Nome do produto é obrigatório")
-      return
-    }
-    
-    // Validação do preço tradicional (obrigatório)
-    if (formData.preco_tradicional === null || formData.preco_tradicional === undefined || formData.preco_tradicional <= 0) {
-      alert("Preço tradicional deve ser maior que zero")
-      return
-    }
-    
-    // Validação do preço broto (quando habilitado)
-    if (brotoHabilitado && (formData.preco_broto === null || formData.preco_broto === undefined || formData.preco_broto <= 0)) {
-      alert("Quando o broto está habilitado, o preço broto deve ser maior que zero")
-      return
-    }
-    
-    // Validação da categoria (obrigatória)
-    if (!formData.categoria_id) {
-      alert("Categoria é obrigatória")
-      return
-    }
-    
-    // Validação dos preços promocionais (quando em promoção)
-    if (formData.promocao) {
-      if (formData.preco_promocional_tradicional === null || formData.preco_promocional_tradicional === undefined || formData.preco_promocional_tradicional <= 0) {
-        alert("Preço promocional tradicional deve ser maior que zero quando produto está em promoção")
-        return
-      }
-      
-      if (brotoHabilitado && (formData.preco_promocional_broto === null || formData.preco_promocional_broto === undefined || formData.preco_promocional_broto <= 0)) {
-        alert("Preço promocional broto deve ser maior que zero quando produto está em promoção e broto habilitado")
-        return
-      }
-    }
-    
-    // Validação dos adicionais (se houver, devem ter nome e preço válidos)
-    for (let i = 0; i < formData.adicionais.length; i++) {
-      const adicional = formData.adicionais[i]
-      if (!adicional.nome.trim()) {
-        alert(`Nome do adicional ${i + 1} é obrigatório`)
-        return
-      }
-      if (adicional.preco === null || adicional.preco === undefined || adicional.preco <= 0) {
-        alert(`Preço do adicional "${adicional.nome}" deve ser maior que zero`)
-        return
-      }
-    }
-    
-    // Preparar dados para envio
-    const dadosParaEnvio = { 
-      ...formData, 
-      adicionais: formData.adicionais,
-      // Se broto não está habilitado, garantir que preco_broto seja null
-      preco_broto: brotoHabilitado ? formData.preco_broto : null
-    }
-    
-    // Remove o campo temporário antes de salvar
-    delete dadosParaEnvio.numeroSequencial
-    onSave(dadosParaEnvio)
-  }
+    e.preventDefault();
+    const cleanedData = { ...formData };
+    // @ts-ignore
+    delete cleanedData.numeroSequencial;
+    onSave(cleanedData);
+  };
 
   const adicionarAdicional = () => {
-    setFormData(prev => ({ ...prev, adicionais: [...prev.adicionais, { nome: "", preco: 0 }] }))
-  }
+    setFormData((prev) => ({
+      ...prev,
+      adicionais: [...(prev.adicionais || []), { nome: "", preco: 0 }],
+    }));
+  };
 
   const removerAdicional = (index: number) => {
-    setFormData(prev => ({ ...prev, adicionais: prev.adicionais.filter((_, i) => i !== index) }))
-  }
+    setFormData((prev) => ({
+      ...prev,
+      adicionais: [...(prev.adicionais || [])].filter((_, i) => i !== index),
+    }));
+  };
 
-  const atualizarAdicional = (index: number, campo: keyof Adicional, valor: string | number) => {
-    const novosAdicionais = [...formData.adicionais]
-    novosAdicionais[index] = { ...novosAdicionais[index], [campo]: valor }
-    setFormData(prev => ({ ...prev, adicionais: novosAdicionais }))
-  }
+  const atualizarAdicional = (
+    index: number,
+    campo: keyof Adicional,
+    valor: string | number
+  ) => {
+    const novosAdicionais = [...(formData.adicionais || [])];
+    novosAdicionais[index] = { ...novosAdicionais[index], [campo]: valor };
+    setFormData((prev) => ({ ...prev, adicionais: novosAdicionais }));
+  };
 
   const atualizarPrecoAdicional = (index: number, valorFormatado: string) => {
-    const novosFormatados = [...formData.adicionais.map(adicional => 
-      adicional.preco ? formatCurrencyInput((adicional.preco * 100).toString()) : ""
-    )]
-    novosFormatados[index] = valorFormatado
-    setFormData(prev => ({ ...prev, adicionais: formData.adicionais.map((adicional, i) => ({ ...adicional, preco: parseFloat(novosFormatados[i]) })) }))
-    
-    const valorNumerico = parseCurrencyInput(valorFormatado)
-    atualizarAdicional(index, 'preco', valorNumerico > 0 ? valorNumerico : 0)
-  }
+    const novosAdicionais = [...(formData.adicionais || [])];
+    const precoNumerico = parseCurrencyInput(valorFormatado);
+    novosAdicionais[index] = { ...novosAdicionais[index], preco: precoNumerico };
+    setFormData((prev) => ({ ...prev, adicionais: novosAdicionais }));
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -1803,16 +1646,30 @@ function CategoriaForm({
   onSave: (categoria: Partial<Categoria>) => void
   onCancel: () => void
 }) {
-  const [formData, setFormData] = useState<Partial<Categoria>>({
-    nome: categoria?.nome || "",
-    descricao: categoria?.descricao || "",
-    ordem: categoria?.ordem || 0,
-    ativo: categoria?.ativo ?? true,
-    multi_sabores_habilitado: categoria?.multi_sabores_habilitado ?? false,
-  })
+  const [formData, setFormData] = useState<Partial<Categoria>>(
+    categoria || {
+      nome: "",
+      descricao: "",
+      ordem: 0,
+      ativo: true,
+      multi_sabores_habilitado: false,
+    }
+  );
+
+  useEffect(() => {
+    setFormData(
+      categoria || {
+        nome: "",
+        descricao: "",
+        ordem: 0,
+        ativo: true,
+        multi_sabores_habilitado: false,
+      }
+    );
+  }, [categoria]);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!formData.nome.trim()) {
       alert("Nome da categoria é obrigatório")
       return
@@ -1912,20 +1769,28 @@ function BordaForm({
   onSave: (borda: Partial<BordaRecheada>) => void
   onCancel: () => void
 }) {
-  const [formData, setFormData] = useState<Partial<BordaRecheada>>({
-    nome: borda?.nome || "",
-    preco: borda?.preco || 0,
-    ordem: borda?.ordem || 0,
-    ativo: borda?.ativo ?? true,
-  })
+  const [formData, setFormData] = useState<Partial<BordaRecheada>>(
+    borda || {
+      nome: "",
+      preco: 0,
+      ativo: true,
+      ordem: 0,
+    }
+  );
 
-  // Estado para o valor formatado do preço
-  const [precoFormatado, setPrecoFormatado] = useState(
-    borda?.preco ? formatCurrencyInput((borda.preco * 100).toString()) : ""
-  )
+  useEffect(() => {
+    setFormData(
+      borda || {
+        nome: "",
+        preco: 0,
+        ativo: true,
+        ordem: 0,
+      }
+    );
+  }, [borda]);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!formData.nome.trim()) {
       alert("Nome da borda é obrigatório")
       return
