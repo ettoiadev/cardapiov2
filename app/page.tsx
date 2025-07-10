@@ -442,7 +442,9 @@ function HomePageContent() {
             const preco = Math.max(...prices)
             const sabores = newSelection.map(p => p.nome)
             const nomeItem = formatPizzaName(sabores)
-            const itemId = `multi-${sabores.sort().join("-")}-${tamanhoComum}`
+            // Usar IDs únicos dos produtos em vez de nomes para evitar conflitos entre categorias
+            const pizzaIds = newSelection.map(p => p.id).sort()
+            const itemId = `multi-${pizzaIds.join("-")}-${tamanhoComum}`
             
             // Adicionar a nova pizza ao carrinho
             dispatch({
@@ -490,10 +492,15 @@ function HomePageContent() {
     const sabores = selectedFlavorsForMulti.map(p => p.nome)
     const nomeItem = formatPizzaName(sabores)
 
+    // Para múltiplos sabores, usar IDs únicos dos produtos em vez de nomes
+    const itemId = flavorMode === 1 
+      ? `${selectedFlavorsForMulti[0].id}-${tamanho}` 
+      : `multi-${selectedFlavorsForMulti.map(p => p.id).sort().join("-")}-${tamanho}`
+
     dispatch({
       type: "ADD_ITEM",
       payload: {
-        id: flavorMode === 1 ? `${selectedFlavorsForMulti[0].id}-${tamanho}` : `multi-${sabores.sort().join("-")}-${tamanho}`,
+        id: itemId,
         nome: nomeItem,
         tamanho: tamanho,
         sabores: sabores,
@@ -831,9 +838,11 @@ function HomePageContent() {
                             .map((pizza, index) => {
                             const isSelected = selectedFlavorsForMulti.find(p => p.id === pizza.id)
                             const isDisabled = selectedFlavorsForMulti.length >= flavorMode && !isSelected
-                            // Para 1 sabor: verificar se a pizza está no carrinho (múltiplas seleções visuais permitidas)
+                            // Para 1 sabor: verificar se a pizza está no carrinho usando ID único
+                            const tamanho = getSelectedSize(pizza.id)
+                            const expectedItemId = `${pizza.id}-${tamanho}`
                             const isSingleFlavorSelected = flavorMode === 1 && cartState.items.some(item => 
-                              item.sabores.length === 1 && item.sabores[0] === pizza.nome
+                              item.id === expectedItemId
                             )
                             const pizzaNumber = index + 1 // Numeração sequencial baseada na posição ordenada
                             

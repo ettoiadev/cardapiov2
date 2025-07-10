@@ -272,15 +272,15 @@ export default function CheckoutPage() {
       return produto?.promocao === true
     }
     
-    // Para pizzas múltiplos sabores: ID no carrinho é multi-{sabores}-{tamanho}
+    // Para pizzas múltiplos sabores: ID no carrinho é multi-{productIds}-{tamanho}
     if (itemId.startsWith('multi-')) {
-      // Extrair sabores do ID
-      const saboresString = itemId.replace(/^multi-/, '').replace(/-tradicional$|-broto$/, '')
-      const sabores = saboresString.split('-')
+      // Extrair IDs dos produtos do ID do carrinho
+      const productIdsString = itemId.replace(/^multi-/, '').replace(/-tradicional$|-broto$/, '')
+      const productIds = productIdsString.split('-')
       
-      // Verificar se algum dos sabores está em promoção
-      const temPromocao = sabores.some(sabor => {
-        const produto = produtos.find(p => p.nome === sabor)
+      // Verificar se algum dos produtos está em promoção usando IDs únicos
+      const temPromocao = productIds.some(productId => {
+        const produto = produtos.find(p => p.id === productId)
         return produto?.promocao === true
       })
       return temPromocao
