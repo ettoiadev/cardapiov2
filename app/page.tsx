@@ -572,9 +572,31 @@ function HomePageContent() {
               )}
             </div>
             {produto.descricao && <p className="text-sm text-gray-600 mt-1">{produto.descricao}</p>}
-            <span className="text-sm font-medium text-red-600">
-              {formatCurrency(produto.promocao ? produto.preco_promocional_tradicional : produto.preco_tradicional)}
-            </span>
+            
+            {/* Verificar se o produto tem múltiplos tamanhos */}
+            {hasMultipleSizes(produto) ? (
+              <div className="flex items-center space-x-4 mt-2">
+                <span className="text-sm text-black font-bold">
+                  Broto: {formatCurrency(produto.promocao ? produto.preco_promocional_broto : produto.preco_broto)}
+                </span>
+                <span className="text-sm font-bold text-black">
+                  Tradicional: {formatCurrency(produto.promocao ? produto.preco_promocional_tradicional : produto.preco_tradicional)}
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-4 mt-2">
+                {pizzariaConfig.habilitar_broto && produto.preco_broto && (
+                  <span className="text-sm text-black font-bold">
+                    Broto: {formatCurrency(produto.promocao ? produto.preco_promocional_broto : produto.preco_broto)}
+                  </span>
+                )}
+                {produto.preco_tradicional && (
+                  <span className="text-sm font-bold text-red-600">
+                    {produto.preco_broto ? 'Tradicional: ' : ''}{formatCurrency(produto.promocao ? produto.preco_promocional_tradicional : produto.preco_tradicional)}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
           {isInCart ? (
             <div className="w-6 h-6 rounded border-2 flex items-center justify-center transition-all border-red-500 bg-red-500">
