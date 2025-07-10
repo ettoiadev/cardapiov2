@@ -11,6 +11,7 @@ import {
   ChefHat,
   Settings
 } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 interface DashboardStats {
   totalProdutos: number
@@ -71,31 +72,31 @@ export default function AdminDashboard() {
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="shadow-lg border-0 bg-card rounded-2xl overflow-hidden hover:shadow-xl transition-shadow">
+          <Card className="shadow-md rounded-xl bg-blue-50 border-blue-200 hover:shadow-lg transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-primary">Total de Produtos</p>
-                  <p className="text-3xl font-bold text-foreground">{stats.totalProdutos}</p>
-                  <p className="text-xs text-muted-foreground">produtos ativos</p>
+                  <p className="text-sm font-bold text-blue-800">Total de Produtos</p>
+                  <p className="text-3xl font-bold text-gray-800">{stats.totalProdutos}</p>
+                  <p className="text-xs text-blue-700">produtos ativos</p>
                 </div>
-                <div className="p-3 bg-secondary rounded-xl">
-                  <Package className="h-8 w-8 text-primary" />
+                <div className="p-3 bg-white rounded-full">
+                  <Package className="h-8 w-8 text-blue-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg border-0 bg-card rounded-2xl overflow-hidden hover:shadow-xl transition-shadow">
+          <Card className="shadow-md rounded-xl bg-yellow-50 border-yellow-200 hover:shadow-lg transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-primary">Categorias Ativas</p>
-                  <p className="text-3xl font-bold text-foreground">{stats.totalCategorias}</p>
-                  <p className="text-xs text-muted-foreground">categorias do cardápio</p>
+                  <p className="text-sm font-bold text-yellow-800">Categorias Ativas</p>
+                  <p className="text-3xl font-bold text-gray-800">{stats.totalCategorias}</p>
+                  <p className="text-xs text-yellow-700">categorias do cardápio</p>
                 </div>
-                <div className="p-3 bg-secondary rounded-xl">
-                  <ChefHat className="h-8 w-8 text-primary" />
+                <div className="p-3 bg-white rounded-full">
+                  <ChefHat className="h-8 w-8 text-yellow-600" />
                 </div>
               </div>
             </CardContent>
@@ -104,17 +105,17 @@ export default function AdminDashboard() {
 
         {/* Detailed Information Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="shadow-lg border-0 bg-card rounded-2xl overflow-hidden">
-            <CardHeader className="bg-secondary border-b border-border p-6">
+          <Card className="shadow-md rounded-xl bg-green-50 border-green-200 overflow-hidden">
+            <CardHeader className="border-b border-green-200 p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-muted rounded-lg">
-                  <BarChart3 className="h-6 w-6 text-muted-foreground" />
+                <div className="p-2 bg-white rounded-lg">
+                  <BarChart3 className="h-6 w-6 text-green-700" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl font-semibold text-foreground">
+                  <CardTitle className="text-xl font-bold text-gray-800">
                     Resumo do Sistema
                   </CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-sm text-green-800 mt-1">
                     Principais métricas do seu negócio
                   </p>
                 </div>
@@ -122,36 +123,36 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-accent rounded-lg border border-border">
+                <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-green-200">
                   <div className="flex items-center gap-3">
-                    <Package className="h-5 w-5 text-primary" />
-                    <span className="font-medium text-foreground">Produtos ativos</span>
+                    <Package className="h-5 w-5 text-green-700" />
+                    <span className="font-bold text-gray-800">Produtos ativos</span>
                   </div>
-                  <span className="text-xl font-bold text-primary">{stats.totalProdutos}</span>
+                  <span className="text-xl font-bold text-green-800">{stats.totalProdutos}</span>
                 </div>
                 
-                <div className="flex items-center justify-between p-3 bg-accent rounded-lg border border-border">
+                <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-green-200">
                   <div className="flex items-center gap-3">
-                    <ChefHat className="h-5 w-5 text-primary" />
-                    <span className="font-medium text-foreground">Categorias ativas</span>
+                    <ChefHat className="h-5 w-5 text-green-700" />
+                    <span className="font-bold text-gray-800">Categorias ativas</span>
                   </div>
-                  <span className="text-xl font-bold text-primary">{stats.totalCategorias}</span>
+                  <span className="text-xl font-bold text-green-800">{stats.totalCategorias}</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-lg border-0 bg-card rounded-2xl overflow-hidden">
-            <CardHeader className="bg-secondary border-b border-border p-6">
+          <Card className="shadow-md rounded-xl bg-orange-50 border-orange-200 overflow-hidden">
+            <CardHeader className="border-b border-orange-200 p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-muted rounded-lg">
-                  <ChefHat className="h-6 w-6 text-muted-foreground" />
+                <div className="p-2 bg-white rounded-lg">
+                  <Settings className="h-6 w-6 text-orange-700" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl font-semibold text-foreground">
+                  <CardTitle className="text-xl font-bold text-gray-800">
                     Gestão Rápida
                   </CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-sm text-orange-800 mt-1">
                     Principais funcionalidades do sistema
                   </p>
                 </div>
@@ -159,25 +160,29 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-4">
-                <div className="flex items-center gap-4 p-4 bg-accent rounded-lg border border-border hover:shadow-md transition-shadow">
-                  <div className="p-2 bg-muted rounded-lg">
-                    <Package className="h-5 w-5 text-primary" />
+                <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-orange-200 hover:shadow-sm transition-shadow">
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 bg-orange-100 rounded-lg">
+                      <Package className="h-5 w-5 text-orange-700" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-800">Gerenciar Produtos</h3>
+                      <p className="text-sm text-orange-800">Organize produtos e categorias do cardápio</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">Gerenciar Produtos</h3>
-                    <p className="text-sm text-muted-foreground">Organize produtos e categorias do cardápio</p>
-                  </div>
+                  <Button variant="outline" size="sm" className="bg-neutral-100 hover:bg-neutral-200 text-gray-800 rounded-full">Ver</Button>
                 </div>
-
-                
-                <div className="flex items-center gap-4 p-4 bg-accent rounded-lg border border-border hover:shadow-md transition-shadow">
-                  <div className="p-2 bg-muted rounded-lg">
-                    <Activity className="h-5 w-5 text-muted-foreground" />
+                <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-orange-200 hover:shadow-sm transition-shadow">
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 bg-orange-100 rounded-lg">
+                      <Settings className="h-5 w-5 text-orange-700" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-800">Configurar Sistema</h3>
+                      <p className="text-sm text-orange-800">Ajuste informações da pizzaria</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">Configurar Sistema</h3>
-                    <p className="text-sm text-muted-foreground">Ajuste informações da pizzaria</p>
-                  </div>
+                  <Button variant="outline" size="sm" className="bg-neutral-100 hover:bg-neutral-200 text-gray-800 rounded-full">Ajustar</Button>
                 </div>
               </div>
             </CardContent>
