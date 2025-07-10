@@ -372,11 +372,11 @@ export default function AdminProdutosPage() {
     }, {} as Record<string, { categoria: any, produtos: Produto[] }>)
 
     // Para compatibilidade com a interface existente, identificar categorias específicas
-    const pizzasCategoria = categorias.find(c => c.nome.toLowerCase().includes('pizzas'))
+    const pizzasTradicionaisCategoria = categorias.find(c => c.nome.toLowerCase().includes('pizzas tradicionais'))
     const bebidasCategoria = categorias.find(c => c.nome.toLowerCase() === 'bebidas')
     
-    // Pizzas (categoria "Pizzas") com numeração sequencial
-    const pizzasProdutos = pizzasCategoria ? produtosPorCategoria[pizzasCategoria.id]?.produtos || [] : []
+    // Pizzas Tradicionais (categoria "Pizzas Tradicionais") com numeração sequencial
+    const pizzasProdutos = pizzasTradicionaisCategoria ? produtosPorCategoria[pizzasTradicionaisCategoria.id]?.produtos || [] : []
     const pizzasComNumeracao = pizzasProdutos.map((pizza, index) => ({
       ...pizza,
       numeroSequencial: String(index + 1).padStart(2, '0')
@@ -385,12 +385,15 @@ export default function AdminProdutosPage() {
     // Bebidas (categoria "Bebidas") 
     const bebidas = bebidasCategoria ? produtosPorCategoria[bebidasCategoria.id]?.produtos || [] : []
 
-    // Outras categorias (exceto Pizzas e Bebidas)
+    // IDs das categorias especiais que têm seções dedicadas
+    const categoriasEspeciais = new Set([
+      pizzasTradicionaisCategoria?.id,
+      bebidasCategoria?.id
+    ].filter(Boolean))
+
+    // Outras categorias (exceto Pizzas Tradicionais e Bebidas)
     const outrasCategoriasData = Object.values(produtosPorCategoria)
-      .filter(({ categoria }) => 
-        !categoria.nome.toLowerCase().includes('pizzas') && 
-        categoria.nome.toLowerCase() !== 'bebidas'
-      )
+      .filter(({ categoria }) => !categoriasEspeciais.has(categoria.id))
 
     // Para compatibilidade, flatten dos produtos de outras categorias
     const outros = outrasCategoriasData.flatMap(({ produtos }) => produtos)
