@@ -372,7 +372,7 @@ export default function AdminProdutosPage() {
     }, {} as Record<string, { categoria: any, produtos: Produto[] }>)
 
     // Para compatibilidade com a interface existente, identificar categorias específicas
-    const pizzasCategoria = categorias.find(c => c.nome.toLowerCase() === 'pizzas')
+    const pizzasCategoria = categorias.find(c => c.nome.toLowerCase().includes('pizzas'))
     const bebidasCategoria = categorias.find(c => c.nome.toLowerCase() === 'bebidas')
     
     // Pizzas (categoria "Pizzas") com numeração sequencial
@@ -388,7 +388,7 @@ export default function AdminProdutosPage() {
     // Outras categorias (exceto Pizzas e Bebidas)
     const outrasCategoriasData = Object.values(produtosPorCategoria)
       .filter(({ categoria }) => 
-        categoria.nome.toLowerCase() !== 'pizzas' && 
+        !categoria.nome.toLowerCase().includes('pizzas') && 
         categoria.nome.toLowerCase() !== 'bebidas'
       )
 
@@ -511,7 +511,7 @@ export default function AdminProdutosPage() {
                             <Pizza className="h-5 w-5 text-orange-600" />
                           </div>
                           <div>
-                            <h2 className="text-xl font-bold text-gray-900">Pizzas</h2>
+                            <h2 className="text-xl font-bold text-foreground">Pizzas Tradicionais</h2>
                             <p className="text-sm text-gray-600">{pizzas.length} pizza{pizzas.length !== 1 ? 's' : ''} cadastrada{pizzas.length !== 1 ? 's' : ''}</p>
                           </div>
                         </div>
