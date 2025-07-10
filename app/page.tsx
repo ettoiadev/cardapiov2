@@ -55,6 +55,15 @@ interface Produto {
   adicionais?: Adicional[]
 }
 
+interface Categoria {
+  id: string
+  nome: string
+  descricao?: string | null
+  ordem: number
+  ativo: boolean
+  multi_sabores_habilitado?: boolean
+}
+
 // Função utilitária para formatar nome da pizza com sabores
 const formatPizzaName = (sabores: string[]): string => {
   if (sabores.length === 1) {
@@ -79,7 +88,7 @@ function HomePageContent() {
   const [loading, setLoading] = useState(true)
   const [config, setConfig] = useState<PizzariaConfig | null>(null)
   const [produtos, setProdutos] = useState<Produto[]>([])
-  const [categorias, setCategorias] = useState<any[]>([])
+  const [categorias, setCategorias] = useState<Categoria[]>([])
   const [opcoesSabores, setOpcoesSabores] = useState<any[]>([])
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({})
   const [hasError, setHasError] = useState(false)
@@ -776,20 +785,22 @@ function HomePageContent() {
 
           {/* Renderizar todas as categorias na ordem definida no banco */}
           {categoriasOrdenadas.map(({ categoria, produtos }) => {
-            // Pizzas tem renderização especial
-            if (categoria.nome.toLowerCase() === 'pizzas') {
+            // Categorias com multi-sabores (incluindo Pizzas) têm renderização especial
+            if (categoria.multi_sabores_habilitado || categoria.nome.toLowerCase() === 'pizzas') {
               return (
                 <Card key={categoria.id}>
                   <CardContent className="p-4">
-                    <div className="flex items-center justify-between cursor-pointer" onClick={() => toggleSection("pizzas")}>
-                      <h2 className="text-lg font-semibold">Pizzas</h2>
-                      {expandedSections.pizzas ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+                    <div className="flex items-center justify-between cursor-pointer" onClick={() => toggleSection(categoria.nome.toLowerCase())}>
+                      <h2 className="text-lg font-semibold">{categoria.nome}</h2>
+                      {expandedSections[categoria.nome.toLowerCase()] ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
                     </div>
 
-                    {expandedSections.pizzas && (
+                    {expandedSections[categoria.nome.toLowerCase()] && (
                       <div className="mt-4 space-y-4">
                         <div className="text-sm text-gray-600">
-                          {config?.descricao_pizzas || "Pizzas doces e salgadas (Tradicional 8 fatias / Broto 4 fatias)"}
+                          {categoria.descricao || (categoria.nome.toLowerCase() === 'pizzas' 
+                            ? (config?.descricao_pizzas || "Pizzas doces e salgadas (Tradicional 8 fatias / Broto 4 fatias)")
+                            : `Produtos da categoria ${categoria.nome} com seleção múltipla de sabores`)}
                         </div>
                         <div className="text-sm text-green-600 font-semibold">
                           Você pode escolher até {Math.max(...opcoesSabores.filter(o => o.ativo).map(o => o.maximo_sabores))} sabores
@@ -853,9 +864,9 @@ function HomePageContent() {
                           })}
                         </div>
 
-                        {/* Lista de pizzas */}
+                        {/* Lista de produtos */}
                         <div className="space-y-3">
-                          {[...pizzasSalgadas, ...pizzasDoces]
+                          {produtos
                             .sort((a, b) => a.ordem - b.ordem) // Garantir ordenação por ordem
                             .map((pizza, index) => {
                             const isSelected = selectedFlavorsForMulti.find(p => p.id === pizza.id)

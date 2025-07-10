@@ -62,6 +62,7 @@ interface Categoria {
   descricao?: string | null
   ordem?: number
   ativo?: boolean
+  multi_sabores_habilitado?: boolean
 }
 
 interface OpcaoSabor {
@@ -1937,6 +1938,7 @@ function CategoriaForm({
     descricao: categoria?.descricao || "",
     ordem: categoria?.ordem || 0,
     ativo: categoria?.ativo ?? true,
+    multi_sabores_habilitado: categoria?.multi_sabores_habilitado ?? false,
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -1974,29 +1976,45 @@ function CategoriaForm({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="ordem" className="text-sm font-medium text-foreground">Ordem</Label>
-          <Input
-            id="ordem"
-            type="number"
-            value={formData.ordem}
-            onChange={(e) => setFormData({ ...formData, ordem: Number.parseInt(e.target.value) || 0 })}
-            placeholder="0"
-            className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
+      <div>
+        <Label htmlFor="ordem" className="text-sm font-medium text-foreground">Ordem</Label>
+        <Input
+          id="ordem"
+          type="number"
+          value={formData.ordem}
+          onChange={(e) => setFormData({ ...formData, ordem: Number.parseInt(e.target.value) || 0 })}
+          placeholder="0"
+          className="mt-1 rounded-xl border-muted/40 focus:border-primary/50 focus:ring-primary/20"
+        />
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex items-center space-x-3">
+          <input
+            type="checkbox"
+            id="ativo"
+            checked={formData.ativo}
+            onChange={(e) => setFormData({ ...formData, ativo: e.target.checked })}
+            className="w-4 h-4 text-primary border-muted rounded focus:ring-primary/20"
           />
+          <Label htmlFor="ativo" className="text-sm font-medium text-foreground">Categoria ativa</Label>
         </div>
-        <div className="flex items-end">
-          <label className="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              checked={formData.ativo}
-              onChange={(e) => setFormData({ ...formData, ativo: e.target.checked })}
-              className="w-4 h-4 text-primary border-muted rounded focus:ring-primary/20"
-            />
-            <span className="text-sm font-medium text-foreground">Categoria ativa</span>
-          </label>
+        
+        <div className="flex items-center space-x-3">
+          <input
+            type="checkbox"
+            id="multi_sabores"
+            checked={formData.multi_sabores_habilitado}
+            onChange={(e) => setFormData({ ...formData, multi_sabores_habilitado: e.target.checked })}
+            className="w-4 h-4 text-primary border-muted rounded focus:ring-primary/20"
+          />
+          <Label htmlFor="multi_sabores" className="text-sm font-medium text-foreground">
+            Habilitar seleção múltipla de sabores
+          </Label>
         </div>
+        <p className="text-xs text-muted-foreground ml-7">
+          Quando habilitado, esta categoria funcionará como "Pizzas" com accordion e opções de 1, 2 ou 3 sabores
+        </p>
       </div>
 
       <div className="flex justify-end space-x-3 pt-6 border-t border-muted/30">
