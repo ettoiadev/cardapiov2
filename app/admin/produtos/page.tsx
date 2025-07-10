@@ -422,16 +422,16 @@ export default function AdminProdutosPage() {
     <AdminLayout>
       <div className="container mx-auto p-6 space-y-6">
         {/* 1. Header Section - Gerenciamento de Produtos */}
-        <div className="bg-gradient-to-r from-slate-50 to-blue-50/30 rounded-2xl p-8 border border-muted/30 shadow-sm">
+        <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-                <div className="p-2 bg-primary/10 rounded-xl">
-                  <Package className="h-8 w-8 text-primary" />
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <div className="p-2 bg-blue-100 rounded-xl">
+                  <Package className="h-8 w-8 text-blue-600" />
                 </div>
                 Gerenciamento de Produtos
               </h1>
-              <p className="text-muted-foreground max-w-2xl text-lg">
+              <p className="text-gray-600 max-w-2xl text-lg">
                 Gerencie produtos, categorias e configurações do seu cardápio digital.
               </p>
             </div>
@@ -439,18 +439,18 @@ export default function AdminProdutosPage() {
         </div>
 
         {/* 2. Lista de Produtos (exceto bebidas) */}
-        <Card className="border-muted/30 shadow-sm rounded-2xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-slate-50/50 to-blue-50/30 border-b border-muted/20 p-6">
+        <Card className="border-gray-200 shadow-sm rounded-2xl overflow-hidden">
+          <CardHeader className="bg-white border-b border-gray-200 p-6">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100/80 rounded-xl">
+                <div className="p-2 bg-blue-100 rounded-xl">
                   <Package className="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl font-semibold text-foreground">
+                  <CardTitle className="text-xl font-semibold text-gray-900">
                     Lista de Produtos
                   </CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-sm text-gray-600 mt-1">
                     {filteredProdutos.filter(p => p.tipo !== 'bebida').length} produto{filteredProdutos.filter(p => p.tipo !== 'bebida').length !== 1 ? 's' : ''} encontrado{filteredProdutos.filter(p => p.tipo !== 'bebida').length !== 1 ? 's' : ''}
                   </p>
                 </div>
@@ -503,15 +503,15 @@ export default function AdminProdutosPage() {
                 {/* Seção de Pizzas */}
                 {pizzas.length > 0 && (
                   <div>
-                    <div className="bg-gradient-to-r from-orange-50/50 to-amber-50/30 rounded-xl p-4 mb-6 border border-muted/30">
+                    <div className="bg-white rounded-xl p-4 mb-6 border border-gray-200 shadow-sm">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-orange-100/80 rounded-xl">
+                          <div className="p-2 bg-orange-100 rounded-xl">
                             <Pizza className="h-5 w-5 text-orange-600" />
                           </div>
                           <div>
-                            <h2 className="text-xl font-bold text-foreground">Pizzas</h2>
-                            <p className="text-sm text-muted-foreground">{pizzas.length} pizza{pizzas.length !== 1 ? 's' : ''} cadastrada{pizzas.length !== 1 ? 's' : ''}</p>
+                            <h2 className="text-xl font-bold text-gray-900">Pizzas</h2>
+                            <p className="text-sm text-gray-600">{pizzas.length} pizza{pizzas.length !== 1 ? 's' : ''} cadastrada{pizzas.length !== 1 ? 's' : ''}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-3 bg-card/50 rounded-xl p-3 border border-muted/30">
@@ -535,14 +535,14 @@ export default function AdminProdutosPage() {
                       {pizzas.map((produto) => (
                         <div
                           key={produto.id}
-                          className="group bg-gradient-to-br from-orange-50 to-amber-50 border border-muted/30 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-muted/50"
+                          className="group bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-gray-300 shadow-sm"
                         >
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
                               {getProductIcon(produto.tipo)}
                               <div>
-                                <h3 className="font-semibold text-foreground text-lg leading-tight">
-                                  <span className="inline-block bg-orange-200 text-orange-800 text-sm font-bold px-2 py-1 rounded-md mr-2">
+                                <h3 className="font-semibold text-gray-900 text-lg leading-tight">
+                                  <span className="inline-block bg-orange-100 text-orange-900 text-sm font-bold px-2 py-1 rounded-md mr-2">
                                     {produto.numeroSequencial}
                                   </span>
                                   {produto.nome}
@@ -550,11 +550,11 @@ export default function AdminProdutosPage() {
                                 <div className="flex items-center gap-2 mt-1">
                                   <Badge 
                                     variant={produto.ativo ? "default" : "secondary"}
-                                    className={`text-xs ${produto.ativo ? 'bg-green-600 hover:bg-green-700 text-white' : ''}`}
+                                    className={`text-xs font-medium ${produto.ativo ? 'bg-green-700 hover:bg-green-800 text-white' : 'bg-gray-200 text-gray-700'}`}
                                   >
-                                    {produto.ativo ? "Ativo" : "Inativo"}
+                                    {produto.ativo ? "Disponível" : "Indisponível"}
                                   </Badge>
-                                  <span className="text-xs text-muted-foreground capitalize">
+                                  <span className="text-xs text-gray-600 capitalize font-medium">
                                     {produto.tipo}
                                   </span>
                                 </div>
@@ -584,7 +584,7 @@ export default function AdminProdutosPage() {
                           </div>
 
                           {produto.descricao && (
-                            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                            <p className="text-sm text-gray-700 mb-4 leading-relaxed">
                               {produto.descricao}
                             </p>
                           )}
@@ -592,12 +592,12 @@ export default function AdminProdutosPage() {
                           {/* Exibir adicionais se existirem */}
                           {produto.adicionais && produto.adicionais.length > 0 && (
                             <div className="mb-4">
-                              <div className="text-xs text-muted-foreground mb-2 font-medium">Adicionais:</div>
+                              <div className="text-xs text-gray-700 mb-2 font-medium">Adicionais:</div>
                               <div className="space-y-1">
                                 {produto.adicionais.map((adicional, index) => (
-                                  <div key={index} className="flex justify-between items-center text-xs text-muted-foreground bg-orange-50 px-2 py-1 rounded">
+                                  <div key={index} className="flex justify-between items-center text-xs text-gray-700 bg-gray-50 px-2 py-1 rounded border">
                                     <span>{adicional.nome}</span>
-                                    <span className="font-medium text-green-600">
+                                    <span className="font-medium text-green-700">
                                       +{formatCurrency(adicional.preco)}
                                     </span>
                                   </div>
@@ -607,13 +607,13 @@ export default function AdminProdutosPage() {
                           )}
 
                           <div className="space-y-3">
-                            <div className="bg-white rounded-lg p-3 border border-orange-100">
+                            <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                               <div className="flex justify-between items-center">
-                                <span className="text-sm text-muted-foreground flex items-center gap-2">
+                                <span className="text-sm text-gray-700 flex items-center gap-2 font-medium">
                                   <Pizza className="h-4 w-4" />
                                   Tradicional
                                 </span>
-                                <span className="font-semibold text-green-600">
+                                <span className="font-bold text-green-700 text-base">
                                   {produto.promocao && produto.preco_promocional_tradicional 
                                     ? formatCurrency(produto.preco_promocional_tradicional)
                                     : formatCurrency(produto.preco_tradicional)
@@ -621,12 +621,12 @@ export default function AdminProdutosPage() {
                                 </span>
                               </div>
                               {config.habilitar_broto && produto.preco_broto && (
-                                <div className="flex justify-between items-center mt-2 pt-2 border-t border-orange-100">
-                                  <span className="text-sm text-muted-foreground flex items-center gap-2">
+                                <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-200">
+                                  <span className="text-sm text-gray-700 flex items-center gap-2 font-medium">
                                     <Pizza className="h-3 w-3" />
                                     Broto
                                   </span>
-                                  <span className="font-semibold text-green-600">
+                                  <span className="font-bold text-green-700 text-base">
                                     {produto.promocao && produto.preco_promocional_broto 
                                       ? formatCurrency(produto.preco_promocional_broto)
                                       : formatCurrency(produto.preco_broto)
@@ -637,8 +637,8 @@ export default function AdminProdutosPage() {
                             </div>
 
                             {/* Toggle de disponibilidade no card */}
-                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-orange-100">
-                              <span className="text-xs text-muted-foreground font-medium">
+                            <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+                              <span className="text-sm text-gray-800 font-medium">
                                 {produto.ativo ? "Disponível" : "Indisponível"}
                               </span>
                               <label className="relative inline-flex items-center cursor-pointer">
@@ -648,7 +648,7 @@ export default function AdminProdutosPage() {
                                   onChange={(e) => handleToggleDisponibilidade(produto.id, e.target.checked)}
                                   className="sr-only peer"
                                 />
-                                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-600"></div>
+                                <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
                               </label>
                             </div>
 
@@ -690,14 +690,14 @@ export default function AdminProdutosPage() {
                 {/* Seção de Outras Categorias */}
                 {outros.length > 0 && (
                   <div>
-                    <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl p-4 mb-6 border border-purple-200">
+                    <div className="bg-white rounded-xl p-4 mb-6 border border-gray-200 shadow-sm">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-purple-200 rounded-lg">
+                        <div className="p-2 bg-purple-100 rounded-lg">
                           <Package className="h-6 w-6 text-purple-700" />
                         </div>
                         <div>
-                          <h2 className="text-xl font-bold text-purple-900">Outras Categorias</h2>
-                          <p className="text-sm text-purple-700">{outros.length} produto{outros.length !== 1 ? 's' : ''} cadastrado{outros.length !== 1 ? 's' : ''}</p>
+                          <h2 className="text-xl font-bold text-gray-900">Outras Categorias</h2>
+                          <p className="text-sm text-gray-600">{outros.length} produto{outros.length !== 1 ? 's' : ''} cadastrado{outros.length !== 1 ? 's' : ''}</p>
                         </div>
                       </div>
                     </div>
@@ -705,23 +705,23 @@ export default function AdminProdutosPage() {
                       {outros.map((produto) => (
                         <div
                           key={produto.id}
-                          className="group bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-purple-200"
+                          className="group bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-gray-300 shadow-sm"
                         >
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
                               {getProductIcon(produto.tipo)}
                               <div>
-                                <h3 className="font-semibold text-foreground text-lg leading-tight">
+                                <h3 className="font-semibold text-gray-900 text-lg leading-tight">
                                   {produto.nome}
                                 </h3>
                                 <div className="flex items-center gap-2 mt-1">
                                   <Badge 
                                     variant={produto.ativo ? "default" : "secondary"}
-                                    className="text-xs"
+                                    className={`text-xs font-medium ${produto.ativo ? 'bg-green-700 hover:bg-green-800 text-white' : 'bg-gray-200 text-gray-700'}`}
                                   >
-                                    {produto.ativo ? "Ativo" : "Inativo"}
+                                    {produto.ativo ? "Disponível" : "Indisponível"}
                                   </Badge>
-                                  <span className="text-xs text-muted-foreground capitalize">
+                                  <span className="text-xs text-gray-600 capitalize font-medium">
                                     {produto.tipo}
                                   </span>
                                 </div>
@@ -751,19 +751,19 @@ export default function AdminProdutosPage() {
                           </div>
 
                           {produto.descricao && (
-                            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                            <p className="text-sm text-gray-700 mb-4 leading-relaxed">
                               {produto.descricao}
                             </p>
                           )}
 
                           <div className="space-y-3">
-                            <div className="bg-white rounded-lg p-3 border border-purple-100">
+                            <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                               <div className="flex justify-between items-center">
-                                <span className="text-sm text-muted-foreground flex items-center gap-2">
+                                <span className="text-sm text-gray-700 flex items-center gap-2 font-medium">
                                   <Package className="h-4 w-4" />
                                   Preço
                                 </span>
-                                <span className="font-semibold text-green-600">
+                                <span className="font-bold text-green-700 text-base">
                                   {produto.promocao && produto.preco_promocional_tradicional 
                                     ? formatCurrency(produto.preco_promocional_tradicional)
                                     : formatCurrency(produto.preco_tradicional)
@@ -773,8 +773,8 @@ export default function AdminProdutosPage() {
                             </div>
 
                             {/* Toggle de disponibilidade no card */}
-                            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-purple-100">
-                              <span className="text-xs text-muted-foreground font-medium">
+                            <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+                              <span className="text-sm text-gray-800 font-medium">
                                 {produto.ativo ? "Disponível" : "Indisponível"}
                               </span>
                               <label className="relative inline-flex items-center cursor-pointer">
@@ -784,7 +784,7 @@ export default function AdminProdutosPage() {
                                   onChange={(e) => handleToggleDisponibilidade(produto.id, e.target.checked)}
                                   className="sr-only peer"
                                 />
-                                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+                                <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
                               </label>
                             </div>
 
@@ -837,17 +837,17 @@ export default function AdminProdutosPage() {
 
         {/* 3. Bebidas */}
         {bebidas.length > 0 && (
-          <Card className="border-muted/30 shadow-sm rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-blue-50/50 to-cyan-50/30 border-b border-muted/20 p-6">
+          <Card className="border-gray-200 shadow-sm rounded-2xl overflow-hidden">
+            <CardHeader className="bg-white border-b border-gray-200 p-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100/80 rounded-xl">
+                <div className="p-2 bg-blue-100 rounded-xl">
                   <Coffee className="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl font-semibold text-foreground">
+                  <CardTitle className="text-xl font-semibold text-gray-900">
                     Bebidas
                   </CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-sm text-gray-600 mt-1">
                     {bebidas.length} bebida{bebidas.length !== 1 ? 's' : ''} cadastrada{bebidas.length !== 1 ? 's' : ''}
                   </p>
                 </div>
@@ -858,7 +858,7 @@ export default function AdminProdutosPage() {
                 {bebidas.map((produto) => (
                   <div
                     key={produto.id}
-                    className="group bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-100 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-200"
+                    className="group bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-gray-300 shadow-sm"
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-3">
@@ -910,13 +910,13 @@ export default function AdminProdutosPage() {
                     )}
 
                     <div className="space-y-3">
-                      <div className="bg-white rounded-lg p-3 border border-blue-100">
+                      <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                         <div className="flex justify-between items-center">
-                          <span className="text-sm text-muted-foreground flex items-center gap-2">
+                          <span className="text-sm text-gray-700 flex items-center gap-2 font-medium">
                             <Coffee className="h-4 w-4" />
                             Preço
                           </span>
-                          <span className="font-semibold text-green-600">
+                          <span className="font-bold text-green-700 text-base">
                             {produto.promocao && produto.preco_promocional_tradicional 
                               ? formatCurrency(produto.preco_promocional_tradicional)
                               : formatCurrency(produto.preco_tradicional)
@@ -926,8 +926,8 @@ export default function AdminProdutosPage() {
                       </div>
 
                       {/* Toggle de disponibilidade no card */}
-                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-blue-100">
-                        <span className="text-xs text-muted-foreground font-medium">
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+                        <span className="text-sm text-gray-800 font-medium">
                           {produto.ativo ? "Disponível" : "Indisponível"}
                         </span>
                         <label className="relative inline-flex items-center cursor-pointer">
@@ -937,14 +937,14 @@ export default function AdminProdutosPage() {
                             onChange={(e) => handleToggleDisponibilidade(produto.id, e.target.checked)}
                             className="sr-only peer"
                           />
-                          <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                          <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
                         </label>
                       </div>
 
                       {/* Toggle de promoção no card */}
-                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100">
-                        <span className="text-xs text-muted-foreground font-medium">
-                          {produto.promocao ? "Promoção" : "Sem promoção"}
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+                        <span className="text-sm text-gray-800 font-medium">
+                          {produto.promocao ? "Em Promoção" : "Preço Normal"}
                         </span>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input
@@ -953,17 +953,17 @@ export default function AdminProdutosPage() {
                             onChange={(e) => handleTogglePromocao(produto.id, e.target.checked)}
                             className="sr-only peer"
                           />
-                          <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
+                          <div className="w-9 h-5 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-600"></div>
                         </label>
                       </div>
 
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
+                      <div className="flex items-center justify-between text-xs text-gray-600">
+                        <span className="flex items-center gap-1 font-medium">
                           <ArrowUpDown className="h-3 w-3" />
                           Ordem: {produto.ordem}
                         </span>
                         {produto.categoria_id && (
-                          <span className="flex items-center gap-1">
+                          <span className="flex items-center gap-1 font-medium">
                             <Tag className="h-3 w-3" />
                             {categorias.find(c => c.id === produto.categoria_id)?.nome || 'Sem categoria'}
                           </span>
