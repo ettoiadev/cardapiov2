@@ -47,12 +47,12 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header with Horizontal Navigation */}
-      <header className="bg-card shadow-sm border-b border-border sticky top-0 z-40">
+      <header className="bg-red-700 text-white shadow-lg sticky top-0 z-40">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo/Title */}
             <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-foreground">Painel Administrativo</h1>
+              <h1 className="text-xl font-semibold">Painel Administrativo</h1>
             </div>
 
             {/* Desktop Navigation */}
@@ -65,8 +65,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     href={item.href}
                     className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       isActive 
-                        ? "bg-primary/10 text-primary" 
-                        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                        ? "bg-red-800" 
+                        : "hover:bg-red-600"
                     }`}
                   >
                     <item.icon className="h-4 w-4" />
@@ -79,10 +79,15 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             {/* User Menu & Mobile Menu Button */}
             <div className="flex items-center space-x-4">
               {/* User Info - Hidden on very small screens */}
-              <span className="hidden sm:block text-sm text-muted-foreground">Olá, {admin.nome}</span>
+              <span className="hidden sm:block text-sm">Olá, {admin.nome}</span>
               
               {/* Logout Button */}
-              <Button variant="outline" size="sm" onClick={logout} className="hidden sm:flex">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={logout} 
+                className="hidden sm:flex bg-white text-red-700 hover:bg-gray-100 border-white"
+              >
                 <LogOut className="h-4 w-4 mr-2" />
                 Sair
               </Button>
@@ -91,7 +96,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden"
+                className="md:hidden hover:bg-red-600"
                 onClick={toggleMobileMenu}
                 aria-label="Abrir menu"
               >
@@ -106,7 +111,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
           {/* Mobile Navigation Menu */}
           {isMobileMenuOpen && (
-            <div className="md:hidden border-t border-border">
+            <div className="md:hidden border-t border-red-600">
               <div className="pt-2 pb-3 space-y-1">
                 {menuItems.map((item) => {
                   const isActive = pathname === item.href
@@ -116,8 +121,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                       href={item.href}
                       className={`flex items-center space-x-3 px-3 py-3 text-base font-medium transition-colors ${
                         isActive
-                          ? "bg-primary/10 text-primary border-r-4 border-primary"
-                          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                          ? "bg-red-800"
+                          : "hover:bg-red-600"
                       }`}
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
@@ -128,9 +133,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 })}
                 
                 {/* Mobile User Info & Logout */}
-                <div className="border-t border-border pt-3 mt-3">
+                <div className="border-t border-red-600 pt-3 mt-3">
                   <div className="flex items-center justify-between px-3 py-2">
-                    <span className="text-sm text-muted-foreground">Olá, {admin.nome}</span>
+                    <span className="text-sm">Olá, {admin.nome}</span>
                     <Button 
                       variant="outline" 
                       size="sm" 
@@ -138,6 +143,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                         logout()
                         setIsMobileMenuOpen(false)
                       }}
+                      className="bg-white text-red-700 hover:bg-gray-100 border-white"
                     >
                       <LogOut className="h-4 w-4 mr-2" />
                       Sair
