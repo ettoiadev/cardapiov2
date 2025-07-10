@@ -330,19 +330,10 @@ function HomePageContent() {
   }
 
   const toggleSection = (section: string) => {
-    setExpandedSections((prev) => {
-      const newState = {
-        ...prev,
-        [section]: !prev[section],
-      }
-      
-      // Se a seção de pizzas estiver sendo aberta, abrir também a seção de bebidas
-      if (section === "pizzas" && !prev[section]) {
-        newState.bebidas = true
-      }
-      
-      return newState
-    })
+    setExpandedSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }))
   }
 
   const scrollToNextCategory = () => {
@@ -611,6 +602,15 @@ function HomePageContent() {
   // Bebidas continuam sendo filtradas por tipo (para compatibilidade)
   const bebidas = produtos.filter((p) => p.tipo === "bebida")
 
+  // Organizar todas as categorias por ordem para renderização
+  const categoriasOrdenadas = categorias
+    .sort((a, b) => a.ordem - b.ordem)
+    .map(categoria => ({
+      categoria,
+      produtos: produtosPorCategoria[categoria.id]?.produtos || []
+    }))
+    .filter(({ produtos }) => produtos.length > 0)
+
   // Tela de carregamento
   if (loading) {
     return (
@@ -744,283 +744,267 @@ function HomePageContent() {
           <div className="px-4 py-4 space-y-4">
           {/* Carousel */}
           <HomepageCarousel />
-          
-          {/* Seção Pizzas */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between cursor-pointer" onClick={() => toggleSection("pizzas")}>
-                <h2 className="text-lg font-semibold">Pizzas</h2>
-                {expandedSections.pizzas ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-              </div>
 
-              {expandedSections.pizzas && (
-                <div className="mt-4 space-y-4">
-                  <div className="text-sm text-gray-600">
-                    {config?.descricao_pizzas || "Pizzas doces e salgadas (Tradicional 8 fatias / Broto 4 fatias)"}
-                  </div>
-                  <div className="text-sm text-green-600 font-semibold">
-                    Você pode escolher até {Math.max(...opcoesSabores.filter(o => o.ativo).map(o => o.maximo_sabores))} sabores
-                  </div>
+          {/* Renderizar todas as categorias na ordem definida no banco */}
+          {categoriasOrdenadas.map(({ categoria, produtos }) => {
+            // Pizzas tem renderização especial
+            if (categoria.nome.toLowerCase() === 'pizzas') {
+              return (
+                <Card key={categoria.id}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between cursor-pointer" onClick={() => toggleSection("pizzas")}>
+                      <h2 className="text-lg font-semibold">Pizzas</h2>
+                      {expandedSections.pizzas ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+                    </div>
 
-                  {/* Botões de seleção de sabores dinamicos */}
-                  <div className="flex space-x-3">
-                    {opcoesSabores.filter(opcao => opcao.ativo).map((opcao, index) => {
-                      // Função para obter o caminho da imagem baseado na quantidade de sabores
-                      const getImagePath = (maxSabores: number) => {
-                        switch (maxSabores) {
-                          case 1:
-                            return "/images/sabores/1sabor.svg"
-                          case 2:
-                            return "/images/sabores/2sabores.svg"
-                          case 3:
-                            return "/images/sabores/3sabores.svg"
-                          default:
-                            return "/images/sabores/1sabor.svg"
-                        }
-                      }
+                    {expandedSections.pizzas && (
+                      <div className="mt-4 space-y-4">
+                        <div className="text-sm text-gray-600">
+                          {config?.descricao_pizzas || "Pizzas doces e salgadas (Tradicional 8 fatias / Broto 4 fatias)"}
+                        </div>
+                        <div className="text-sm text-green-600 font-semibold">
+                          Você pode escolher até {Math.max(...opcoesSabores.filter(o => o.ativo).map(o => o.maximo_sabores))} sabores
+                        </div>
 
-                      return (
-                        <Button
-                          key={opcao.id}
-                          variant="outline"
-                          className={`flex-1 h-20 flex flex-col items-center justify-center bg-transparent transition-all duration-200 hover:shadow-md ${
-                            flavorMode === opcao.maximo_sabores 
-                              ? "border-teal-500 bg-teal-50 shadow-lg" 
-                              : "border-gray-300 hover:border-gray-400"
-                          }`}
-                          onClick={() => {
-                            setFlavorMode(opcao.maximo_sabores as 1 | 2 | 3)
-                            setSelectedFlavorsForMulti([])
-                            // selectedSingleFlavor removido - marcação visual agora baseada no carrinho
-                          }}
-                        >
-                          <div className="w-8 h-8 mb-2 flex-shrink-0 flex items-center justify-center relative">
-                            <Image
-                              src={getImagePath(opcao.maximo_sabores)}
-                              alt={`${opcao.maximo_sabores} sabor${opcao.maximo_sabores > 1 ? 'es' : ''}`}
-                              width={32}
-                              height={32}
-                              className={`object-contain transition-all duration-200 ${
-                                flavorMode === opcao.maximo_sabores 
-                                  ? "scale-110 brightness-110" 
-                                  : "opacity-80 hover:opacity-100"
-                              }`}
-                              priority={opcao.maximo_sabores <= 2} // Priorizar carregamento dos ícones mais comuns
-                            />
-                          </div>
-                          <span className={`text-xs font-medium transition-colors duration-200 ${
-                            flavorMode === opcao.maximo_sabores 
-                              ? "text-teal-700" 
-                              : "text-gray-600"
-                          }`}>
-                            {opcao.maximo_sabores}
-                          </span>
-                        </Button>
-                      )
-                    })}
-                  </div>
-
-                  {/* Lista de pizzas */}
-                  <div className="space-y-3">
-                    {[...pizzasSalgadas, ...pizzasDoces]
-                      .sort((a, b) => a.ordem - b.ordem) // Garantir ordenação por ordem
-                      .map((pizza, index) => {
-                      const isSelected = selectedFlavorsForMulti.find(p => p.id === pizza.id)
-                      const isDisabled = selectedFlavorsForMulti.length >= flavorMode && !isSelected
-                      // Para 1 sabor: verificar se a pizza está no carrinho (múltiplas seleções visuais permitidas)
-                      const isSingleFlavorSelected = flavorMode === 1 && cartState.items.some(item => 
-                        item.sabores.length === 1 && item.sabores[0] === pizza.nome
-                      )
-                      const pizzaNumber = index + 1 // Numeração sequencial baseada na posição ordenada
-                      
-                      return (
-                        <div
-                          key={pizza.id}
-                          className={`flex items-center justify-between p-3 border rounded-lg transition-colors ${
-                            flavorMode === 1
-                              ? isSingleFlavorSelected
-                                ? "cursor-pointer bg-red-50 border-red-300 hover:border-red-400"
-                                : "cursor-pointer hover:bg-gray-50 border-gray-200 hover:border-gray-300"
-                              : flavorMode > 1 
-                                ? (isSelected 
-                                    ? "border-red-500 bg-red-50" 
-                                    : isDisabled 
-                                      ? "border-gray-200 opacity-50 cursor-not-allowed"
-                                      : "border-gray-200 hover:border-gray-300 cursor-pointer")
-                                : "cursor-pointer hover:bg-gray-50"
-                          }`}
-                          onClick={() => {
-                            if (!isDisabled) {
-                              handlePizzaSelection(pizza)
+                        {/* Botões de seleção de sabores dinamicos */}
+                        <div className="flex space-x-3">
+                          {opcoesSabores.filter(opcao => opcao.ativo).map((opcao, index) => {
+                            // Função para obter o caminho da imagem baseado na quantidade de sabores
+                            const getImagePath = (maxSabores: number) => {
+                              switch (maxSabores) {
+                                case 1:
+                                  return "/images/sabores/1sabor.svg"
+                                case 2:
+                                  return "/images/sabores/2sabores.svg"
+                                case 3:
+                                  return "/images/sabores/3sabores.svg"
+                                default:
+                                  return "/images/sabores/1sabor.svg"
+                              }
                             }
-                          }}
-                        >
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-2">
-                              <h3 className="font-bold text-red-600">{pizzaNumber}. {pizza.nome}</h3>
-                              {pizza.tipo === "doce" && (
-                                <Badge variant="secondary" className="text-xs">
-                                  Doce
-                                </Badge>
+
+                            return (
+                              <Button
+                                key={opcao.id}
+                                variant="outline"
+                                className={`flex-1 h-20 flex flex-col items-center justify-center bg-transparent transition-all duration-200 hover:shadow-md ${
+                                  flavorMode === opcao.maximo_sabores 
+                                    ? "border-teal-500 bg-teal-50 shadow-lg" 
+                                    : "border-gray-300 hover:border-gray-400"
+                                }`}
+                                onClick={() => {
+                                  setFlavorMode(opcao.maximo_sabores as 1 | 2 | 3)
+                                  setSelectedFlavorsForMulti([])
+                                  // selectedSingleFlavor removido - marcação visual agora baseada no carrinho
+                                }}
+                              >
+                                <div className="w-8 h-8 mb-2 flex-shrink-0 flex items-center justify-center relative">
+                                  <Image
+                                    src={getImagePath(opcao.maximo_sabores)}
+                                    alt={`${opcao.maximo_sabores} sabor${opcao.maximo_sabores > 1 ? 'es' : ''}`}
+                                    width={32}
+                                    height={32}
+                                    className={`object-contain transition-all duration-200 ${
+                                      flavorMode === opcao.maximo_sabores 
+                                        ? "scale-110 brightness-110" 
+                                        : "opacity-80 hover:opacity-100"
+                                    }`}
+                                    priority={opcao.maximo_sabores <= 2} // Priorizar carregamento dos ícones mais comuns
+                                  />
+                                </div>
+                                <span className={`text-xs font-medium transition-colors duration-200 ${
+                                  flavorMode === opcao.maximo_sabores 
+                                    ? "text-teal-700" 
+                                    : "text-gray-600"
+                                }`}>
+                                  {opcao.maximo_sabores}
+                                </span>
+                              </Button>
+                            )
+                          })}
+                        </div>
+
+                        {/* Lista de pizzas */}
+                        <div className="space-y-3">
+                          {[...pizzasSalgadas, ...pizzasDoces]
+                            .sort((a, b) => a.ordem - b.ordem) // Garantir ordenação por ordem
+                            .map((pizza, index) => {
+                            const isSelected = selectedFlavorsForMulti.find(p => p.id === pizza.id)
+                            const isDisabled = selectedFlavorsForMulti.length >= flavorMode && !isSelected
+                            // Para 1 sabor: verificar se a pizza está no carrinho (múltiplas seleções visuais permitidas)
+                            const isSingleFlavorSelected = flavorMode === 1 && cartState.items.some(item => 
+                              item.sabores.length === 1 && item.sabores[0] === pizza.nome
+                            )
+                            const pizzaNumber = index + 1 // Numeração sequencial baseada na posição ordenada
+                            
+                            return (
+                              <div
+                                key={pizza.id}
+                                className={`flex items-center justify-between p-3 border rounded-lg transition-colors ${
+                                  flavorMode === 1
+                                    ? isSingleFlavorSelected
+                                      ? "cursor-pointer bg-red-50 border-red-300 hover:border-red-400"
+                                      : "cursor-pointer hover:bg-gray-50 border-gray-200 hover:border-gray-300"
+                                    : flavorMode > 1 
+                                      ? (isSelected 
+                                          ? "border-red-500 bg-red-50" 
+                                          : isDisabled 
+                                            ? "border-gray-200 opacity-50 cursor-not-allowed"
+                                            : "border-gray-200 hover:border-gray-300 cursor-pointer")
+                                      : "cursor-pointer hover:bg-gray-50"
+                                }`}
+                                onClick={() => {
+                                  if (!isDisabled) {
+                                    handlePizzaSelection(pizza)
+                                  }
+                                }}
+                              >
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center space-x-2">
+                                    <h3 className="font-bold text-red-600">{pizzaNumber}. {pizza.nome}</h3>
+                                    {pizza.tipo === "doce" && (
+                                      <Badge variant="secondary" className="text-xs">
+                                        Doce
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  {pizza.promocao && (
+                                    <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded">
+                                      PROMOÇÃO BALCÃO
+                                    </span>
+                                  )}
+                                </div>
+                                {pizza.descricao && <p className="text-sm text-gray-600 mt-1">{pizza.descricao}</p>}
+                                
+                                {/* Seleção de tamanho inline */}
+                                {hasMultipleSizes(pizza) ? (
+                                  <div className="mt-3">
+                                    <div className="flex space-x-2">
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation()
+                                          updateSelectedSize(pizza.id, "tradicional")
+                                        }}
+                                        className={`flex-1 px-3 py-2 rounded-lg border text-sm font-medium transition-all ${
+                                          getSelectedSize(pizza.id) === "tradicional"
+                                            ? "border-green-500 bg-green-50 text-green-700"
+                                            : "border-gray-300 bg-white text-gray-600 hover:border-gray-400"
+                                        }`}
+                                      >
+                                        <div className="text-center">
+                                          <div className="font-semibold">Tradicional</div>
+                                          <div className="text-xs opacity-75">8 fatias</div>
+                                          <div className="font-bold text-black mt-1">
+                                            {formatCurrency(pizza.promocao ? pizza.preco_promocional_tradicional : pizza.preco_tradicional)}
+                                          </div>
+                                        </div>
+                                      </button>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation()
+                                          updateSelectedSize(pizza.id, "broto")
+                                        }}
+                                        className={`flex-1 px-3 py-2 rounded-lg border text-sm font-medium transition-all ${
+                                          getSelectedSize(pizza.id) === "broto"
+                                            ? "border-green-500 bg-green-50 text-green-700"
+                                            : "border-gray-300 bg-white text-gray-600 hover:border-gray-400"
+                                        }`}
+                                      >
+                                        <div className="text-center">
+                                          <div className="font-semibold">Broto</div>
+                                          <div className="text-xs opacity-75">4 fatias</div>
+                                          <div className="font-bold text-black mt-1">
+                                            {formatCurrency(pizza.promocao ? pizza.preco_promocional_broto : pizza.preco_broto)}
+                                          </div>
+                                        </div>
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center space-x-4 mt-2">
+                                    {pizzariaConfig.habilitar_broto && pizza.preco_broto && (
+                                      <span className="text-sm text-black font-bold">
+                                        Broto: {formatCurrency(pizza.promocao ? pizza.preco_promocional_broto : pizza.preco_broto)}
+                                      </span>
+                                    )}
+                                    {pizza.preco_tradicional && (
+                                      <span className="text-sm font-bold text-black">
+                                        Tradicional: {formatCurrency(pizza.promocao ? pizza.preco_promocional_tradicional : pizza.preco_tradicional)}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {flavorMode > 1 && (
+                                <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all ml-4 ${
+                                  isSelected
+                                    ? "border-red-500 bg-red-500"
+                                    : "border-red-500"
+                                }`}>
+                                  {isSelected && (
+                                    <Check className="w-4 h-4 text-white" />
+                                  )}
+                                </div>
                               )}
-                            </div>
-                            {pizza.promocao && (
-                              <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded">
-                                PROMOÇÃO BALCÃO
-                              </span>
-                            )}
-                          </div>
-                          {pizza.descricao && <p className="text-sm text-gray-600 mt-1">{pizza.descricao}</p>}
-                          
-                          {/* Seleção de tamanho inline */}
-                          {hasMultipleSizes(pizza) ? (
-                            <div className="mt-3">
-                              <div className="flex space-x-2">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    updateSelectedSize(pizza.id, "tradicional")
-                                  }}
-                                  className={`flex-1 px-3 py-2 rounded-lg border text-sm font-medium transition-all ${
-                                    getSelectedSize(pizza.id) === "tradicional"
-                                      ? "border-green-500 bg-green-50 text-green-700"
-                                      : "border-gray-300 bg-white text-gray-600 hover:border-gray-400"
-                                  }`}
-                                >
-                                  <div className="text-center">
-                                    <div className="font-semibold">Tradicional</div>
-                                    <div className="text-xs opacity-75">8 fatias</div>
-                                    <div className="font-bold text-black mt-1">
-                                      {formatCurrency(pizza.promocao ? pizza.preco_promocional_tradicional : pizza.preco_tradicional)}
-                                    </div>
-                                  </div>
-                                </button>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    updateSelectedSize(pizza.id, "broto")
-                                  }}
-                                  className={`flex-1 px-3 py-2 rounded-lg border text-sm font-medium transition-all ${
-                                    getSelectedSize(pizza.id) === "broto"
-                                      ? "border-green-500 bg-green-50 text-green-700"
-                                      : "border-gray-300 bg-white text-gray-600 hover:border-gray-400"
-                                  }`}
-                                >
-                                  <div className="text-center">
-                                    <div className="font-semibold">Broto</div>
-                                    <div className="text-xs opacity-75">4 fatias</div>
-                                    <div className="font-bold text-black mt-1">
-                                      {formatCurrency(pizza.promocao ? pizza.preco_promocional_broto : pizza.preco_broto)}
-                                    </div>
-                                  </div>
-                                </button>
+                              
+                              {flavorMode === 1 && (
+                                <Plus className="w-5 h-5 text-red-600" />
+                              )}
+                              </div>
+                            )
+                          })}
+                        </div>
+
+                        {/* Resumo dos sabores selecionados - APENAS para múltiplos sabores */}
+                        {flavorMode > 1 && selectedFlavorsForMulti.length === flavorMode && (
+                          <div className="space-y-3 pt-4 border-t bg-green-50 rounded-lg p-4 mx-2">
+                            <div className="text-center">
+                              <div className="text-sm text-red-600 mb-2 font-medium">
+                                Sabores selecionados: {selectedFlavorsForMulti.map(p => p.nome).join(" + ")}
+                              </div>
+                              <div className="text-sm text-green-600 font-bold">
+                                ✓ Pizza adicionada ao carrinho!
                               </div>
                             </div>
-                          ) : (
-                            <div className="flex items-center space-x-4 mt-2">
-                              {pizzariaConfig.habilitar_broto && pizza.preco_broto && (
-                                <span className="text-sm text-black font-bold">
-                                  Broto: {formatCurrency(pizza.promocao ? pizza.preco_promocional_broto : pizza.preco_broto)}
-                                </span>
-                              )}
-                              {pizza.preco_tradicional && (
-                                <span className="text-sm font-bold text-black">
-                                  Tradicional: {formatCurrency(pizza.promocao ? pizza.preco_promocional_tradicional : pizza.preco_tradicional)}
-                                </span>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                        
-                        {flavorMode > 1 && (
-                          <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all ml-4 ${
-                            isSelected
-                              ? "border-red-500 bg-red-500"
-                              : "border-red-500"
-                          }`}>
-                            {isSelected && (
-                              <Check className="w-4 h-4 text-white" />
-                            )}
                           </div>
                         )}
-                        
-                        {flavorMode === 1 && (
-                          <Plus className="w-5 h-5 text-red-600" />
-                        )}
-                        </div>
-                      )
-                    })}
-                  </div>
-
-                  {/* Resumo dos sabores selecionados - APENAS para múltiplos sabores */}
-                  {flavorMode > 1 && selectedFlavorsForMulti.length === flavorMode && (
-                    <div className="space-y-3 pt-4 border-t bg-green-50 rounded-lg p-4 mx-2">
-                      <div className="text-center">
-                        <div className="text-sm text-red-600 mb-2 font-medium">
-                          Sabores selecionados: {selectedFlavorsForMulti.map(p => p.nome).join(" + ")}
-                        </div>
-                        <div className="text-sm text-green-600 font-bold">
-                          ✓ Pizza adicionada ao carrinho!
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Seção Bebidas */}
-          <Card data-section="bebidas">
-            <CardContent className="p-4">
-              <div
-                className="flex items-center justify-between cursor-pointer"
-                onClick={() => toggleSection("bebidas")}
-              >
-                <h2 className="text-lg font-semibold">Bebidas</h2>
-                {expandedSections.bebidas ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-              </div>
-
-              {expandedSections.bebidas && (
-                <div className="mt-4 space-y-3">
-                  {renderCategoryProducts(bebidas, "Bebidas")}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Seções Dinâmicas para Outras Categorias */}
-          {Object.values(produtosPorCategoria)
-            .filter(({ categoria }) => categoria.nome.toLowerCase() !== 'pizzas' && categoria.nome.toLowerCase() !== 'bebidas')
-            .map(({ categoria, produtos }) => {
-              const sectionKey = categoria.nome.toLowerCase().replace(/\s+/g, '-')
-              
-              return (
-                <Card key={categoria.id} data-section={sectionKey}>
-                  <CardContent className="p-4">
-                    <div
-                      className="flex items-center justify-between cursor-pointer"
-                      onClick={() => toggleSection(sectionKey)}
-                    >
-                      <h2 className="text-lg font-semibold">{categoria.nome}</h2>
-                      {expandedSections[sectionKey] ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-                    </div>
-
-                    {expandedSections[sectionKey] && (
-                      <div className="mt-4 space-y-3">
-                        {categoria.descricao && (
-                          <div className="text-sm text-gray-600 mb-3">
-                            {categoria.descricao}
-                          </div>
-                        )}
-                        {renderCategoryProducts(produtos, categoria.nome)}
                       </div>
                     )}
                   </CardContent>
                 </Card>
               )
-            })}
+            }
+
+            // Bebidas e outras categorias têm renderização padrão
+            const sectionKey = categoria.nome.toLowerCase().replace(/\s+/g, '-')
+            
+            return (
+              <Card key={categoria.id} data-section={sectionKey}>
+                <CardContent className="p-4">
+                  <div
+                    className="flex items-center justify-between cursor-pointer"
+                    onClick={() => toggleSection(sectionKey)}
+                  >
+                    <h2 className="text-lg font-semibold">{categoria.nome}</h2>
+                    {expandedSections[sectionKey] ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+                  </div>
+
+                  {expandedSections[sectionKey] && (
+                    <div className="mt-4 space-y-3">
+                      {categoria.descricao && (
+                        <div className="text-sm text-gray-600 mb-3">
+                          {categoria.descricao}
+                        </div>
+                      )}
+                      {renderCategoryProducts(produtos, categoria.nome)}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )
+          })}
           </div>
 
           {/* Modals */}
