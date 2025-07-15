@@ -631,12 +631,6 @@ function HomePageContent() {
     return acc
   }, {} as Record<string, { categoria: any, produtos: Produto[] }>)
 
-  // Para compatibilidade com código existente (especialmente a seção de pizzas que tem lógica especial)
-  const pizzasCategoria = categorias.find(c => c.nome.toLowerCase().includes('pizzas'))
-  const pizzasProdutos = pizzasCategoria ? produtosPorCategoria[pizzasCategoria.id]?.produtos || [] : []
-  const pizzasSalgadas = pizzasProdutos.filter((p: Produto) => p.tipo === "salgada")
-  const pizzasDoces = pizzasProdutos.filter((p: Produto) => p.tipo === "doce")
-  
   // Bebidas continuam sendo filtradas por tipo (para compatibilidade)
   const bebidas = produtos.filter((p) => p.tipo === "bebida")
 
@@ -785,8 +779,8 @@ function HomePageContent() {
 
           {/* Renderizar todas as categorias na ordem definida no banco */}
           {categoriasOrdenadas.map(({ categoria, produtos }) => {
-            // Categorias com multi-sabores (incluindo Pizzas) têm renderização especial
-            if (categoria.multi_sabores_habilitado || categoria.nome.toLowerCase().includes('pizzas')) {
+            // Categorias com multi-sabores têm renderização especial
+            if (categoria.multi_sabores_habilitado) {
               return (
                 <Card key={categoria.id}>
                   <CardContent className="p-4">
@@ -798,9 +792,7 @@ function HomePageContent() {
                     {expandedSections[categoria.nome.toLowerCase()] && (
                       <div className="mt-4 space-y-4">
                         <div className="text-sm text-gray-600">
-                                                  {categoria.descricao || (categoria.nome.toLowerCase().includes('pizzas') 
-                          ? (config?.descricao_pizzas || "Pizzas doces e salgadas (Tradicional 8 fatias / Broto 4 fatias)")
-                            : `Produtos da categoria ${categoria.nome} com seleção múltipla de sabores`)}
+                          {categoria.descricao || `Produtos da categoria ${categoria.nome} com seleção múltipla de sabores`}
                         </div>
                         <div className="text-sm text-green-600 font-semibold">
                           Você pode escolher até {Math.max(...opcoesSabores.filter(o => o.ativo).map(o => o.maximo_sabores))} sabores
