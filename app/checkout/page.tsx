@@ -385,7 +385,7 @@ export default function CheckoutPage() {
         telefone: customerPhone.replace(/\D/g, "").length >= 10
       }
       
-      console.log("📝 Validação balcão:", validacoes)
+      // console.log("📝 Validação balcão:", validacoes) // Log removido para evitar spam
       
       // Para retirada no balcão: apenas nome e telefone são obrigatórios
       return (
@@ -404,7 +404,7 @@ export default function CheckoutPage() {
     let message = `*NOVO PEDIDO - ${storeConfig?.nome}*\n\n`
     
     // Resumo dos itens com formatação melhorada
-    message += `🧾 *ITENS DO PEDIDO:*\n\n`
+    message += `📋 *ITENS DO PEDIDO:*\n\n`
     state.items?.forEach((item) => {
       // Emoji baseado no tipo de item
       const emoji = item.tipo === "bebida" ? "🥤" : "🍕"
@@ -448,7 +448,7 @@ export default function CheckoutPage() {
     })
     
     // Tipo de entrega
-    message += `🏍️ *ENTREGA:* ${deliveryType === "delivery" ? "Delivery" : "Retirada no Balcão"}\n\n`
+    message += `🚚 *ENTREGA:* ${deliveryType === "delivery" ? "Delivery" : "Retirada no Balcão"}\n\n`
     
     // Dados do cliente
     message += `👤 *DADOS DO CLIENTE:*\n`
@@ -605,6 +605,15 @@ export default function CheckoutPage() {
     return cleaned
   }
 
+  // Limpar caracteres problemáticos da mensagem
+  const sanitizeMessage = (message: string): string => {
+    return message
+      .replace(/[\u200B-\u200D\uFEFF]/g, '') // Remove zero-width characters
+      .replace(/[\uFFFD]/g, '') // Remove replacement characters
+      .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
+      .trim()
+  }
+
   // Finalizar pedido
   const handleFinishOrder = () => {
     console.log("🔄 Iniciando processo de finalização do pedido...")
@@ -638,31 +647,44 @@ export default function CheckoutPage() {
         return
       }
       
+      // Limpar caracteres problemáticos da mensagem
+      let mensagemFinal = sanitizeMessage(message)
+      
       // Verificar tamanho da mensagem (WhatsApp tem limite de ~2048 caracteres na URL)
-      let mensagemFinal = message
-      if (mensagemFinal.length > 1800) {
+      if (mensagemFinal.length > 1500) {
         console.warn("⚠️ Mensagem muito longa, truncando...")
-        mensagemFinal = mensagemFinal.substring(0, 1750) + "\n\n... (mensagem truncada)"
+        mensagemFinal = mensagemFinal.substring(0, 1400) + "\n\n... (mensagem truncada)"
       }
       
-      // Tentar abrir o aplicativo nativo primeiro, depois fallback para wa.me
-      const whatsappAppUrl = `whatsapp://send?phone=${whatsappNumber}&text=${encodeURIComponent(mensagemFinal)}`
-      const whatsappWebUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(mensagemFinal)}`
+      // Construir URL do WhatsApp (wa.me é mais compatível)
+      let whatsappWebUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(mensagemFinal)}`
       
-      // Detectar se é mobile para priorizar o app nativo
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      // Verificar se a URL final não excede limites do navegador
+      if (whatsappWebUrl.length > 2000) {
+        console.warn("⚠️ URL muito longa, reduzindo mensagem...")
+        const reducedMessage = mensagemFinal.substring(0, 1000) + "\n\n... (mensagem reduzida)"
+        whatsappWebUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(reducedMessage)}`
+      }
       
-      if (isMobile) {
-        // No mobile, tentar abrir o app nativo primeiro
-        window.location.href = whatsappAppUrl
-        
-        // Fallback para wa.me após um pequeno delay se o app não abrir
-        setTimeout(() => {
+      console.log("📱 Preparando envio para WhatsApp:", { 
+        numeroProcessado: whatsappNumber, 
+        tamanhoMensagem: mensagemFinal.length,
+        urlLength: whatsappWebUrl.length 
+      })
+      
+      // Usar wa.me em todos os casos para máxima compatibilidade
+      try {
+        console.log("📱 Abrindo WhatsApp via wa.me...")
+        window.open(whatsappWebUrl, '_blank')
+      } catch (error) {
+        console.error("❌ Erro ao abrir WhatsApp:", error)
+        // Fallback: tentar com window.location
+        try {
           window.location.href = whatsappWebUrl
-        }, 2000)
-      } else {
-        // No desktop, usar wa.me diretamente
-        window.location.href = whatsappWebUrl
+        } catch (fallbackError) {
+          console.error("❌ Erro no fallback:", fallbackError)
+          alert("Erro ao abrir WhatsApp. Copie o link manualmente: " + whatsappWebUrl)
+        }
       }
       
       // Resetar estado após um pequeno delay
@@ -1287,31 +1309,7 @@ export default function CheckoutPage() {
       
       {/* Botão Fixo */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4">
-        {/* Debug Info (remover depois) */}
-        {process.env.NODE_ENV === "development" && (
-          <div className="mb-2 p-2 bg-gray-100 rounded text-xs space-y-2">
-            <div className="grid grid-cols-2 gap-2">
-              <div>Valor mínimo: {isMinimumMet ? "✅" : "❌"}</div>
-              <div>Formulário: {isFormValid() ? "✅" : "❌"}</div>
-              <div>WhatsApp: {storeConfig?.whatsapp ? "✅" : "❌"}</div>
-              <div>Carrinho: {state.items?.length || 0} itens</div>
-            </div>
-            <button
-              onClick={() => {
-                console.log("🧪 Teste de redirecionamento WhatsApp")
-                const testMessage = "🧪 TESTE - Mensagem de teste do checkout"
-                const testNumber = storeConfig?.whatsapp || "5511999999999"
-                const cleanNumber = sanitizeWhatsappNumber(testNumber)
-                const testUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(testMessage)}`
-                console.log("Test URL:", testUrl)
-                window.open(testUrl, "_blank")
-              }}
-              className="w-full bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
-            >
-              🧪 Testar WhatsApp
-            </button>
-          </div>
-        )}
+
         
         <Button
           onClick={handleFinishOrder}

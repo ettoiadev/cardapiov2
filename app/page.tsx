@@ -407,12 +407,28 @@ function HomePageContent() {
     
     if (isCurrentlySelected) {
       // Remove APENAS o sabor clicado se já estiver selecionado
-      setSelectedFlavorsForMulti(prev => {
-        const newSelection = prev.filter(p => p.id !== pizza.id)
-        
-        // Para 2 sabores: se removeu um sabor e ainda tem 1, remover a pizza do carrinho
-        if (flavorMode === 2 && newSelection.length === 1) {
-          // Encontrar e remover qualquer pizza de 2 sabores existente no carrinho
+      const newSelection = selectedFlavorsForMulti.filter(p => p.id !== pizza.id)
+      setSelectedFlavorsForMulti(newSelection)
+      
+      // Para 2 sabores: se removeu um sabor e ainda tem 1, remover a pizza do carrinho
+      if (flavorMode === 2 && newSelection.length === 1) {
+        // Encontrar e remover qualquer pizza de 2 sabores existente no carrinho
+        const existingMultiItem = cartState.items.find(item => 
+          item.sabores.length === 2 && item.id.startsWith('multi-')
+        )
+        if (existingMultiItem) {
+          dispatch({ type: 'REMOVE_ITEM', payload: existingMultiItem.id })
+        }
+      }
+    } else if (selectedFlavorsForMulti.length < flavorMode) {
+      // Adiciona se ainda não atingiu o limite
+      const newSelection = [...selectedFlavorsForMulti, pizza]
+      setSelectedFlavorsForMulti(newSelection)
+      
+      // Se completou a seleção de sabores, adicionar ao carrinho
+      if (newSelection.length === flavorMode) {
+        // Para 2 sabores: primeiro remover qualquer pizza de 2 sabores existente
+        if (flavorMode === 2) {
           const existingMultiItem = cartState.items.find(item => 
             item.sabores.length === 2 && item.id.startsWith('multi-')
           )
@@ -421,57 +437,33 @@ function HomePageContent() {
           }
         }
         
-        return newSelection
-      })
-    } else if (selectedFlavorsForMulti.length < flavorMode) {
-      // Adiciona se ainda não atingiu o limite
-      setSelectedFlavorsForMulti(prev => {
-        const newSelection = [...prev, pizza]
+        // Para múltiplos sabores, usar o primeiro tamanho comum ou tradicional como padrão
+        const tamanhosSelecionados = newSelection.map(p => getSelectedSize(p.id))
+        const tamanhoComum = tamanhosSelecionados.every(t => t === tamanhosSelecionados[0]) 
+          ? tamanhosSelecionados[0] 
+          : "tradicional"
         
-        // Se completou a seleção de sabores, adicionar ao carrinho
-        if (newSelection.length === flavorMode) {
-          setTimeout(() => {
-            // Para 2 sabores: primeiro remover qualquer pizza de 2 sabores existente
-            if (flavorMode === 2) {
-              const existingMultiItem = cartState.items.find(item => 
-                item.sabores.length === 2 && item.id.startsWith('multi-')
-              )
-              if (existingMultiItem) {
-                dispatch({ type: 'REMOVE_ITEM', payload: existingMultiItem.id })
-              }
-            }
-            
-            // Para múltiplos sabores, usar o primeiro tamanho comum ou tradicional como padrão
-            const tamanhosSelecionados = newSelection.map(p => getSelectedSize(p.id))
-            const tamanhoComum = tamanhosSelecionados.every(t => t === tamanhosSelecionados[0]) 
-              ? tamanhosSelecionados[0] 
-              : "tradicional"
-            
-            const prices = newSelection.map(p => getPriceBySize(p, tamanhoComum))
-            const preco = Math.max(...prices)
-            const sabores = newSelection.map(p => p.nome)
-            const nomeItem = formatPizzaName(sabores)
-            // Usar IDs únicos dos produtos em vez de nomes para evitar conflitos entre categorias
-            const pizzaIds = newSelection.map(p => p.id).sort()
-            const itemId = `multi-${pizzaIds.join("-")}-${tamanhoComum}`
-            
-            // Adicionar a nova pizza ao carrinho
-            dispatch({
-              type: "ADD_ITEM",
-              payload: {
-                id: itemId,
-                nome: nomeItem,
-                tamanho: tamanhoComum,
-                sabores: sabores,
-                preco: preco,
-                tipo: newSelection[0].tipo,
-              },
-            })
-          }, 100)
-        }
+        const prices = newSelection.map(p => getPriceBySize(p, tamanhoComum))
+        const preco = Math.max(...prices)
+        const sabores = newSelection.map(p => p.nome)
+        const nomeItem = formatPizzaName(sabores)
+        // Usar IDs únicos dos produtos em vez de nomes para evitar conflitos entre categorias
+        const pizzaIds = newSelection.map(p => p.id).sort()
+        const itemId = `multi-${pizzaIds.join("-")}-${tamanhoComum}`
         
-        return newSelection
-      })
+        // Adicionar a nova pizza ao carrinho
+        dispatch({
+          type: "ADD_ITEM",
+          payload: {
+            id: itemId,
+            nome: nomeItem,
+            tamanho: tamanhoComum,
+            sabores: sabores,
+            preco: preco,
+            tipo: newSelection[0].tipo,
+          },
+        })
+      }
     }
   }
 

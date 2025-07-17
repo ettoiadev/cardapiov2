@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge"
 import { AdminLayout } from "@/components/admin-layout"
 import { supabase } from "@/lib/supabase"
 import { useConfig } from "@/lib/config-context"
-import { formatCurrency, formatCurrencyInput, parseCurrencyInput } from "@/lib/currency-utils"
+import { formatCurrency, formatCurrencyInput, formatCurrencyForInput, parseCurrencyInput } from '@/lib/currency-utils'
 import { 
   Plus, 
   Edit, 
@@ -1438,7 +1438,9 @@ function ProdutoForm({
   
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    const parsedValue = parseCurrencyInput(value)
+    const formattedValue = formatCurrencyInput(value)
+    e.target.value = formattedValue
+    const parsedValue = parseCurrencyInput(formattedValue)
     setFormData(prev => ({ ...prev, [name]: parsedValue }))
   }
 
@@ -1474,9 +1476,10 @@ function ProdutoForm({
     setFormData((prev) => ({ ...prev, adicionais: novosAdicionais }));
   };
 
-  const atualizarPrecoAdicional = (index: number, valorFormatado: string) => {
+  const atualizarPrecoAdicional = (index: number, valor: string) => {
+    const formattedValue = formatCurrencyInput(valor);
     const novosAdicionais = [...(formData.adicionais || [])];
-    const precoNumerico = parseCurrencyInput(valorFormatado);
+    const precoNumerico = parseCurrencyInput(formattedValue);
     novosAdicionais[index] = { ...novosAdicionais[index], preco: precoNumerico };
     setFormData((prev) => ({ ...prev, adicionais: novosAdicionais }));
   };
@@ -1529,7 +1532,7 @@ function ProdutoForm({
           <Input
             id="preco_tradicional"
             name="preco_tradicional"
-            value={formatCurrencyInput(String(formData.preco_tradicional || ''))}
+            value={formatCurrencyForInput(formData.preco_tradicional)}
             onChange={handlePriceChange}
             className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80"
             placeholder="R$ 0,00"
@@ -1542,7 +1545,7 @@ function ProdutoForm({
             <Input
               id="preco_broto"
               name="preco_broto"
-              value={formatCurrencyInput(String(formData.preco_broto || ''))}
+              value={formatCurrencyForInput(formData.preco_broto)}
               onChange={handlePriceChange}
               className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80"
               placeholder="R$ 0,00"
@@ -1555,7 +1558,7 @@ function ProdutoForm({
           <Input
             id="preco_promocional_tradicional"
             name="preco_promocional_tradicional"
-            value={formatCurrencyInput(String(formData.preco_promocional_tradicional || ''))}
+            value={formatCurrencyForInput(formData.preco_promocional_tradicional)}
             onChange={handlePriceChange}
             className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80"
             placeholder="R$ 0,00"
@@ -1568,7 +1571,7 @@ function ProdutoForm({
             <Input
               id="preco_promocional_broto"
               name="preco_promocional_broto"
-              value={formatCurrencyInput(String(formData.preco_promocional_broto || ''))}
+              value={formatCurrencyForInput(formData.preco_promocional_broto)}
               onChange={handlePriceChange}
               className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80"
               placeholder="R$ 0,00"
@@ -1596,7 +1599,7 @@ function ProdutoForm({
               <Label htmlFor={`adicional-preco-${index}`} className="text-xs font-medium text-gray-600">Preço do Adicional</Label>
               <Input
                 id={`adicional-preco-${index}`}
-                value={formatCurrencyInput(String(adicional.preco || ''))}
+                value={formatCurrencyForInput(adicional.preco)}
                 onChange={(e) => atualizarPrecoAdicional(index, e.target.value)}
                 placeholder="R$ 0,00"
                 className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80"
@@ -1804,8 +1807,15 @@ function BordaForm({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    const parsedValue = parseFloat(value)
-    setFormData(prev => ({ ...prev, [name]: parsedValue }))
+    if (name === 'preco') {
+      const formattedValue = formatCurrencyInput(value)
+      e.target.value = formattedValue
+      const parsedValue = parseCurrencyInput(formattedValue)
+      setFormData(prev => ({ ...prev, [name]: parsedValue }))
+    } else {
+      const parsedValue = parseFloat(value)
+      setFormData(prev => ({ ...prev, [name]: parsedValue }))
+    }
   }
 
   return (
@@ -1828,7 +1838,7 @@ function BordaForm({
           <Input
             id="preco-borda"
             name="preco"
-            value={formatCurrencyInput(String(formData.preco || ''))}
+            value={formatCurrencyForInput(formData.preco)}
             onChange={handleChange}
             className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/80"
             placeholder="R$ 0,00"

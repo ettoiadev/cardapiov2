@@ -59,6 +59,24 @@ export function parseCurrencyInput(formattedValue: string): number {
 }
 
 /**
+ * Formata um valor numérico para exibição em campos de input
+ * 45.00 -> "R$ 45,00"
+ */
+export function formatCurrencyForInput(value: number | null | undefined): string {
+  if (value === null || value === undefined || isNaN(value) || value === 0) {
+    return ''
+  }
+  
+  // Formata com vírgula decimal
+  let valorFormatado = value.toFixed(2).replace('.', ',')
+  
+  // Adiciona separador de milhar
+  valorFormatado = valorFormatado.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
+  
+  return `R$ ${valorFormatado}`
+}
+
+/**
  * Aplica formatação de moeda em um campo de input durante a digitação
  */
 export function applyCurrencyMask(event: React.ChangeEvent<HTMLInputElement>) {
@@ -68,4 +86,4 @@ export function applyCurrencyMask(event: React.ChangeEvent<HTMLInputElement>) {
   
   // Retorna o valor numérico para uso interno
   return parseCurrencyInput(formattedValue)
-} 
+}
