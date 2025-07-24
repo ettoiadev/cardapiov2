@@ -610,7 +610,8 @@ export default function CheckoutPage() {
     return message
       .replace(/[\u200B-\u200D\uFEFF]/g, '') // Remove zero-width characters
       .replace(/[\uFFFD]/g, '') // Remove replacement characters
-      .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
+      // Remove control characters, exceto \n (0x0A)
+      .replace(/[\u0000-\u0009\u000B-\u001F\u007F-\u009F]/g, '')
       .trim()
   }
 
