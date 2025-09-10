@@ -1,0 +1,19 @@
+{
+  "status": "commited",
+  "type": "backend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:3000",
+  "backendAuthType": "basic token",
+  "backendUsername": "admin@pizzaria.com",
+  "backendPassword": "admin123",
+  "executionArgs": {
+    "projectName": "cardapiodigital",
+    "projectPath": "c:\\Users\\ettop\\Desktop\\aplicacoes\\cardapiodigital",
+    "testIds": [],
+    "additionalInstruction": "Executar todos os testes backend para o projeto Cardápio Digital com Supabase",
+    "envs": {
+      "API_KEY": "sk-user-6t3I6hNRm2kewV5NpKAAD6QdCnG9vQWSs00pIPOytsxXu_q-7oRGSWybiAvvDhFgbOVyOGMwCeS0n3llWH_FMXF_KH3rQvx1A9i52cZ7fJQxgHOk5ErHZSs093VXcxW7zLU"
+    }
+  },
+  "proxy": "http://89762f46-959b-40ff-98c9-a37a217d1178:BbDBt4g7jnB8l4CXz5AnSdHweYvjvBJs@tun.testsprite.com:8080"
+}

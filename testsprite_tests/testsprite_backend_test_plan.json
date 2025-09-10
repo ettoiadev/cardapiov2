@@ -1,0 +1,52 @@
+[
+  {
+    "id": "TC001",
+    "title": "admin login with valid credentials",
+    "description": "Test the /api/auth/login endpoint with valid admin email and password to ensure successful login and session creation."
+  },
+  {
+    "id": "TC002",
+    "title": "list all products",
+    "description": "Test the GET /api/products endpoint to verify it returns a list of all products with correct details."
+  },
+  {
+    "id": "TC003",
+    "title": "create new product with valid data",
+    "description": "Test the POST /api/products endpoint with valid product data to ensure a new product is created successfully."
+  },
+  {
+    "id": "TC004",
+    "title": "update existing product",
+    "description": "Test the PUT /api/products/{id} endpoint to update product details and verify the changes are saved."
+  },
+  {
+    "id": "TC005",
+    "title": "delete existing product",
+    "description": "Test the DELETE /api/products/{id} endpoint to remove a product and confirm it is deleted from the database."
+  },
+  {
+    "id": "TC006",
+    "title": "list all categories",
+    "description": "Test the GET /api/categories endpoint to verify it returns a list of all product categories."
+  },
+  {
+    "id": "TC007",
+    "title": "create new category",
+    "description": "Test the POST /api/categories endpoint with valid category data to ensure a new category is created successfully."
+  },
+  {
+    "id": "TC008",
+    "title": "add item to cart",
+    "description": "Test the POST /api/cart/add endpoint to add a product item with quantity and customizations to the shopping cart."
+  },
+  {
+    "id": "TC009",
+    "title": "remove item from cart",
+    "description": "Test the POST /api/cart/remove endpoint to remove an item from the shopping cart and verify the cart updates correctly."
+  },
+  {
+    "id": "TC010",
+    "title": "process order checkout",
+    "description": "Test the POST /api/checkout endpoint with valid customer info, payment method, delivery option, and items to ensure order is processed and sent via WhatsApp."
+  }
+]

@@ -1,0 +1,578 @@
+[
+  {
+    "id": "TC001",
+    "title": "Admin login success",
+    "description": "Verify that administrator can log in with correct credentials and access protected admin routes.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the admin login page."
+      },
+      {
+        "type": "action",
+        "description": "Input valid administrator username and password."
+      },
+      {
+        "type": "action",
+        "description": "Click the login button."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify login is successful and dashboard is displayed."
+      },
+      {
+        "type": "action",
+        "description": "Navigate to a protected admin page directly via URL."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure access is granted without redirect to login page."
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Admin login failure with incorrect credentials",
+    "description": "Ensure login fails when administrator enters invalid username or password.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the admin login page."
+      },
+      {
+        "type": "action",
+        "description": "Input invalid username or password."
+      },
+      {
+        "type": "action",
+        "description": "Click the login button."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an error message is displayed and login is denied."
+      },
+      {
+        "type": "action",
+        "description": "Attempt to access protected admin routes after failed login."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify redirection back to login page."
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Admin logout functionality",
+    "description": "Verify that administrator can log out successfully and session is terminated.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as an administrator with valid credentials."
+      },
+      {
+        "type": "action",
+        "description": "Click the logout button on the admin panel."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that session is terminated and user is redirected to login page."
+      },
+      {
+        "type": "action",
+        "description": "Attempt to access any admin page after logout."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify access is denied and user is redirected to login."
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "CRUD operations on products",
+    "description": "Verify that administrator can create, read, update and delete products successfully with database persistence.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as administrator and navigate to product management page."
+      },
+      {
+        "type": "action",
+        "description": "Create a new product with all required fields including category, sizes, prices and optional image upload."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new product appears in product list with correct data."
+      },
+      {
+        "type": "action",
+        "description": "Update the product details such as price, name or image."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated product data is saved and reflected in the list."
+      },
+      {
+        "type": "action",
+        "description": "Delete the created product."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the product is removed from the database and product list."
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "CRUD operations on categories",
+    "description": "Ensure administrator can create, read, update and delete product categories with persistence.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in and navigate to category management."
+      },
+      {
+        "type": "action",
+        "description": "Add a new product category."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm the category appears in the list."
+      },
+      {
+        "type": "action",
+        "description": "Modify the category name."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify updated name is shown."
+      },
+      {
+        "type": "action",
+        "description": "Delete the category."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure the category no longer appears and products are either reassigned or handle category deletion gracefully."
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Filter product catalog by category and promotion",
+    "description": "Verify clients can filter the product catalog by category and active promotions on homepage.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the web homepage."
+      },
+      {
+        "type": "action",
+        "description": "Use filter controls to select a specific category."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify only products belonging to the selected category are displayed."
+      },
+      {
+        "type": "action",
+        "description": "Toggle filter for promotional products."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm only products with promotions are shown."
+      },
+      {
+        "type": "action",
+        "description": "Combine filters (category + promotion)."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure product list displays correct filtered results."
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Add customized product to shopping cart",
+    "description": "Ensure client can select product size, flavors, stuffed crust option, and add to cart with correct pricing.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to a product details page."
+      },
+      {
+        "type": "action",
+        "description": "Select a size for the product."
+      },
+      {
+        "type": "action",
+        "description": "Choose one or multiple flavors."
+      },
+      {
+        "type": "action",
+        "description": "Select stuffed crust option if available."
+      },
+      {
+        "type": "action",
+        "description": "Add the customized product to the shopping cart."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the item is added with correct details and pricing, including promotions and additional costs."
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Persistent shopping cart across sessions",
+    "description": "Verify the shopping cart retains items, quantities and pricing after user closes and reopens browser.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Add multiple items with different customizations to the cart."
+      },
+      {
+        "type": "action",
+        "description": "Close the browser or tab."
+      },
+      {
+        "type": "action",
+        "description": "Reopen the web application and access the cart."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm that previously added items are still present with correct quantities and prices."
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Modify shopping cart quantities and check price recalculation",
+    "description": "Ensure client can update quantity of items in cart and pricing updates accordingly including promotions and extras.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the shopping cart containing multiple items."
+      },
+      {
+        "type": "action",
+        "description": "Change the quantity of an item to a valid number."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify total price and individual item price update correctly."
+      },
+      {
+        "type": "action",
+        "description": "Set quantity to zero or remove an item."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify item is removed from cart and pricing updates."
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Checkout process with delivery selection and WhatsApp integration",
+    "description": "Verify client can proceed through checkout steps with personal data input, select delivery, choose payment, and finish order with WhatsApp message sent.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Proceed to checkout with items in the cart."
+      },
+      {
+        "type": "action",
+        "description": "Fill in customer personal information including name, address, and phone."
+      },
+      {
+        "type": "action",
+        "description": "Select delivery option."
+      },
+      {
+        "type": "action",
+        "description": "Choose a payment method from available options."
+      },
+      {
+        "type": "action",
+        "description": "Confirm and finalize the order."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that order data is validated and a WhatsApp message with order details is composed/sent."
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Checkout process with pickup selection and payment options",
+    "description": "Confirm client can complete checkout choosing pickup (retirada) with valid payment and finishing order correctly.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Go to checkout with items in cart."
+      },
+      {
+        "type": "action",
+        "description": "Enter required customer information."
+      },
+      {
+        "type": "action",
+        "description": "Select pickup as order modality."
+      },
+      {
+        "type": "action",
+        "description": "Select payment method."
+      },
+      {
+        "type": "action",
+        "description": "Submit the order."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure order validation passes and WhatsApp message is prepared and dispatched."
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Checkout error handling for missing or invalid customer data",
+    "description": "Verify checkout prevents submission and shows errors when required customer fields are missing or invalid.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Proceed to checkout."
+      },
+      {
+        "type": "action",
+        "description": "Leave required personal data fields empty or enter invalid data (e.g., invalid phone number)."
+      },
+      {
+        "type": "action",
+        "description": "Attempt to finalize order."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify error messages appear for each invalid or missing field and order cannot be submitted."
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Update store configurations reflections",
+    "description": "Verify that changes made by admins in store configurations like delivery fees, payment options, and opening hours are reflected throughout the application.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as admin and navigate to configurations page."
+      },
+      {
+        "type": "action",
+        "description": "Change delivery fees, add/remove payment options and adjust opening hours."
+      },
+      {
+        "type": "action",
+        "description": "Save configuration changes."
+      },
+      {
+        "type": "action",
+        "description": "Log out and as client, refresh store front pages including checkout."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify updated fees, payment options, and hours are reflected correctly."
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "Product image upload and preview in admin panel",
+    "description": "Ensure admin can upload product images and preview them before saving changes in product management.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in and go to product editing page."
+      },
+      {
+        "type": "action",
+        "description": "Upload a valid image file for the product."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify uploaded image preview is displayed correctly."
+      },
+      {
+        "type": "action",
+        "description": "Save product changes."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm the image is persisted and visible on the product catalog."
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Homepage carousel display and navigation",
+    "description": "Check the carousel on the homepage displays promotional images correctly and allows navigation controls (next/prev).",
+    "category": "ui",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open homepage."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm carousel images are visible and auto-rotate correctly."
+      },
+      {
+        "type": "action",
+        "description": "Use navigation arrows or dots to go to next and previous images."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the images update accordingly."
+      }
+    ]
+  },
+  {
+    "id": "TC016",
+    "title": "Footer social and contact information display",
+    "description": "Verify that the footer displays configured social media links and contact information consistently.",
+    "category": "ui",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to any page of the application."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm footer shows active social media icons with working links and contact details as configured."
+      }
+    ]
+  },
+  {
+    "id": "TC017",
+    "title": "Access control for debug tools",
+    "description": "Ensure debug tools under admin panel are accessible only by authenticated administrators.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Attempt to access debug tools page without logging in."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify access is denied and redirected to login page."
+      },
+      {
+        "type": "action",
+        "description": "Login as admin and access debug tools page."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm debug tools are available and functional."
+      }
+    ]
+  },
+  {
+    "id": "TC018",
+    "title": "Database security with Row Level Security (RLS)",
+    "description": "Validate that Row Level Security policies prevent unauthorized data access in PostgreSQL.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Attempt to query product and order data from a client context bypassing authentication."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that data access is restricted as per RLS policies."
+      },
+      {
+        "type": "action",
+        "description": "Query data using authenticated admin context."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm full access to relevant data is granted."
+      }
+    ]
+  },
+  {
+    "id": "TC019",
+    "title": "Application responsiveness and WCAG compliance",
+    "description": "Verify that the application is fully responsive on different screen sizes and supports WCAG accessibility standards.",
+    "category": "ui",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the application on desktop, tablet and multiple mobile devices."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm UI elements adapt appropriately without loss of functionality or content."
+      },
+      {
+        "type": "action",
+        "description": "Use a screen reader and keyboard only navigation."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that all interactive components are accessible and usable."
+      }
+    ]
+  },
+  {
+    "id": "TC020",
+    "title": "Performance check under load conditions",
+    "description": "Assess that application pages load within 3 seconds under expected normal user load.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Simulate multiple users browsing homepage, product catalog, and checkout simultaneously."
+      },
+      {
+        "type": "assertion",
+        "description": "Measure page load times and verify they are below 3 seconds."
+      }
+    ]
+  }
+]

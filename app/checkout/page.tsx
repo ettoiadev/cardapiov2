@@ -12,6 +12,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useCart } from "@/lib/cart-context"
 import { useConfig } from "@/lib/config-context"
+import { useClientes } from "@/lib/clientes-context"
 import { formatCurrency } from "@/lib/currency-utils"
 import { supabase, isSupabaseConfigured } from "@/lib/supabase"
 
@@ -83,6 +84,11 @@ export default function CheckoutPage() {
   // Dados do cliente
   const [customerName, setCustomerName] = useState("")
   const [customerPhone, setCustomerPhone] = useState("")
+  const [saveCustomer, setSaveCustomer] = useState(false)
+  const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null)
+  
+  // Context de clientes
+  const { clientes, buscarClientes, salvarCliente } = useClientes()
   const [customerCep, setCep] = useState("")
   const [addressData, setAddressData] = useState<AddressData | null>(null)
   const [addressNumber, setAddressNumber] = useState("")
@@ -102,6 +108,11 @@ export default function CheckoutPage() {
     }
     loadData()
   }, [])
+  
+  // Carregar clientes
+  useEffect(() => {
+    buscarClientes()
+  }, [buscarClientes])
 
   // Ajustar método de pagamento baseado nas configurações disponíveis
   useEffect(() => {
@@ -616,7 +627,7 @@ export default function CheckoutPage() {
   }
 
   // Finalizar pedido
-  const handleFinishOrder = () => {
+  const handleFinishOrder = async () => {
     console.log("🔄 Iniciando processo de finalização do pedido...")
     console.log("📋 Validações:", {
       formValida: isFormValid(),
@@ -632,6 +643,26 @@ export default function CheckoutPage() {
     }
 
     setSubmitting(true)
+    
+    // Salvar cliente se solicitado
+    if (saveCustomer && !selectedCustomer && customerName.trim() && customerPhone.replace(/\D/g, "").length >= 10) {
+      try {
+        const clienteData = {
+          nome_completo: customerName.trim(),
+          telefone: customerPhone,
+          cep: customerCep,
+          endereco_completo: addressData ? `${addressData.logradouro}, ${addressData.bairro} - ${addressData.localidade}/${addressData.uf}` : "",
+          numero: addressNumber,
+          complemento: addressComplement
+        }
+        
+        await salvarCliente(clienteData)
+        console.log("✅ Cliente salvo com sucesso")
+      } catch (error) {
+        console.error("❌ Erro ao salvar cliente:", error)
+        // Continuar com o pedido mesmo se falhar ao salvar o cliente
+      }
+    }
     
     try {
       const message = generateWhatsAppMessage()
@@ -807,6 +838,49 @@ export default function CheckoutPage() {
             ) : (
               /* Formulário normal */
               <div className="space-y-4">
+                {/* Buscar Cliente Existente */}
+                {clientes.length > 0 && (
+                  <div>
+                    <Label className="text-[15px]">Cliente Cadastrado</Label>
+                    <select
+                      value={selectedCustomer || ""}
+                      onChange={(e) => {
+                        const clienteId = e.target.value
+                        if (clienteId) {
+                          const cliente = clientes.find(c => c.id === clienteId)
+                          if (cliente) {
+                            setCustomerName(cliente.nome_completo)
+                            setCustomerPhone(cliente.telefone)
+                            setCustomerCep(cliente.cep)
+                            setAddressNumber(cliente.numero || "")
+                            setAddressComplement(cliente.complemento || "")
+                            setSelectedCustomer(clienteId)
+                            // Buscar endereço pelo CEP
+                            if (cliente.cep) {
+                              handleCepChange(cliente.cep)
+                            }
+                          }
+                        } else {
+                          setCustomerName("")
+                          setCustomerPhone("")
+                          setCustomerCep("")
+                          setAddressNumber("")
+                          setAddressComplement("")
+                          setSelectedCustomer(null)
+                        }
+                      }}
+                      className="w-full p-2 border border-gray-300 rounded-md mt-1"
+                    >
+                      <option value="">Selecionar cliente ou cadastrar novo</option>
+                      {clientes.map(cliente => (
+                        <option key={cliente.id} value={cliente.id}>
+                          {cliente.nome_completo} - {cliente.telefone}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                
                 {/* Nome */}
                 <div>
                   <Label htmlFor="name" className="text-[15px]">Nome Completo *</Label>
@@ -816,7 +890,10 @@ export default function CheckoutPage() {
                       id="name"
                       placeholder="Ex: João Silva"
                       value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
+                      onChange={(e) => {
+                        setCustomerName(e.target.value)
+                        setSelectedCustomer(null) // Limpar seleção ao editar
+                      }}
                       className="pl-10"
                       required
                     />
@@ -832,12 +909,29 @@ export default function CheckoutPage() {
                       id="phone"
                       placeholder="Ex: (11) 99999-9999"
                       value={customerPhone}
-                      onChange={(e) => handlePhoneChange(e.target.value)}
+                      onChange={(e) => {
+                        handlePhoneChange(e.target.value)
+                        setSelectedCustomer(null) // Limpar seleção ao editar
+                      }}
                       className="pl-10"
                       required
                     />
                   </div>
                 </div>
+                
+                {/* Opção para salvar cliente */}
+                {!selectedCustomer && customerName.trim() && customerPhone.replace(/\D/g, "").length >= 10 && (
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="save-customer"
+                      checked={saveCustomer}
+                      onCheckedChange={(checked) => setSaveCustomer(checked as boolean)}
+                    />
+                    <Label htmlFor="save-customer" className="text-sm text-gray-600">
+                      Salvar dados para próximos pedidos
+                    </Label>
+                  </div>
+                )}
                 
                 {/* Campos específicos para Delivery */}
                 {deliveryType === "delivery" && (

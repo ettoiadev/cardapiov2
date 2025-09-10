@@ -1,0 +1,213 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Markdown Preview</title>
+      <style>
+        body {
+          font-family: sans-serif;
+          padding: 40px;
+          line-height: 1.6;
+          background: #fdfdfd;
+          color: #333;
+        }
+        pre {
+          background: #f4f4f4;
+          padding: 10px;
+          border-radius: 5px;
+          overflow-x: auto;
+        }
+        code {
+          font-family: monospace;
+          background: #eee;
+          padding: 2px 4px;
+        }
+        table {
+          border-collapse: collapse;
+          width: 100%;
+          margin-top: 20px;
+        }
+        th, td {
+          border: 1px solid #ccc;
+          padding: 8px 12px;
+          text-align: left;
+        }
+        th {
+          background-color: #f2f2f2;
+          font-weight: bold;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Relatório de Testes - Cardápio Digital</h1>
+<h2>Resumo Executivo</h2>
+<p><strong>Projeto</strong>: Cardápio Digital para Pizzaria<br>
+<strong>Tipo</strong>: Frontend (Next.js + React + TypeScript)<br>
+<strong>Data</strong>: Janeiro 2025<br>
+<strong>Status</strong>: Configuração do TestSprite Concluída<br>
+<strong>Servidor</strong>: http://localhost:3000</p>
+<h2>Configuração do Ambiente de Testes</h2>
+<h3>✅ Configurações Realizadas</h3>
+<ul>
+<li><strong>Servidor de Desenvolvimento</strong>: Iniciado com sucesso na porta 3000</li>
+<li><strong>Tipo de Projeto</strong>: Frontend identificado corretamente</li>
+<li><strong>Credenciais de Teste</strong>: admin@pizzaria.com / admin123</li>
+<li><strong>Plano de Testes</strong>: 20 casos de teste gerados</li>
+<li><strong>Resumo do Código</strong>: Análise técnica completa realizada</li>
+</ul>
+<h3>📋 Stack Tecnológica Identificada</h3>
+<ul>
+<li><strong>Frontend</strong>: Next.js 15.2.4, React, TypeScript</li>
+<li><strong>UI</strong>: Tailwind CSS, Radix UI</li>
+<li><strong>Backend</strong>: Supabase (PostgreSQL)</li>
+<li><strong>Autenticação</strong>: Sistema customizado</li>
+<li><strong>Estado</strong>: Context API (React)</li>
+</ul>
+<h2>Plano de Testes Gerado</h2>
+<h3>🔐 Testes de Segurança (Prioridade Alta)</h3>
+<ol>
+<li>
+<p><strong>TC001 - Login de Administrador</strong></p>
+<ul>
+<li>✅ Configurado</li>
+<li>Verifica login com credenciais válidas</li>
+<li>Testa acesso a rotas protegidas</li>
+</ul>
+</li>
+<li>
+<p><strong>TC002 - Falha de Login</strong></p>
+<ul>
+<li>✅ Configurado</li>
+<li>Testa credenciais inválidas</li>
+<li>Verifica mensagens de erro</li>
+</ul>
+</li>
+<li>
+<p><strong>TC003 - Logout</strong></p>
+<ul>
+<li>✅ Configurado</li>
+<li>Testa encerramento de sessão</li>
+<li>Verifica redirecionamento</li>
+</ul>
+</li>
+</ol>
+<h3>🛍️ Testes de Funcionalidade (Prioridade Alta)</h3>
+<ol start="4">
+<li>
+<p><strong>TC004 - CRUD de Produtos</strong></p>
+<ul>
+<li>✅ Configurado</li>
+<li>Criar, ler, atualizar, deletar produtos</li>
+<li>Persistência no banco de dados</li>
+</ul>
+</li>
+<li>
+<p><strong>TC005 - Gerenciamento de Categorias</strong></p>
+<ul>
+<li>✅ Configurado</li>
+<li>Operações CRUD em categorias</li>
+<li>Validação de dados</li>
+</ul>
+</li>
+<li>
+<p><strong>TC006 - Filtros do Catálogo</strong></p>
+<ul>
+<li>✅ Configurado</li>
+<li>Filtro por categoria</li>
+<li>Filtro por promoções</li>
+</ul>
+</li>
+</ol>
+<h3>🛒 Testes de E-commerce (Prioridade Média)</h3>
+<ol start="7">
+<li><strong>TC007-TC012 - Sistema de Carrinho</strong>
+<ul>
+<li>✅ Configurado</li>
+<li>Adicionar/remover itens</li>
+<li>Cálculo de preços</li>
+<li>Customização de produtos</li>
+<li>Checkout completo</li>
+</ul>
+</li>
+</ol>
+<h3>⚙️ Testes de Configuração (Prioridade Média)</h3>
+<ol start="13">
+<li><strong>TC013 - Configurações da Loja</strong>
+<ul>
+<li>✅ Configurado</li>
+<li>Horários de funcionamento</li>
+<li>Formas de pagamento</li>
+<li>Informações de contato</li>
+</ul>
+</li>
+</ol>
+<h3>🔧 Testes Técnicos (Prioridade Baixa)</h3>
+<ol start="14">
+<li><strong>TC014-TC020 - Testes Avançados</strong>
+<ul>
+<li>✅ Configurado</li>
+<li>Upload de imagens</li>
+<li>Responsividade</li>
+<li>Performance</li>
+<li>Ferramentas de debug</li>
+<li>Testes de carga</li>
+</ul>
+</li>
+</ol>
+<h2>Status dos Componentes</h2>
+<h3>✅ Componentes Funcionais</h3>
+<ul>
+<li><strong>Sistema de Autenticação</strong>: Implementado e configurado</li>
+<li><strong>Painel Administrativo</strong>: Interface completa</li>
+<li><strong>Carrinho de Compras</strong>: Context API funcionando</li>
+<li><strong>Catálogo de Produtos</strong>: Exibição dinâmica</li>
+<li><strong>Sistema de Checkout</strong>: Integração WhatsApp</li>
+<li><strong>Configurações</strong>: Gerenciamento de loja</li>
+<li><strong>Integração Supabase</strong>: Conexão estabelecida</li>
+</ul>
+<h3>⚠️ Pontos de Atenção</h3>
+<ol>
+<li><strong>Variáveis de Ambiente</strong>: Sistema funciona com fallbacks quando Supabase não configurado</li>
+<li><strong>Autenticação</strong>: Sistema simplificado (recomenda-se hash de senhas para produção)</li>
+<li><strong>Dados de Teste</strong>: Usando dados mock quando banco não disponível</li>
+</ol>
+<h2>Próximos Passos</h2>
+<h3>🎯 Execução dos Testes</h3>
+<ol>
+<li><strong>Testes Manuais</strong>: Executar os 20 casos de teste criados</li>
+<li><strong>Testes Automatizados</strong>: Implementar com Playwright/Cypress</li>
+<li><strong>Testes de Integração</strong>: Validar fluxos completos</li>
+<li><strong>Testes de Performance</strong>: Verificar tempos de resposta</li>
+</ol>
+<h3>🔧 Melhorias Recomendadas</h3>
+<ol>
+<li><strong>Segurança</strong>: Implementar hash de senhas</li>
+<li><strong>Validação</strong>: Adicionar validação de formulários</li>
+<li><strong>Error Handling</strong>: Melhorar tratamento de erros</li>
+<li><strong>Loading States</strong>: Adicionar indicadores de carregamento</li>
+<li><strong>Testes Unitários</strong>: Implementar Jest/Testing Library</li>
+</ol>
+<h2>Conclusão</h2>
+<p>✅ <strong>TestSprite configurado com sucesso</strong><br>
+✅ <strong>Plano de testes abrangente criado (20 casos)</strong><br>
+✅ <strong>Servidor de desenvolvimento funcionando</strong><br>
+✅ <strong>Credenciais de teste configuradas</strong></p>
+<p>O projeto está <strong>pronto para execução de testes</strong>. O TestSprite identificou corretamente a arquitetura do sistema e gerou um plano de testes completo cobrindo:</p>
+<ul>
+<li><strong>Segurança</strong> (autenticação/autorização)</li>
+<li><strong>Funcionalidades core</strong> (CRUD, carrinho, checkout)</li>
+<li><strong>Interface de usuário</strong> (responsividade, usabilidade)</li>
+<li><strong>Performance</strong> (carga, responsividade)</li>
+</ul>
+<p><strong>Recomendação</strong>: Proceder com a execução manual dos testes seguindo o plano gerado, e posteriormente implementar automação para testes de regressão.</p>
+<hr>
+<p><strong>Gerado por</strong>: TestSprite MCP<br>
+<strong>Arquivo de Configuração</strong>: <code>testsprite_tests/tmp/config.json</code><br>
+<strong>Plano de Testes</strong>: <code>testsprite_tests/testsprite_frontend_test_plan.json</code><br>
+<strong>Resumo Técnico</strong>: <code>testsprite_tests/tmp/code_summary.json</code></p>
+
+    </body>
+    </html>
+  

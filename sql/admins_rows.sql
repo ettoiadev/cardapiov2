@@ -1,0 +1,1 @@
+INSERT INTO "public"."admins" ("id", "email", "senha", "nome", "ativo", "created_at", "updated_at") VALUES ('bbc4a914-12b5-4e7e-b841-de50663c0b04', 'admin@pizzaria.com', 'admin123', 'Administrador William Disk Pizza', 'true', '2025-07-04 13:08:54.108393+00', '2025-07-04 13:08:54.108393+00');
