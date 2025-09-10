@@ -460,6 +460,8 @@ export default function AdminConfigPage() {
           endereco: data.endereco || "",
           telefone: data.telefone || "",
           whatsapp: data.whatsapp || "",
+          taxa_entrega: data.taxa_entrega || 5.0,
+          valor_minimo: data.valor_minimo || 20.0,
           aceita_pix: data.aceita_pix !== undefined ? data.aceita_pix : true,
           aceita_ticket_alimentacao: data.aceita_ticket_alimentacao !== undefined ? data.aceita_ticket_alimentacao : false,
           horario_funcionamento: data.horario_funcionamento || {
@@ -484,9 +486,11 @@ export default function AdminConfigPage() {
         }
         setConfig(configData)
         
-        // Formatar valores monetários
-        setTaxaEntregaFormatada(formatCurrencyInput((configData.taxa_entrega * 100).toString()))
-        setValorMinimoFormatado(formatCurrencyInput((configData.valor_minimo * 100).toString()))
+        // Formatar valores monetários com verificação de segurança
+        const taxaEntrega = configData.taxa_entrega || 5.0
+        const valorMinimo = configData.valor_minimo || 20.0
+        setTaxaEntregaFormatada(formatCurrencyInput((taxaEntrega * 100).toString()))
+        setValorMinimoFormatado(formatCurrencyInput((valorMinimo * 100).toString()))
       } else {
         // Valores padrão formatados
         setTaxaEntregaFormatada(formatCurrencyInput("500")) // R$ 5,00
@@ -494,6 +498,9 @@ export default function AdminConfigPage() {
       }
     } catch (error) {
       console.error("Erro ao conectar com Supabase:", error)
+      // Definir valores padrão em caso de erro
+      setTaxaEntregaFormatada(formatCurrencyInput("500")) // R$ 5,00
+      setValorMinimoFormatado(formatCurrencyInput("2000")) // R$ 20,00
     }
   }
 
@@ -672,16 +679,40 @@ export default function AdminConfigPage() {
 
   const handleSaveCarouselConfig = async () => {
     try {
-      const { error } = await supabase
+      // Primeiro, verificar se existe uma configuração
+      const { data: existingConfig, error: selectError } = await supabase
         .from('carousel_config')
-        .update({
-          ativo: carouselConfig.ativo,
-          intervalo_segundos: carouselConfig.intervalo_segundos
-        })
-        .eq('id', (await supabase.from('carousel_config').select('id').single()).data?.id)
+        .select('id')
+        .single()
 
-      if (error) {
-        console.error('Erro ao salvar configuração do carousel:', error)
+      if (selectError && selectError.code !== 'PGRST116') {
+        console.error('Erro ao buscar configuração do carousel:', selectError)
+        setCarouselMessage("Erro ao buscar configuração")
+        return
+      }
+
+      let result
+      if (existingConfig?.id) {
+        // Atualizar configuração existente
+        result = await supabase
+          .from('carousel_config')
+          .update({
+            ativo: carouselConfig.ativo,
+            intervalo_segundos: carouselConfig.intervalo_segundos
+          })
+          .eq('id', existingConfig.id)
+      } else {
+        // Criar nova configuração
+        result = await supabase
+          .from('carousel_config')
+          .insert({
+            ativo: carouselConfig.ativo,
+            intervalo_segundos: carouselConfig.intervalo_segundos
+          })
+      }
+
+      if (result.error) {
+        console.error('Erro ao salvar configuração do carousel:', result.error)
         setCarouselMessage("Erro ao salvar configuração")
         return
       }
@@ -704,8 +735,26 @@ export default function AdminConfigPage() {
   }
 
   // Novas funções para gerenciar horários separados
-  const parseHorario = (horario: string) => {
-    if (!horario || horario.toLowerCase() === 'fechado') {
+  const parseHorario = (horario: string | any) => {
+    // Se é um objeto (formato do Supabase)
+    if (horario && typeof horario === 'object') {
+      if (horario.aberto === false) {
+        return { inicio: '', fim: '', fechado: true }
+      }
+      return {
+        inicio: horario.abertura || '',
+        fim: horario.fechamento || '',
+        fechado: false
+      }
+    }
+    
+    // Verificar se horario é uma string válida
+    if (!horario || typeof horario !== 'string') {
+      return { inicio: '', fim: '', fechado: true }
+    }
+    
+    // Verificar se está marcado como fechado
+    if (horario.toLowerCase() === 'fechado') {
       return { inicio: '', fim: '', fechado: true }
     }
     

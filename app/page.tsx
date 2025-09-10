@@ -92,7 +92,13 @@ function HomePageContent() {
   const [produtos, setProdutos] = useState<Produto[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [opcoesSabores, setOpcoesSabores] = useState<any[]>([])
-  const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({})
+  const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({
+    pizzas: true,
+    bebidas: true,
+    sobremesas: true,
+    lanches: true,
+    porcoes: true
+  })
   const [hasError, setHasError] = useState(false)
 
   const [showStoreInfo, setShowStoreInfo] = useState(false)
@@ -267,6 +273,15 @@ function HomePageContent() {
         setCategorias(fallbackData.categorias)
         setOpcoesSabores(fallbackData.opcoesSabores)
         
+        // Expandir todas as seções automaticamente baseadas nas categorias de fallback
+        const expandedSectionsFromCategories = fallbackData.categorias.reduce((acc, categoria) => {
+          const sectionKey = categoria.nome.toLowerCase().replace(/\s+/g, '-')
+          acc[sectionKey] = true
+          return acc
+        }, {} as Record<string, boolean>)
+        
+        setExpandedSections(expandedSectionsFromCategories)
+        
         log.info("Aplicação carregada com dados de fallback", 'APP')
         setLoading(false)
         return
@@ -289,6 +304,16 @@ function HomePageContent() {
         setProdutos(fallbackData.produtos)
         setCategorias(fallbackData.categorias)
         setOpcoesSabores(fallbackData.opcoesSabores)
+        
+        // Expandir todas as seções automaticamente baseadas nas categorias de fallback
+        const expandedSectionsFromCategories = fallbackData.categorias.reduce((acc, categoria) => {
+          const sectionKey = categoria.nome.toLowerCase().replace(/\s+/g, '-')
+          acc[sectionKey] = true
+          return acc
+        }, {} as Record<string, boolean>)
+        
+        setExpandedSections(expandedSectionsFromCategories)
+        
         setLoading(false)
         return
       }
@@ -299,13 +324,25 @@ function HomePageContent() {
       log.info("Configuração e produtos carregados do Supabase", 'APP')
 
       // Categorias são opcionais - usar fallback se não existir
+      let categoriasParaUsar = []
       if (categoriasResult.success && categoriasResult.data.length > 0) {
         setCategorias(categoriasResult.data)
+        categoriasParaUsar = categoriasResult.data
         log.info(`${categoriasResult.data.length} categorias carregadas`, 'APP')
       } else {
         log.warn("Usando categorias de fallback", 'APP')
         setCategorias(fallbackData.categorias)
+        categoriasParaUsar = fallbackData.categorias
       }
+
+      // Expandir todas as seções automaticamente baseadas nas categorias carregadas
+      const expandedSectionsFromCategories = categoriasParaUsar.reduce((acc, categoria) => {
+        const sectionKey = categoria.nome.toLowerCase().replace(/\s+/g, '-')
+        acc[sectionKey] = true
+        return acc
+      }, {} as Record<string, boolean>)
+      
+      setExpandedSections(expandedSectionsFromCategories)
 
       // Opções de sabores - usar fallback se não existir
       if (opcoesResult.success && opcoesResult.data.length > 0) {
@@ -333,6 +370,15 @@ function HomePageContent() {
       setProdutos(fallbackData.produtos)
       setCategorias(fallbackData.categorias)
       setOpcoesSabores(fallbackData.opcoesSabores)
+      
+      // Expandir todas as seções automaticamente baseadas nas categorias de fallback
+      const expandedSectionsFromCategories = fallbackData.categorias.reduce((acc, categoria) => {
+        const sectionKey = categoria.nome.toLowerCase().replace(/\s+/g, '-')
+        acc[sectionKey] = true
+        return acc
+      }, {} as Record<string, boolean>)
+      
+      setExpandedSections(expandedSectionsFromCategories)
     } finally {
       setLoading(false)
     }
