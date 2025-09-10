@@ -101,27 +101,84 @@ export async function supabaseOperation<T>(
  */
 export const fallbackData = {
   pizzariaConfig: {
-    nome: 'Pizzaria',
-    telefone: '(00) 0000-0000',
-    endereco: 'Endereço não disponível',
+    id: 'fallback-config',
+    nome: 'Pizzaria Demo',
+    telefone: '(11) 99999-9999',
+    whatsapp: '5511999999999',
+    endereco: 'Rua das Pizzas, 123 - Centro',
     horario_funcionamento: {
-      segunda: { abertura: '18:00', fechamento: '23:00' },
-      terca: { abertura: '18:00', fechamento: '23:00' },
-      quarta: { abertura: '18:00', fechamento: '23:00' },
-      quinta: { abertura: '18:00', fechamento: '23:00' },
-      sexta: { abertura: '18:00', fechamento: '23:00' },
-      sabado: { abertura: '18:00', fechamento: '23:00' },
-      domingo: { abertura: '18:00', fechamento: '23:00' }
+      segunda: '18:00-23:00',
+      terca: '18:00-23:00',
+      quarta: '18:00-23:00',
+      quinta: '18:00-23:00',
+      sexta: '18:00-23:00',
+      sabado: '18:00-23:00',
+      domingo: '18:00-23:00'
     },
     taxa_entrega: 5.00,
-    valor_minimo_entrega: 25.00,
+    valor_minimo: 25.00,
+    aceita_dinheiro: true,
+    aceita_cartao: true,
+    aceita_pix: true,
     habilitar_broto: true,
     habilitar_bordas_recheadas: true
   },
   
   categorias: [
-    { id: 'fallback-1', nome: 'Pizzas Salgadas', ativo: true, ordem: 1 },
-    { id: 'fallback-2', nome: 'Pizzas Doces', ativo: true, ordem: 2 }
+    { id: 'fallback-1', nome: 'Pizzas Salgadas', ativo: true, ordem: 1, multi_sabores_habilitado: true },
+    { id: 'fallback-2', nome: 'Pizzas Doces', ativo: true, ordem: 2, multi_sabores_habilitado: true },
+    { id: 'fallback-3', nome: 'Bebidas', ativo: true, ordem: 3, multi_sabores_habilitado: false }
+  ],
+  
+  produtos: [
+    {
+      id: 'fallback-pizza-1',
+      categoria_id: 'fallback-1',
+      nome: 'Margherita',
+      descricao: 'Molho de tomate, mussarela e manjericão',
+      preco_tradicional: 35.00,
+      preco_broto: 25.00,
+      tipo: 'pizza',
+      ativo: true,
+      promocao: false,
+      ordem: 1
+    },
+    {
+      id: 'fallback-pizza-2',
+      categoria_id: 'fallback-1',
+      nome: 'Calabresa',
+      descricao: 'Molho de tomate, mussarela, calabresa e cebola',
+      preco_tradicional: 38.00,
+      preco_broto: 28.00,
+      tipo: 'pizza',
+      ativo: true,
+      promocao: false,
+      ordem: 2
+    },
+    {
+      id: 'fallback-pizza-3',
+      categoria_id: 'fallback-2',
+      nome: 'Chocolate',
+      descricao: 'Chocolate ao leite derretido',
+      preco_tradicional: 32.00,
+      preco_broto: 22.00,
+      tipo: 'pizza',
+      ativo: true,
+      promocao: false,
+      ordem: 3
+    },
+    {
+      id: 'fallback-bebida-1',
+      categoria_id: 'fallback-3',
+      nome: 'Coca-Cola 2L',
+      descricao: 'Refrigerante Coca-Cola 2 litros',
+      preco_tradicional: 8.00,
+      preco_broto: null,
+      tipo: 'bebida',
+      ativo: true,
+      promocao: false,
+      ordem: 4
+    }
   ],
   
   tamanhosPizza: [
@@ -130,8 +187,8 @@ export const fallbackData = {
   ],
   
   opcoesSabores: [
-    { id: 'fallback-1', nome: '1 Sabor', ativo: true, ordem: 1 },
-    { id: 'fallback-2', nome: '2 Sabores', ativo: true, ordem: 2 }
+    { id: 'fallback-1', nome: '1 Sabor', maximo_sabores: 1, ativo: true, ordem: 1 },
+    { id: 'fallback-2', nome: '2 Sabores', maximo_sabores: 2, ativo: true, ordem: 2 }
   ]
 }
 

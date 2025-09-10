@@ -25,7 +25,21 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 // Helper function to check if Supabase is properly configured
 export const isSupabaseConfigured = () => {
-  return !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  
+  // Check if variables exist and are not placeholder values
+  const hasValidUrl = url && 
+    url !== 'https://seu-projeto.supabase.co' && 
+    url !== 'https://placeholder.supabase.co' &&
+    !url.includes('placeholder')
+    
+  const hasValidKey = key && 
+    key !== 'placeholder-key' &&
+    key !== 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.exemplo-chave-anon' &&
+    !key.includes('exemplo')
+    
+  return !!(hasValidUrl && hasValidKey)
 }
 
 // Helper function to test Supabase connectivity

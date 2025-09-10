@@ -261,11 +261,11 @@ function HomePageContent() {
       if (!isSupabaseConfigured()) {
         log.warn("Supabase não configurado - usando dados de fallback", 'APP')
         
-        // Usar dados de fallback
-         setConfig(fallbackData.pizzariaConfig)
-         setProdutos([])
-         setCategorias(fallbackData.categorias)
-         setOpcoesSabores(fallbackData.opcoesSabores)
+        // Usar dados de fallback completos
+        setConfig(fallbackData.pizzariaConfig)
+        setProdutos(fallbackData.produtos)
+        setCategorias(fallbackData.categorias)
+        setOpcoesSabores(fallbackData.opcoesSabores)
         
         log.info("Aplicação carregada com dados de fallback", 'APP')
         setLoading(false)
@@ -286,9 +286,9 @@ function HomePageContent() {
       if (!configResult.success || !produtosResult.success) {
         log.warn("Erro ao carregar dados críticos - usando fallback", 'APP')
         setConfig(fallbackData.pizzariaConfig)
-         setProdutos([])
-         setCategorias(fallbackData.categorias)
-         setOpcoesSabores(fallbackData.opcoesSabores)
+        setProdutos(fallbackData.produtos)
+        setCategorias(fallbackData.categorias)
+        setOpcoesSabores(fallbackData.opcoesSabores)
         setLoading(false)
         return
       }
@@ -329,10 +329,10 @@ function HomePageContent() {
       log.error("Erro crítico ao carregar dados - usando fallback", 'APP', {}, error instanceof Error ? error : new Error(String(error)))
       
       // Em caso de erro crítico, usar fallback
-       setConfig(fallbackData.pizzariaConfig)
-       setProdutos([])
-       setCategorias(fallbackData.categorias)
-       setOpcoesSabores(fallbackData.opcoesSabores)
+      setConfig(fallbackData.pizzariaConfig)
+      setProdutos(fallbackData.produtos)
+      setCategorias(fallbackData.categorias)
+      setOpcoesSabores(fallbackData.opcoesSabores)
     } finally {
       setLoading(false)
     }
