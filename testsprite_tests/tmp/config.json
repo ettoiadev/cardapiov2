@@ -1,19 +1,18 @@
 {
   "status": "commited",
-  "type": "backend",
+  "type": "frontend",
   "scope": "codebase",
   "localEndpoint": "http://localhost:3000",
-  "backendAuthType": "basic token",
-  "backendUsername": "admin@pizzaria.com",
-  "backendPassword": "admin123",
+  "loginUser": "admin@pizzaria.com",
+  "loginPassword": "admin123",
   "executionArgs": {
     "projectName": "cardapiodigital",
-    "projectPath": "c:\\Users\\ettop\\Desktop\\aplicacoes\\cardapiodigital",
+    "projectPath": "C:\\Users\\ettop\\Desktop\\aplicacoes\\cardapiodigital",
     "testIds": [],
-    "additionalInstruction": "Executar todos os testes backend para o projeto Cardápio Digital com Supabase",
+    "additionalInstruction": "Executar teste completo do projeto após implementação de correções de bugs, sistema de logs estruturados e tratamento de erros. Validar especialmente: 1) Correção dos erros PGRST116 do Supabase, 2) Sistema de autenticação administrativa, 3) Carregamento de dados da pizzaria, 4) Funcionalidades do carrinho de compras, 5) Sistema de logs implementado",
     "envs": {
       "API_KEY": "sk-user-6t3I6hNRm2kewV5NpKAAD6QdCnG9vQWSs00pIPOytsxXu_q-7oRGSWybiAvvDhFgbOVyOGMwCeS0n3llWH_FMXF_KH3rQvx1A9i52cZ7fJQxgHOk5ErHZSs093VXcxW7zLU"
     }
   },
-  "proxy": "http://89762f46-959b-40ff-98c9-a37a217d1178:BbDBt4g7jnB8l4CXz5AnSdHweYvjvBJs@tun.testsprite.com:8080"
+  "proxy": "http://c12bf89f-6702-4c28-8dae-5740a1997622:IChYBlk7SBoMWjUCnUunokFawvj5nnLC@tun.testsprite.com:8080"
 }

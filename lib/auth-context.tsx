@@ -1,6 +1,8 @@
 "use client"
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { supabase, testSupabaseConnection, getSupabaseDebugInfo } from "@/lib/supabase"
+import { supabaseOperation } from "@/lib/error-handler"
+import { log } from "@/lib/logger"
 
 interface Admin {
   id: string
@@ -44,19 +46,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, senha: string): Promise<boolean> => {
     try {
-      console.log("🔐 Iniciando processo de login...")
-      console.log("📧 Email fornecido:", email)
-      console.log("🔑 Senha fornecida (length):", senha.length)
+      log.info("Tentando fazer login", 'AUTH', { email })
       
       // Test connection first
+      log.info("Testando conexão com Supabase", 'AUTH')
       const connectionResult = await testSupabaseConnection()
       if (!connectionResult.success) {
-        console.error("❌ Falha na conexão:", connectionResult.error)
-        console.error("📋 Detalhes:", connectionResult.details)
+        log.error("Erro de conexão com Supabase", 'AUTH', {}, connectionResult.error)
         throw new Error(`Erro de conexão: ${connectionResult.error}`)
       }
 
-      console.log("✅ Conexão com Supabase verificada")
+      log.info("Conexão com Supabase estabelecida", 'AUTH')
 
       // Primeiro, vamos verificar se existem admins na tabela
       console.log("🔍 Verificando todos os admins na tabela...")
@@ -72,48 +72,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       // Agora vamos tentar a consulta específica com logs detalhados
-      console.log("🔍 Buscando admin específico com email:", email)
-      const { data, error, count } = await supabase
-        .from("admins")
-        .select("*", { count: 'exact' })
-        .eq("email", email)
-        .eq("ativo", true)
+      log.info("Buscando dados do admin", 'AUTH', { email })
+      const result = await supabaseOperation(
+        () => supabase
+          .from("admins")
+          .select("*")
+          .eq("email", email)
+          .eq("ativo", true)
+          .maybeSingle()
+      )
 
-      console.log("📊 Resultado da consulta:", { data, error, count })
+      log.info("Consulta de admin executada", 'AUTH', { hasData: !!result.data })
 
-      if (error) {
-        console.error("❌ Erro na consulta de admin:", error)
-        console.error("🔍 Código do erro:", error.code)
-        console.error("🔍 Mensagem do erro:", error.message)
-        console.error("🔍 Detalhes do erro:", error.details)
-        
-        if (error.code === 'PGRST116') {
-          console.error("📋 PGRST116: Nenhum admin encontrado com este email")
-          // Vamos tentar uma consulta mais permissiva
-          console.log("🔍 Tentando consulta sem filtro de ativo...")
-          const { data: dataWithoutActive, error: errorWithoutActive } = await supabase
-            .from("admins")
-            .select("*")
-            .eq("email", email)
-          
-          console.log("📊 Resultado sem filtro ativo:", { dataWithoutActive, errorWithoutActive })
-        } else {
-          console.error("📋 Erro técnico:", error.message)
-        }
+      if (!result.success) {
+        log.error("Erro na consulta de admin", 'AUTH', {}, result.error)
         return false
       }
 
-      if (!data || data.length === 0) {
-        console.error("❌ Erro: Nenhum admin encontrado com este email")
-        console.log("🔍 Dados retornados:", data)
-        console.log("🔍 Count:", count)
+      if (!result.data) {
+        log.warn("Nenhum admin encontrado com este email", 'AUTH', { email })
         return false
       }
 
-      const adminData = data[0]
-      console.log("👤 Admin encontrado:", adminData)
-      console.log("🔑 Senha no banco:", adminData.senha)
-      console.log("🔑 Senha fornecida:", senha)
+      const adminData = result.data
+      log.info("Admin encontrado", 'AUTH', { adminId: adminData.id, email: adminData.email })
 
       // IMPORTANTE: Em produção, implementar verificação de hash de senha segura
       // Por enquanto, verificação simplificada - DEVE SER ALTERADO PARA PRODUÇÃO
@@ -121,8 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       // Verificar senha (substituir por verificação de hash em produção)
       if (adminData.senha !== senha) {
-        console.error("❌ Erro: Senha incorreta")
-        console.log("🔍 Comparação: banco='", adminData.senha, "' vs fornecida='", senha, "'")
+        log.warn("Senha incorreta", 'AUTH', { email })
         return false
       }
 
@@ -134,13 +115,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       setAdmin(responseAdminData)
       localStorage.setItem("admin", JSON.stringify(responseAdminData))
-      console.log("✅ Login realizado com sucesso")
+      log.info("Login realizado com sucesso", 'AUTH', { adminId: adminData.id })
       return true
     } catch (error) {
-      console.error("❌ Erro no sistema de login:", error)
-      if (error instanceof Error) {
-        console.error("🔍 Stack trace:", error.stack)
-      }
+      log.error("Erro no sistema de login", 'AUTH', { email }, error instanceof Error ? error : new Error(String(error)))
       return false
     }
   }
@@ -154,13 +132,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Test connection first
       const connectionResult = await testSupabaseConnection()
       if (!connectionResult.success) {
-        console.error("❌ Falha na conexão para atualizar credenciais:", connectionResult.error)
+        log.error("Falha na conexão para atualizar credenciais", 'AUTH', {}, connectionResult.error)
         throw new Error(`Erro de conexão: ${connectionResult.error}`)
       }
 
       // Por enquanto, vamos simular a atualização para desenvolvimento
       // Em produção, isso deveria ser feito com hash seguro no backend
-      console.log("Simulando atualização de credenciais:", { novoEmail, novaSenha })
+      log.info("Simulando atualização de credenciais", 'AUTH', { novoEmail })
       
       // Atualizar dados locais
       const updatedAdmin = { ...admin, email: novoEmail }
@@ -170,7 +148,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Simular sucesso
       return true
     } catch (error) {
-      console.error("Erro ao atualizar credenciais:", error)
+      log.error("Erro ao atualizar credenciais", 'AUTH', {}, error instanceof Error ? error : new Error(String(error)))
       return false
     }
   }
@@ -178,7 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setAdmin(null)
     localStorage.removeItem("admin")
-    console.log("🚪 Logout realizado")
+    log.info("Logout realizado", 'AUTH')
   }
 
   return <AuthContext.Provider value={{ admin, login, logout, updateCredentials, loading, connectionTest }}>{children}</AuthContext.Provider>

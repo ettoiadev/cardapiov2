@@ -8,6 +8,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Minus, CreditCard, Banknote, Check } from "lucide-react"
 import { supabase, isSupabaseConfigured } from "@/lib/supabase"
+import { supabaseOperation, fallbackData } from "@/lib/error-handler"
+import { log } from "@/lib/logger"
 import { useCart } from "@/lib/cart-context"
 import { useConfig } from "@/lib/config-context"
 import { StoreInfoModal } from "@/components/store-info-modal"
@@ -257,59 +259,58 @@ function HomePageContent() {
   const loadData = async () => {
     try {
       if (!isSupabaseConfigured()) {
-        console.error("❌ Aplicação não configurada para produção")
-        console.error("   Configure as variáveis de ambiente:")
-        console.error("   NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY")
-        setHasError(true)
+        log.warn("Supabase não configurado - usando dados de fallback", 'APP')
+        
+        // Usar dados de fallback
+         setConfig(fallbackData.pizzariaConfig)
+         setProdutos([])
+         setCategorias(fallbackData.categorias)
+         setOpcoesSabores(fallbackData.opcoesSabores)
+        
+        log.info("Aplicação carregada com dados de fallback", 'APP')
         setLoading(false)
         return
       }
 
-      console.log("🔄 Carregando dados de produção...")
+      log.info("Carregando dados de produção", 'APP')
       
-      // Carregar dados do Supabase
+      // Carregar dados do Supabase com tratamento de erro
       const [configResult, produtosResult, categoriasResult, opcoesResult] = await Promise.all([
-        supabase.from("pizzaria_config").select("*").single(),
-        supabase.from("produtos").select("*").eq("ativo", true).order("ordem"),
-        supabase.from("categorias").select("*").eq("ativo", true).order("ordem"),
-        supabase.from("opcoes_sabores").select("*").eq("ativo", true).order("ordem"),
+        supabaseOperation(() => supabase.from("pizzaria_config").select("*").maybeSingle()),
+        supabaseOperation(() => supabase.from("produtos").select("*").eq("ativo", true).order("ordem")),
+        supabaseOperation(() => supabase.from("categorias").select("*").eq("ativo", true).order("ordem")),
+        supabaseOperation(() => supabase.from("opcoes_sabores").select("*").eq("ativo", true).order("ordem")),
       ])
 
-      // Configuração da pizzaria é obrigatória
-      if (configResult.error || !configResult.data) {
-        console.error("❌ Erro: Configuração da pizzaria não encontrada")
-        setHasError(true)
+      // Se alguma operação crítica falhou, usar fallback
+      if (!configResult.success || !produtosResult.success) {
+        log.warn("Erro ao carregar dados críticos - usando fallback", 'APP')
+        setConfig(fallbackData.pizzariaConfig)
+         setProdutos([])
+         setCategorias(fallbackData.categorias)
+         setOpcoesSabores(fallbackData.opcoesSabores)
         setLoading(false)
         return
       }
       
+      // Usar dados do Supabase
       setConfig(configResult.data)
-      console.log("✅ Configuração da pizzaria carregada")
-
-      // Produtos são obrigatórios
-      if (produtosResult.error || !produtosResult.data || produtosResult.data.length === 0) {
-        console.error("❌ Erro: Nenhum produto encontrado no cardápio")
-        setHasError(true)
-        setLoading(false)
-        return
-      }
-      
       setProdutos(produtosResult.data)
-      console.log(`✅ ${produtosResult.data.length} produtos carregados`)
+      log.info("Configuração e produtos carregados do Supabase", 'APP')
 
-      // Categorias são opcionais - usar padrão se não existir
-      if (categoriasResult.data && categoriasResult.data.length > 0) {
+      // Categorias são opcionais - usar fallback se não existir
+      if (categoriasResult.success && categoriasResult.data.length > 0) {
         setCategorias(categoriasResult.data)
-        console.log(`✅ ${categoriasResult.data.length} categorias carregadas`)
+        log.info(`${categoriasResult.data.length} categorias carregadas`, 'APP')
       } else {
-        console.warn("⚠️ Nenhuma categoria encontrada")
-        setCategorias([])
+        log.warn("Usando categorias de fallback", 'APP')
+        setCategorias(fallbackData.categorias)
       }
 
-      // Opções de sabores - usar padrão se não existir
-      if (opcoesResult.data && opcoesResult.data.length > 0) {
+      // Opções de sabores - usar fallback se não existir
+      if (opcoesResult.success && opcoesResult.data.length > 0) {
         setOpcoesSabores(opcoesResult.data)
-        console.log(`✅ ${opcoesResult.data.length} opções de sabores carregadas`)
+        log.info(`${opcoesResult.data.length} opções de sabores carregadas`, 'APP')
         
         // Verificar se o modo atual ainda está ativo
         const opcaoAtual = opcoesResult.data.find(o => o.maximo_sabores === flavorMode && o.ativo)
@@ -319,20 +320,19 @@ function HomePageContent() {
           setSelectedFlavorsForMulti([])
         }
       } else {
-        console.warn("⚠️ Usando opções de sabores padrão")
-        // Configuração padrão de sabores
-        setOpcoesSabores([
-          { id: "1", nome: "1 Sabor", maximo_sabores: 1, ordem: 1, ativo: true },
-          { id: "2", nome: "2 Sabores", maximo_sabores: 2, ordem: 2, ativo: true },
-          { id: "3", nome: "3 Sabores", maximo_sabores: 3, ordem: 3, ativo: true }
-        ])
+        log.warn("Usando opções de sabores de fallback", 'APP')
+        setOpcoesSabores(fallbackData.opcoesSabores)
       }
 
-      console.log("✅ Aplicação carregada com dados reais")
+      log.info("Aplicação carregada com dados de produção", 'APP')
     } catch (error) {
-      console.error("❌ Erro crítico ao carregar dados:", error)
-      console.error("   Verifique a configuração do Supabase")
-      setHasError(true)
+      log.error("Erro crítico ao carregar dados - usando fallback", 'APP', {}, error instanceof Error ? error : new Error(String(error)))
+      
+      // Em caso de erro crítico, usar fallback
+       setConfig(fallbackData.pizzariaConfig)
+       setProdutos([])
+       setCategorias(fallbackData.categorias)
+       setOpcoesSabores(fallbackData.opcoesSabores)
     } finally {
       setLoading(false)
     }

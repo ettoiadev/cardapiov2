@@ -41,172 +41,318 @@
       </style>
     </head>
     <body>
-      <h1>Relatório de Testes - Cardápio Digital</h1>
+      <h1>TestSprite - Relatório de Testes Frontend</h1>
 <h2>Resumo Executivo</h2>
-<p><strong>Projeto</strong>: Cardápio Digital para Pizzaria<br>
-<strong>Tipo</strong>: Frontend (Next.js + React + TypeScript)<br>
-<strong>Data</strong>: Janeiro 2025<br>
-<strong>Status</strong>: Configuração do TestSprite Concluída<br>
-<strong>Servidor</strong>: http://localhost:3000</p>
-<h2>Configuração do Ambiente de Testes</h2>
-<h3>✅ Configurações Realizadas</h3>
+<p><strong>Projeto:</strong> Cardápio Digital - Sistema de Pizzaria<br>
+<strong>Data do Teste:</strong> $(date)<br>
+<strong>Total de Casos de Teste:</strong> 15<br>
+<strong>Status Geral:</strong> ❌ <strong>CRÍTICO</strong> - Falhas sistêmicas detectadas</p>
+<h3>Estatísticas dos Testes</h3>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Quantidade</th>
+<th>Percentual</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>✅ Passou</td>
+<td>1</td>
+<td>6.7%</td>
+</tr>
+<tr>
+<td>❌ Falhou</td>
+<td>14</td>
+<td>93.3%</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>15</strong></td>
+<td><strong>100%</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>Severidade dos Problemas</h3>
+<table>
+<thead>
+<tr>
+<th>Severidade</th>
+<th>Quantidade</th>
+<th>Casos</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🔴 <strong>Alta</strong></td>
+<td>13</td>
+<td>TC001-TC013, TC015</td>
+</tr>
+<tr>
+<td>🟡 <strong>Baixa</strong></td>
+<td>1</td>
+<td>TC014</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>🚨 Problemas Críticos Identificados</h2>
+<h3>1. <strong>Falha Sistêmica no Backend (Supabase)</strong></h3>
+<p><strong>Impacto:</strong> Crítico - Bloqueia toda a funcionalidade da aplicação</p>
+<p><strong>Erro Principal:</strong></p>
+<pre><code>PGRST116: Cannot coerce the result to a single JSON object
+HTTP Status: 406 (Not Acceptable)
+</code></pre>
+<p><strong>Tabelas Afetadas:</strong></p>
 <ul>
-<li><strong>Servidor de Desenvolvimento</strong>: Iniciado com sucesso na porta 3000</li>
-<li><strong>Tipo de Projeto</strong>: Frontend identificado corretamente</li>
-<li><strong>Credenciais de Teste</strong>: admin@pizzaria.com / admin123</li>
-<li><strong>Plano de Testes</strong>: 20 casos de teste gerados</li>
-<li><strong>Resumo do Código</strong>: Análise técnica completa realizada</li>
+<li><code>pizzaria_config</code> - Configurações da pizzaria</li>
+<li><code>produtos</code> - Catálogo de produtos</li>
+<li><code>categorias</code> - Categorias de produtos</li>
+<li><code>clientes</code> - Dados de clientes</li>
+<li><code>opcoes_sabores</code> - Opções de sabores</li>
+<li><code>admins</code> - Usuários administrativos</li>
 </ul>
-<h3>📋 Stack Tecnológica Identificada</h3>
+<p><strong>Causa Raiz:</strong> O erro PGRST116 indica que as consultas estão retornando múltiplas linhas quando o código espera um único objeto JSON. Isso sugere:</p>
+<ol>
+<li>Dados duplicados nas tabelas</li>
+<li>Consultas mal formadas</li>
+<li>Configuração incorreta do PostgREST/Supabase</li>
+</ol>
+<h3>2. <strong>Sistema de Autenticação Comprometido</strong></h3>
 <ul>
-<li><strong>Frontend</strong>: Next.js 15.2.4, React, TypeScript</li>
-<li><strong>UI</strong>: Tailwind CSS, Radix UI</li>
-<li><strong>Backend</strong>: Supabase (PostgreSQL)</li>
-<li><strong>Autenticação</strong>: Sistema customizado</li>
-<li><strong>Estado</strong>: Context API (React)</li>
+<li>Login administrativo falha com credenciais fornecidas</li>
+<li>Tabela <code>admins</code> retorna 0 linhas para consultas</li>
+<li>Controle de acesso não pode ser validado</li>
 </ul>
-<h2>Plano de Testes Gerado</h2>
-<h3>🔐 Testes de Segurança (Prioridade Alta)</h3>
+<hr>
+<h2>📋 Detalhamento dos Casos de Teste</h2>
+<h3>✅ <strong>Testes que Passaram</strong></h3>
+<h4>TC014 - Responsividade da Interface</h4>
+<ul>
+<li><strong>Status:</strong> ✅ PASSOU</li>
+<li><strong>Componente:</strong> Frontend - Componentes UI Responsivos</li>
+<li><strong>Resultado:</strong> Interface responde corretamente em diferentes tamanhos de tela</li>
+<li><strong>Recomendação:</strong> Implementar testes de regressão visual automatizados</li>
+</ul>
+<hr>
+<h3>❌ <strong>Testes que Falharam</strong></h3>
+<h4>TC001 - Navegação e Visualização do Catálogo</h4>
+<ul>
+<li><strong>Status:</strong> ❌ FALHOU</li>
+<li><strong>Severidade:</strong> 🔴 Alta</li>
+<li><strong>Problema:</strong> Dados do catálogo não carregam devido a erros de API</li>
+<li><strong>Erro:</strong> <code>Cardápio Indisponível</code> - falha ao carregar produtos e categorias</li>
+</ul>
+<h4>TC002 - Adição de Produtos ao Carrinho</h4>
+<ul>
+<li><strong>Status:</strong> ❌ FALHOU</li>
+<li><strong>Severidade:</strong> 🔴 Alta</li>
+<li><strong>Problema:</strong> Impossível adicionar produtos sem catálogo carregado</li>
+<li><strong>Impacto:</strong> Funcionalidade core do e-commerce comprometida</li>
+</ul>
+<h4>TC003 - Personalização de Produtos</h4>
+<ul>
+<li><strong>Status:</strong> ❌ FALHOU</li>
+<li><strong>Severidade:</strong> 🔴 Alta</li>
+<li><strong>Problema:</strong> Opções de personalização indisponíveis</li>
+<li><strong>Erro:</strong> Falha ao carregar <code>opcoes_sabores</code> e configurações</li>
+</ul>
+<h4>TC004 - Gerenciamento do Carrinho</h4>
+<ul>
+<li><strong>Status:</strong> ❌ FALHOU</li>
+<li><strong>Severidade:</strong> 🔴 Alta</li>
+<li><strong>Problema:</strong> Carrinho não funciona sem produtos disponíveis</li>
+</ul>
+<h4>TC005 - Processo de Checkout</h4>
+<ul>
+<li><strong>Status:</strong> ❌ FALHOU</li>
+<li><strong>Severidade:</strong> 🔴 Alta</li>
+<li><strong>Problema:</strong> Checkout bloqueado por falta de dados de configuração</li>
+<li><strong>Impacto:</strong> Impossível completar vendas</li>
+</ul>
+<h4>TC006 - Cadastro de Clientes</h4>
+<ul>
+<li><strong>Status:</strong> ❌ FALHOU</li>
+<li><strong>Severidade:</strong> 🔴 Alta</li>
+<li><strong>Problema:</strong> Formulário de cliente não funciona devido a erros de API</li>
+<li><strong>Erro:</strong> <code>Cannot coerce the result to a single JSON object</code></li>
+</ul>
+<h4>TC007 - Integração com ViaCEP</h4>
+<ul>
+<li><strong>Status:</strong> ❌ FALHOU</li>
+<li><strong>Severidade:</strong> 🔴 Alta</li>
+<li><strong>Problema:</strong> Autocompletar de endereço indisponível</li>
+<li><strong>Causa:</strong> Dependente do cadastro de clientes que está falhando</li>
+</ul>
+<h4>TC008 - Login Administrativo</h4>
+<ul>
+<li><strong>Status:</strong> ❌ FALHOU</li>
+<li><strong>Severidade:</strong> 🔴 Alta</li>
+<li><strong>Problema:</strong> Credenciais administrativas rejeitadas</li>
+<li><strong>Erro:</strong> <code>The result contains 0 rows</code> na tabela <code>admins</code></li>
+</ul>
+<h4>TC009 - Gerenciamento de Promoções e Categorias</h4>
+<ul>
+<li><strong>Status:</strong> ❌ FALHOU</li>
+<li><strong>Severidade:</strong> 🔴 Alta</li>
+<li><strong>Problema:</strong> Painel administrativo inacessível</li>
+<li><strong>Dependência:</strong> Requer login administrativo funcional</li>
+</ul>
+<h4>TC010 - Configurações da Loja</h4>
+<ul>
+<li><strong>Status:</strong> ❌ FALHOU</li>
+<li><strong>Severidade:</strong> 🔴 Alta</li>
+<li><strong>Problema:</strong> Configurações não carregam nem podem ser modificadas</li>
+<li><strong>Erro:</strong> Múltiplas linhas na tabela <code>pizzaria_config</code></li>
+</ul>
+<h4>TC011 - Integração WhatsApp</h4>
+<ul>
+<li><strong>Status:</strong> ❌ FALHOU</li>
+<li><strong>Severidade:</strong> 🔴 Alta</li>
+<li><strong>Problema:</strong> Impossível testar envio de pedidos</li>
+<li><strong>Causa:</strong> Dependente do processo de checkout funcional</li>
+</ul>
+<h4>TC012 - Controle de Acesso</h4>
+<ul>
+<li><strong>Status:</strong> ❌ FALHOU</li>
+<li><strong>Severidade:</strong> 🔴 Alta</li>
+<li><strong>Problema:</strong> Proteção de rotas não pode ser validada</li>
+<li><strong>Causa:</strong> Sistema de autenticação comprometido</li>
+</ul>
+<h4>TC013 - Acesso a Debug e Logs</h4>
+<ul>
+<li><strong>Status:</strong> ❌ FALHOU</li>
+<li><strong>Severidade:</strong> 🔴 Alta</li>
+<li><strong>Problema:</strong> Controle de acesso a páginas administrativas não funcional</li>
+<li><strong>Observação:</strong> Informações de debug visíveis sem autenticação</li>
+</ul>
+<h4>TC015 - Métodos de Pagamento</h4>
+<ul>
+<li><strong>Status:</strong> ❌ FALHOU</li>
+<li><strong>Severidade:</strong> 🔴 Alta</li>
+<li><strong>Problema:</strong> Impossível testar checkout com diferentes métodos</li>
+<li><strong>Causa:</strong> Processo de checkout não funcional</li>
+</ul>
+<hr>
+<h2>🔧 Recomendações de Correção</h2>
+<h3><strong>Prioridade 1 - Crítica (Imediata)</strong></h3>
 <ol>
 <li>
-<p><strong>TC001 - Login de Administrador</strong></p>
+<p><strong>Corrigir Configuração do Banco de Dados</strong></p>
+<pre><code class="language-sql">-- Verificar dados duplicados na tabela pizzaria_config
+SELECT COUNT(*) FROM pizzaria_config;
+
+-- Deve retornar apenas 1 linha
+-- Se houver múltiplas, consolidar em uma única configuração
+</code></pre>
+</li>
+<li>
+<p><strong>Revisar Consultas PostgREST</strong></p>
 <ul>
-<li>✅ Configurado</li>
-<li>Verifica login com credenciais válidas</li>
-<li>Testa acesso a rotas protegidas</li>
+<li>Verificar se as consultas estão usando <code>.single()</code> quando apropriado</li>
+<li>Garantir que consultas que esperam um único resultado não retornem múltiplas linhas</li>
 </ul>
 </li>
 <li>
-<p><strong>TC002 - Falha de Login</strong></p>
-<ul>
-<li>✅ Configurado</li>
-<li>Testa credenciais inválidas</li>
-<li>Verifica mensagens de erro</li>
-</ul>
-</li>
-<li>
-<p><strong>TC003 - Logout</strong></p>
-<ul>
-<li>✅ Configurado</li>
-<li>Testa encerramento de sessão</li>
-<li>Verifica redirecionamento</li>
-</ul>
+<p><strong>Configurar Usuário Administrativo</strong></p>
+<pre><code class="language-sql">-- Inserir usuário admin padrão
+INSERT INTO admins (email, senha_hash, ativo) 
+VALUES ('admin@example.com', 'hash_da_senha', true);
+</code></pre>
 </li>
 </ol>
-<h3>🛍️ Testes de Funcionalidade (Prioridade Alta)</h3>
+<h3><strong>Prioridade 2 - Alta (24-48h)</strong></h3>
 <ol start="4">
 <li>
-<p><strong>TC004 - CRUD de Produtos</strong></p>
+<p><strong>Validar Estrutura das Tabelas</strong></p>
 <ul>
-<li>✅ Configurado</li>
-<li>Criar, ler, atualizar, deletar produtos</li>
-<li>Persistência no banco de dados</li>
+<li>Verificar constraints e índices únicos</li>
+<li>Garantir integridade referencial</li>
 </ul>
 </li>
 <li>
-<p><strong>TC005 - Gerenciamento de Categorias</strong></p>
+<p><strong>Implementar Tratamento de Erros Robusto</strong></p>
 <ul>
-<li>✅ Configurado</li>
-<li>Operações CRUD em categorias</li>
-<li>Validação de dados</li>
+<li>Adicionar fallbacks para quando APIs falham</li>
+<li>Melhorar mensagens de erro para usuários</li>
 </ul>
 </li>
 <li>
-<p><strong>TC006 - Filtros do Catálogo</strong></p>
+<p><strong>Configurar Logs Estruturados</strong></p>
 <ul>
-<li>✅ Configurado</li>
-<li>Filtro por categoria</li>
-<li>Filtro por promoções</li>
+<li>Implementar logging detalhado para debugging</li>
+<li>Monitorar erros de API em tempo real</li>
 </ul>
 </li>
 </ol>
-<h3>🛒 Testes de E-commerce (Prioridade Média)</h3>
+<h3><strong>Prioridade 3 - Média (1 semana)</strong></h3>
 <ol start="7">
-<li><strong>TC007-TC012 - Sistema de Carrinho</strong>
+<li>
+<p><strong>Implementar Testes Automatizados</strong></p>
 <ul>
-<li>✅ Configurado</li>
-<li>Adicionar/remover itens</li>
-<li>Cálculo de preços</li>
-<li>Customização de produtos</li>
-<li>Checkout completo</li>
+<li>Testes unitários para componentes críticos</li>
+<li>Testes de integração para APIs</li>
+<li>Testes end-to-end para fluxos principais</li>
+</ul>
+</li>
+<li>
+<p><strong>Melhorar Segurança</strong></p>
+<ul>
+<li>Implementar rate limiting</li>
+<li>Validar todas as entradas de usuário</li>
+<li>Configurar HTTPS em produção</li>
 </ul>
 </li>
 </ol>
-<h3>⚙️ Testes de Configuração (Prioridade Média)</h3>
-<ol start="13">
-<li><strong>TC013 - Configurações da Loja</strong>
-<ul>
-<li>✅ Configurado</li>
-<li>Horários de funcionamento</li>
-<li>Formas de pagamento</li>
-<li>Informações de contato</li>
-</ul>
-</li>
-</ol>
-<h3>🔧 Testes Técnicos (Prioridade Baixa)</h3>
-<ol start="14">
-<li><strong>TC014-TC020 - Testes Avançados</strong>
-<ul>
-<li>✅ Configurado</li>
-<li>Upload de imagens</li>
-<li>Responsividade</li>
-<li>Performance</li>
-<li>Ferramentas de debug</li>
-<li>Testes de carga</li>
-</ul>
-</li>
-</ol>
-<h2>Status dos Componentes</h2>
-<h3>✅ Componentes Funcionais</h3>
-<ul>
-<li><strong>Sistema de Autenticação</strong>: Implementado e configurado</li>
-<li><strong>Painel Administrativo</strong>: Interface completa</li>
-<li><strong>Carrinho de Compras</strong>: Context API funcionando</li>
-<li><strong>Catálogo de Produtos</strong>: Exibição dinâmica</li>
-<li><strong>Sistema de Checkout</strong>: Integração WhatsApp</li>
-<li><strong>Configurações</strong>: Gerenciamento de loja</li>
-<li><strong>Integração Supabase</strong>: Conexão estabelecida</li>
-</ul>
-<h3>⚠️ Pontos de Atenção</h3>
-<ol>
-<li><strong>Variáveis de Ambiente</strong>: Sistema funciona com fallbacks quando Supabase não configurado</li>
-<li><strong>Autenticação</strong>: Sistema simplificado (recomenda-se hash de senhas para produção)</li>
-<li><strong>Dados de Teste</strong>: Usando dados mock quando banco não disponível</li>
-</ol>
-<h2>Próximos Passos</h2>
-<h3>🎯 Execução dos Testes</h3>
-<ol>
-<li><strong>Testes Manuais</strong>: Executar os 20 casos de teste criados</li>
-<li><strong>Testes Automatizados</strong>: Implementar com Playwright/Cypress</li>
-<li><strong>Testes de Integração</strong>: Validar fluxos completos</li>
-<li><strong>Testes de Performance</strong>: Verificar tempos de resposta</li>
-</ol>
-<h3>🔧 Melhorias Recomendadas</h3>
-<ol>
-<li><strong>Segurança</strong>: Implementar hash de senhas</li>
-<li><strong>Validação</strong>: Adicionar validação de formulários</li>
-<li><strong>Error Handling</strong>: Melhorar tratamento de erros</li>
-<li><strong>Loading States</strong>: Adicionar indicadores de carregamento</li>
-<li><strong>Testes Unitários</strong>: Implementar Jest/Testing Library</li>
-</ol>
-<h2>Conclusão</h2>
-<p>✅ <strong>TestSprite configurado com sucesso</strong><br>
-✅ <strong>Plano de testes abrangente criado (20 casos)</strong><br>
-✅ <strong>Servidor de desenvolvimento funcionando</strong><br>
-✅ <strong>Credenciais de teste configuradas</strong></p>
-<p>O projeto está <strong>pronto para execução de testes</strong>. O TestSprite identificou corretamente a arquitetura do sistema e gerou um plano de testes completo cobrindo:</p>
-<ul>
-<li><strong>Segurança</strong> (autenticação/autorização)</li>
-<li><strong>Funcionalidades core</strong> (CRUD, carrinho, checkout)</li>
-<li><strong>Interface de usuário</strong> (responsividade, usabilidade)</li>
-<li><strong>Performance</strong> (carga, responsividade)</li>
-</ul>
-<p><strong>Recomendação</strong>: Proceder com a execução manual dos testes seguindo o plano gerado, e posteriormente implementar automação para testes de regressão.</p>
 <hr>
-<p><strong>Gerado por</strong>: TestSprite MCP<br>
-<strong>Arquivo de Configuração</strong>: <code>testsprite_tests/tmp/config.json</code><br>
-<strong>Plano de Testes</strong>: <code>testsprite_tests/testsprite_frontend_test_plan.json</code><br>
-<strong>Resumo Técnico</strong>: <code>testsprite_tests/tmp/code_summary.json</code></p>
+<h2>📊 Análise de Impacto no Negócio</h2>
+<h3><strong>Impacto Atual</strong></h3>
+<ul>
+<li>❌ <strong>0% das funcionalidades core estão operacionais</strong></li>
+<li>❌ <strong>Impossível processar vendas</strong></li>
+<li>❌ <strong>Experiência do usuário completamente comprometida</strong></li>
+<li>❌ <strong>Painel administrativo inacessível</strong></li>
+</ul>
+<h3><strong>Estimativa de Perda</strong></h3>
+<ul>
+<li><strong>Vendas:</strong> 100% das vendas online bloqueadas</li>
+<li><strong>Produtividade:</strong> Administradores não conseguem gerenciar o sistema</li>
+<li><strong>Reputação:</strong> Clientes encontram site não funcional</li>
+</ul>
+<hr>
+<h2>🎯 Próximos Passos</h2>
+<h3><strong>Ação Imediata (Hoje)</strong></h3>
+<ol>
+<li>✅ Identificar e corrigir dados duplicados no banco</li>
+<li>✅ Configurar usuário administrativo válido</li>
+<li>✅ Testar consultas PostgREST manualmente</li>
+</ol>
+<h3><strong>Curto Prazo (Esta Semana)</strong></h3>
+<ol>
+<li>🔄 Re-executar testes após correções</li>
+<li>🔄 Implementar monitoramento de APIs</li>
+<li>🔄 Configurar ambiente de staging para testes</li>
+</ol>
+<h3><strong>Médio Prazo (Próximas 2 semanas)</strong></h3>
+<ol>
+<li>📋 Implementar suite de testes automatizados</li>
+<li>📋 Configurar CI/CD com validações</li>
+<li>📋 Documentar procedimentos de deploy</li>
+</ol>
+<hr>
+<h2>📞 Contato e Suporte</h2>
+<p><strong>Relatório gerado por:</strong> TestSprite MCP<br>
+<strong>Ferramenta de Teste:</strong> Puppeteer + TestSprite<br>
+<strong>Ambiente Testado:</strong> http://localhost:3000</p>
+<p><strong>Para dúvidas sobre este relatório:</strong></p>
+<ul>
+<li>Consulte a documentação do TestSprite</li>
+<li>Acesse os logs detalhados em: <code>testsprite_tests/tmp/</code></li>
+<li>Links para visualização dos testes disponíveis no arquivo de resultados</li>
+</ul>
+<hr>
+<p><em>Este relatório foi gerado automaticamente e reflete o estado atual do sistema no momento da execução dos testes.</em></p>
 
     </body>
     </html>

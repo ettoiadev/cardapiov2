@@ -13,6 +13,7 @@ import { ClienteForm } from "@/components/cliente-form"
 import { useToast } from "@/components/ui/use-toast"
 import { formatDistanceToNow } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { AdminLayout } from "@/components/admin-layout"
 
 export default function ClientesAdminPage() {
   const { 
@@ -106,7 +107,8 @@ export default function ClientesAdminPage() {
   }
   
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <AdminLayout>
+      <div className="container mx-auto py-6 space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -389,6 +391,7 @@ export default function ClientesAdminPage() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </AdminLayout>
   )
 }

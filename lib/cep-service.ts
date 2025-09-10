@@ -187,13 +187,7 @@ export const useCepSearch = () => {
   }
 }
 
-// Importar React apenas se estiver em ambiente de componente
-let React: any
-try {
-  React = require('react')
-} catch {
-  // React não disponível - hook não funcionará
-}
+// React hooks são importados diretamente nos componentes que os utilizam
 
 export default {
   searchCep,

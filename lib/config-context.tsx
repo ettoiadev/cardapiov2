@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react"
 import { supabase } from "@/lib/supabase"
+import { supabaseOperation, fallbackData } from "@/lib/error-handler"
+import { log } from "@/lib/logger"
 
 interface PizzariaConfig {
   habilitar_broto: boolean
@@ -25,29 +27,24 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   const loadConfig = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("pizzaria_config")
-        .select("id, habilitar_broto, habilitar_bordas_recheadas")
-        .single()
+    const result = await supabaseOperation(
+      () => supabase.from("pizzaria_config").select("id, habilitar_broto, habilitar_bordas_recheadas").maybeSingle(),
+      fallbackData.pizzariaConfig
+    )
 
-      if (error) {
-        console.error("Erro ao carregar configurações:", error)
-        return
-      }
-
-      if (data) {
-        setConfigId(data.id)
-        setConfig({
-          habilitar_broto: data.habilitar_broto ?? true,
-          habilitar_bordas_recheadas: data.habilitar_bordas_recheadas ?? true
-        })
-      }
-    } catch (error) {
-      console.error("Erro ao carregar configurações:", error)
-    } finally {
-      setLoading(false)
+    if (result.success && result.data) {
+      setConfigId(result.data.id)
+      setConfig({
+        habilitar_broto: result.data.habilitar_broto ?? true,
+        habilitar_bordas_recheadas: result.data.habilitar_bordas_recheadas ?? true
+      })
+      log.info("Configuração carregada com sucesso", 'CONFIG', { configId: result.data.id })
+    } else {
+      log.warn("Erro ao carregar configuração - usando fallback", 'CONFIG')
+      setConfig(fallbackData.pizzariaConfig)
     }
+    
+    setLoading(false)
   }
 
   const updateConfig = async (newConfig: Partial<PizzariaConfig>) => {
@@ -65,7 +62,7 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
 
       setConfig(prev => ({ ...prev, ...newConfig }))
     } catch (error) {
-      console.error("Erro ao atualizar configurações:", error)
+      log.error("Erro ao atualizar configurações", 'CONFIG', {}, error)
       throw error
     }
   }
@@ -87,4 +84,4 @@ export function useConfig() {
     throw new Error("useConfig deve ser usado dentro de um ConfigProvider")
   }
   return context
-} 
+}

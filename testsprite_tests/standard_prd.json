@@ -4,507 +4,193 @@
     "date": "2025-09-10",
     "prepared_by": "Equipe de Desenvolvimento"
   },
-  "product_overview": "O Cardápio Digital para Pizzaria é uma aplicação web que digitaliza o processo de pedidos para pizzarias, proporcionando uma experiência simples e intuitiva para clientes, junto a um robusto painel administrativo para gerenciamento de produtos, categorias e configurações. O sistema automatiza o envio de pedidos via WhatsApp, suporta múltiplas modalidades de pagamento, e otimiza operações de delivery e retirada no balcão.",
+  "product_overview": "Aplicação web que digitaliza e simplifica o processo de pedidos em pizzarias, oferecendo clientes uma experiência fluida para customizar e finalizar pedidos, além de um painel administrativo para gestão completa do cardápio e configurações.",
   "core_goals": [
-    "Digitalizar o processo de pedidos da pizzaria para modernizar o atendimento ao cliente.",
-    "Simplificar a experiência do cliente na escolha, personalização e compra de produtos.",
-    "Automatizar o envio de pedidos via WhatsApp para maior eficiência.",
-    "Centralizar o gerenciamento do cardápio, configurações e promoções em um painel administrativo.",
-    "Garantir a segurança, responsividade e escalabilidade do sistema."
+    "Digitalizar o processo de pedidos da pizzaria",
+    "Simplificar a experiência do cliente na escolha e personalização de produtos",
+    "Automatizar o envio de pedidos via WhatsApp",
+    "Centralizar o gerenciamento do cardápio e configurações",
+    "Otimizar operações para delivery e retirada no balcão"
   ],
   "key_features": [
-    "Sistema de autenticação seguro para administradores com login/logout e sessões persistentes.",
-    "Gerenciamento completo (CRUD) de produtos com suporte a variadas categorias, tamanhos, sabores e adicionais personalizáveis.",
-    "Catálogo visual com carousel promocional, filtros de produtos e informações detalhadas para os clientes.",
-    "Carrinho de compras com gerenciamento de itens, ajustes de quantidade, cálculo automático de preços e persistência entre sessões.",
-    "Checkout com stepper vertical, coleta de dados do cliente, modalidades de entrega, múltiplas formas de pagamento e finalização via WhatsApp.",
-    "Painel administrativo para gestão de categorias, configurações de pizzaria (horários, formas de pagamento, contato) e upload de imagens com preview.",
-    "Sistema de promoções dinâmicas, status ativo/inativo para produtos e categorias, e controle de preços promocionais.",
-    "Ferramentas de debug administrativo para monitoramento e análise de dados e performance do sistema.",
-    "Arquitetura SPA moderna com Next.js, React e Supabase, garantindo alta performance e segurança via RLS e validação front-backend."
+    "Homepage com catálogo de produtos agrupados por categorias e promoções.",
+    "Gerenciamento completo do carrinho de compras com adição, remoção e controle de quantidades.",
+    "Checkout com coleta de dados do cliente, validação de endereço via ViaCEP, modalidades de entrega e múltiplas formas de pagamento.",
+    "Autenticação segura para administradores com sessão persistente e proteção de rotas.",
+    "Painel administrativo para CRUD de produtos, categorias, tamanhos, adicionais e promoções.",
+    "Configuração avançada da pizzaria incluindo dados da empresa, tarifas e formas de pagamento.",
+    "Integração com WhatsApp para finalização e envio automático dos pedidos.",
+    "Componentes UI reutilizáveis e responsivos para experiência consistente.",
+    "Sistema de debug e monitoramento administrativo para análise e logs.",
+    "Carousel de imagens promocionais e informações da loja acessíveis pela homepage."
   ],
   "user_flow_summary": [
-    "Cliente acessa a homepage, visualiza o cardápio e navega por categorias com filtros e promoções visuais.",
-    "Seleciona produtos, personaliza sabores, tamanhos e adicionais conforme o tipo de produto.",
-    "Adiciona os itens ao carrinho, revisa o pedido, ajusta quantidades e remove produtos se necessário.",
-    "Preenche os dados pessoais, escolhe modalidade de entrega (delivery ou retirada) e seleciona a forma de pagamento (dinheiro, cartão, PIX).",
-    "Finaliza o pedido que é enviado automáticamente via WhatsApp para a pizzaria.",
-    "Administrador realiza login seguro e acessa o painel administrativo.",
-    "Gerencia produtos e categorias, faz upload de imagens, configura preços e promoções.",
-    "Configura dados gerais da pizzaria como horários, taxas e formas de pagamento.",
-    "Utiliza ferramentas de debug para análise e monitoração do sistema."
+    "Cliente acessa homepage, navega pelo cardápio e seleciona produtos com personalizações.",
+    "Produto adicionado ao carrinho com gestão dinâmica de quantidades e preços.",
+    "Cliente preenche dados pessoais e endereço com validação automática via API.",
+    "Cliente escolhe modalidade de entrega (delivery ou retirada) e forma de pagamento.",
+    "Pedido finalizado e enviado automaticamente via mensagem estruturada no WhatsApp.",
+    "Administrador realiza login seguro e acessa painel administrativo.",
+    "Administra produtos, categorias e configurações da pizzaria.",
+    "Administra promoções, configurações gerais e monitora sistema pelo debug.",
+    "Gerencia upload de imagens para catálogo e atualiza conteúdo visual."
   ],
   "validation_criteria": [
-    "Sistema de autenticação deve permitir login e logout seguro com proteção de rotas administrativas.",
-    "CRUD de produtos e categorias deve suportar criação, edição, exclusão e listagem com dados válidos e upload de imagens funcional.",
-    "Carrinho de compras deve manter estado persistente, permitir ajustes de itens e refletir cálculos de preços corretamente.",
-    "Checkout deve validar entradas, suportar todas formas de pagamento listadas e processar pedidos com sucesso.",
-    "Pedidos devem ser enviados corretamente e formatados via WhatsApp, com histórico armazenado.",
-    "Configurações da pizzaria devem ser atualizáveis e refletidas corretamente no frontend.",
-    "O sistema deve responder dentro de 3 segundos em rotinas principais, incluindo carregamento e operações de CRUD.",
-    "Logs e ferramentas administrativas devem permitir rastreamento de erros e análise de performance em ambiente de produção.",
-    "Aplicação deve ser responsiva e acessível conforme padrões WCAG, com feedback visual em interações críticas.",
-    "Segurança implementada por Supabase Auth, HTTPS obrigatório e RLS com validações no backend para dados sensíveis."
+    "Sistema de autenticação com proteção e sessão mantida.",
+    "CRUD funcional para produtos, categorias e configurações do sistema.",
+    "Carrinho de compras persistente entre sessões e com cálculo preciso de preços.",
+    "Validação de endereço via integração com ViaCEP API.",
+    "Fluxo de checkout completo com seleção de pagamento e modalidade de entrega.",
+    "Mensagens de pedido enviadas corretamente para WhatsApp.",
+    "Interfaces responsivas e intuitivas para clientes e administradores.",
+    "Segurança implementada com Row Level Security e validações no frontend e backend.",
+    "Desempenho otimizado com tempo de carregamento abaixo de 3 segundos.",
+    "Sistema de logs e debug acessível somente para administradores."
   ],
   "code_summary": {
     "tech_stack": [
       "TypeScript",
-      "Next.js",
+      "Next.js 15",
       "React",
       "Supabase",
       "PostgreSQL",
       "Tailwind CSS",
-      "Radix UI"
+      "shadcn/ui",
+      "Lucide React",
+      "date-fns"
     ],
     "features": [
       {
-        "name": "Authentication API",
-        "description": "Sistema de autenticação para administradores com login/logout e gerenciamento de sessão",
+        "name": "Homepage with Product Catalog",
+        "description": "Main page displaying pizzeria products with categories, pricing, and cart functionality",
         "files": [
-          "lib/auth-context.tsx",
-          "app/admin/login/page.tsx"
-        ],
-        "api_doc": {
-          "openapi": "3.0.0",
-          "info": {
-            "title": "Authentication API",
-            "version": "1.0.0"
-          },
-          "paths": {
-            "/api/auth/login": {
-              "post": {
-                "summary": "Admin login",
-                "requestBody": {
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "email": {
-                            "type": "string"
-                          },
-                          "password": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "responses": {
-                  "200": {
-                    "description": "Login successful"
-                  },
-                  "401": {
-                    "description": "Invalid credentials"
-                  }
-                }
-              }
-            }
-          }
-        }
+          "app/page.tsx"
+        ]
       },
       {
-        "name": "Product Management API",
-        "description": "CRUD operations para produtos incluindo categorias, sabores, tamanhos e preços",
-        "files": [
-          "app/admin/produtos/page.tsx",
-          "lib/supabase.ts"
-        ],
-        "api_doc": {
-          "openapi": "3.0.0",
-          "info": {
-            "title": "Product Management API",
-            "version": "1.0.0"
-          },
-          "paths": {
-            "/api/products": {
-              "get": {
-                "summary": "List all products",
-                "responses": {
-                  "200": {
-                    "description": "List of products"
-                  }
-                }
-              },
-              "post": {
-                "summary": "Create new product",
-                "requestBody": {
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "nome": {
-                            "type": "string"
-                          },
-                          "categoria_id": {
-                            "type": "integer"
-                          },
-                          "preco": {
-                            "type": "number"
-                          },
-                          "descricao": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "responses": {
-                  "201": {
-                    "description": "Product created"
-                  },
-                  "400": {
-                    "description": "Invalid data"
-                  }
-                }
-              }
-            },
-            "/api/products/{id}": {
-              "put": {
-                "summary": "Update product",
-                "parameters": [
-                  {
-                    "name": "id",
-                    "in": "path",
-                    "required": true,
-                    "schema": {
-                      "type": "integer"
-                    }
-                  }
-                ],
-                "responses": {
-                  "200": {
-                    "description": "Product updated"
-                  }
-                }
-              },
-              "delete": {
-                "summary": "Delete product",
-                "parameters": [
-                  {
-                    "name": "id",
-                    "in": "path",
-                    "required": true,
-                    "schema": {
-                      "type": "integer"
-                    }
-                  }
-                ],
-                "responses": {
-                  "200": {
-                    "description": "Product deleted"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      {
-        "name": "Category Management API",
-        "description": "Gerenciamento de categorias de produtos com operações CRUD",
-        "files": [
-          "app/admin/page.tsx",
-          "lib/supabase.ts"
-        ],
-        "api_doc": {
-          "openapi": "3.0.0",
-          "info": {
-            "title": "Category Management API",
-            "version": "1.0.0"
-          },
-          "paths": {
-            "/api/categories": {
-              "get": {
-                "summary": "List all categories",
-                "responses": {
-                  "200": {
-                    "description": "List of categories"
-                  }
-                }
-              },
-              "post": {
-                "summary": "Create new category",
-                "requestBody": {
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "nome": {
-                            "type": "string"
-                          },
-                          "descricao": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "responses": {
-                  "201": {
-                    "description": "Category created"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      {
-        "name": "Shopping Cart API",
-        "description": "Sistema de carrinho de compras com gerenciamento de itens, quantidades e cálculos",
+        "name": "Shopping Cart Management",
+        "description": "Context-based cart system with add/remove items, quantity management, and total calculation",
         "files": [
           "lib/cart-context.tsx",
           "components/cart-footer.tsx"
-        ],
-        "api_doc": {
-          "openapi": "3.0.0",
-          "info": {
-            "title": "Shopping Cart API",
-            "version": "1.0.0"
-          },
-          "paths": {
-            "/api/cart/add": {
-              "post": {
-                "summary": "Add item to cart",
-                "requestBody": {
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "product_id": {
-                            "type": "integer"
-                          },
-                          "quantity": {
-                            "type": "integer"
-                          },
-                          "customizations": {
-                            "type": "object"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "responses": {
-                  "200": {
-                    "description": "Item added to cart"
-                  }
-                }
-              }
-            },
-            "/api/cart/remove": {
-              "post": {
-                "summary": "Remove item from cart",
-                "responses": {
-                  "200": {
-                    "description": "Item removed"
-                  }
-                }
-              }
-            }
-          }
-        }
+        ]
       },
       {
-        "name": "Checkout API",
-        "description": "Sistema de finalização de pedidos com integração WhatsApp e múltiplas formas de pagamento",
+        "name": "Admin Authentication",
+        "description": "Admin login system with session management and credential updates",
+        "files": [
+          "lib/auth-context.tsx",
+          "app/admin/login/page.tsx"
+        ]
+      },
+      {
+        "name": "Admin Dashboard",
+        "description": "Administrative interface with statistics and navigation to management sections",
+        "files": [
+          "app/admin/page.tsx",
+          "components/admin-layout.tsx"
+        ]
+      },
+      {
+        "name": "Product Management",
+        "description": "Admin interface for managing products, categories, and menu items",
+        "files": [
+          "app/admin/produtos/page.tsx"
+        ]
+      },
+      {
+        "name": "Client Management System",
+        "description": "Complete CRUD system for customer management with address validation via ViaCEP API",
+        "files": [
+          "app/admin/clientes/page.tsx",
+          "components/cliente-form.tsx",
+          "lib/clientes-context.tsx",
+          "lib/cep-service.ts"
+        ]
+      },
+      {
+        "name": "Checkout Process",
+        "description": "Complete checkout flow with customer registration, address validation, payment method selection, and WhatsApp integration",
         "files": [
           "app/checkout/page.tsx"
-        ],
-        "api_doc": {
-          "openapi": "3.0.0",
-          "info": {
-            "title": "Checkout API",
-            "version": "1.0.0"
-          },
-          "paths": {
-            "/api/checkout": {
-              "post": {
-                "summary": "Process order checkout",
-                "requestBody": {
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "customer_info": {
-                            "type": "object"
-                          },
-                          "payment_method": {
-                            "type": "string"
-                          },
-                          "delivery_option": {
-                            "type": "string"
-                          },
-                          "items": {
-                            "type": "array"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "responses": {
-                  "200": {
-                    "description": "Order processed successfully"
-                  },
-                  "400": {
-                    "description": "Invalid order data"
-                  }
-                }
-              }
-            }
-          }
-        }
+        ]
       },
       {
-        "name": "Store Configuration API",
-        "description": "Configurações da pizzaria incluindo horários, formas de pagamento e informações de contato",
+        "name": "Store Configuration",
+        "description": "Admin interface for configuring store settings, delivery options, payment methods, and business information",
         "files": [
-          "app/admin/config/page.tsx"
-        ],
-        "api_doc": {
-          "openapi": "3.0.0",
-          "info": {
-            "title": "Store Configuration API",
-            "version": "1.0.0"
-          },
-          "paths": {
-            "/api/config": {
-              "get": {
-                "summary": "Get store configuration",
-                "responses": {
-                  "200": {
-                    "description": "Store configuration"
-                  }
-                }
-              },
-              "put": {
-                "summary": "Update store configuration",
-                "requestBody": {
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "opening_hours": {
-                            "type": "object"
-                          },
-                          "payment_methods": {
-                            "type": "array"
-                          },
-                          "contact_info": {
-                            "type": "object"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "responses": {
-                  "200": {
-                    "description": "Configuration updated"
-                  }
-                }
-              }
-            }
-          }
-        }
+          "app/admin/config/page.tsx",
+          "lib/config-context.tsx"
+        ]
       },
       {
-        "name": "Database Operations API",
-        "description": "Operações de banco de dados via Supabase com Row Level Security",
+        "name": "Supabase Integration",
+        "description": "Database connection and configuration with PostgreSQL via Supabase, including connection testing and debug utilities",
         "files": [
           "lib/supabase.ts",
-          "scripts/01-create-tables.sql",
-          "scripts/02-admin-setup.sql"
-        ],
-        "api_doc": {
-          "openapi": "3.0.0",
-          "info": {
-            "title": "Database Operations API",
-            "version": "1.0.0"
-          },
-          "paths": {
-            "/api/db/health": {
-              "get": {
-                "summary": "Check database health",
-                "responses": {
-                  "200": {
-                    "description": "Database is healthy"
-                  }
-                }
-              }
-            },
-            "/api/db/migrate": {
-              "post": {
-                "summary": "Run database migrations",
-                "responses": {
-                  "200": {
-                    "description": "Migrations completed"
-                  }
-                }
-              }
-            }
-          }
-        }
+          "app/admin/debug/page.tsx"
+        ]
       },
       {
-        "name": "Debug Tools API",
-        "description": "Ferramentas de debug para testar conexões e consultas ao banco de dados",
+        "name": "UI Components Library",
+        "description": "Comprehensive set of reusable UI components based on shadcn/ui with custom styling",
         "files": [
-          "app/admin/debug/page.tsx"
-        ],
-        "api_doc": {
-          "openapi": "3.0.0",
-          "info": {
-            "title": "Debug Tools API",
-            "version": "1.0.0"
-          },
-          "paths": {
-            "/api/debug/connection": {
-              "get": {
-                "summary": "Test database connection",
-                "responses": {
-                  "200": {
-                    "description": "Connection successful"
-                  }
-                }
-              }
-            },
-            "/api/debug/query": {
-              "post": {
-                "summary": "Execute debug query",
-                "requestBody": {
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "query": {
-                            "type": "string"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "responses": {
-                  "200": {
-                    "description": "Query executed"
-                  }
-                }
-              }
-            }
-          }
-        }
+          "components/ui/button.tsx",
+          "components/ui/card.tsx",
+          "components/ui/input.tsx",
+          "components/ui/dialog.tsx",
+          "components/ui/table.tsx",
+          "components/ui/form.tsx",
+          "components/ui/alert.tsx",
+          "components/ui/badge.tsx",
+          "components/ui/checkbox.tsx",
+          "components/ui/radio-group.tsx",
+          "components/ui/select.tsx",
+          "components/ui/textarea.tsx",
+          "components/ui/toast.tsx"
+        ]
+      },
+      {
+        "name": "Store Information Modal",
+        "description": "Modal component displaying store information, contact details, and business hours",
+        "files": [
+          "components/store-info-modal.tsx"
+        ]
+      },
+      {
+        "name": "Homepage Carousel",
+        "description": "Image carousel component for showcasing featured products or promotions",
+        "files": [
+          "components/homepage-carousel.tsx"
+        ]
+      },
+      {
+        "name": "Social Media Footer",
+        "description": "Footer component with social media links and contact information",
+        "files": [
+          "components/social-footer.tsx"
+        ]
+      },
+      {
+        "name": "Currency Utilities",
+        "description": "Helper functions for formatting currency values in Brazilian Real (BRL)",
+        "files": [
+          "lib/currency-utils.ts"
+        ]
+      },
+      {
+        "name": "CEP Address Service",
+        "description": "Integration with ViaCEP API for automatic address completion based on postal code",
+        "files": [
+          "lib/cep-service.ts"
+        ]
+      },
+      {
+        "name": "Theme Provider",
+        "description": "Dark/light theme management using next-themes",
+        "files": [
+          "components/theme-provider.tsx"
+        ]
       }
     ]
   }

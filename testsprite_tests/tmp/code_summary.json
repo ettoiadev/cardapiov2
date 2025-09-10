@@ -1,382 +1,147 @@
 {
-  "tech_stack": [
-    "TypeScript",
-    "Next.js",
-    "React",
-    "Supabase",
-    "PostgreSQL",
-    "Tailwind CSS",
-    "Radix UI"
-  ],
-  "features": [
-    {
-      "name": "Authentication API",
-      "description": "Sistema de autenticação para administradores com login/logout e gerenciamento de sessão",
-      "files": [
-        "lib/auth-context.tsx",
-        "app/admin/login/page.tsx"
-      ],
-      "api_doc": {
-        "openapi": "3.0.0",
-        "info": {
-          "title": "Authentication API",
-          "version": "1.0.0"
-        },
-        "paths": {
-          "/api/auth/login": {
-            "post": {
-              "summary": "Admin login",
-              "requestBody": {
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "type": "object",
-                      "properties": {
-                        "email": {"type": "string"},
-                        "password": {"type": "string"}
-                      }
-                    }
-                  }
-                }
-              },
-              "responses": {
-                "200": {"description": "Login successful"},
-                "401": {"description": "Invalid credentials"}
-              }
-            }
-          }
-        }
-      }
+  "tech_stacks": {
+    "frontend": {
+      "framework": "Next.js 15.2.4",
+      "language": "TypeScript",
+      "ui_library": "React",
+      "styling": "Tailwind CSS",
+      "components": "Radix UI",
+      "icons": "Lucide React",
+      "state_management": "React Context API"
     },
-    {
-      "name": "Product Management API",
-      "description": "CRUD operations para produtos incluindo categorias, sabores, tamanhos e preços",
-      "files": [
-        "app/admin/produtos/page.tsx",
-        "lib/supabase.ts"
-      ],
-      "api_doc": {
-        "openapi": "3.0.0",
-        "info": {
-          "title": "Product Management API",
-          "version": "1.0.0"
-        },
-        "paths": {
-          "/api/products": {
-            "get": {
-              "summary": "List all products",
-              "responses": {
-                "200": {"description": "List of products"}
-              }
-            },
-            "post": {
-              "summary": "Create new product",
-              "requestBody": {
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "type": "object",
-                      "properties": {
-                        "nome": {"type": "string"},
-                        "categoria_id": {"type": "integer"},
-                        "preco": {"type": "number"},
-                        "descricao": {"type": "string"}
-                      }
-                    }
-                  }
-                }
-              },
-              "responses": {
-                "201": {"description": "Product created"},
-                "400": {"description": "Invalid data"}
-              }
-            }
-          },
-          "/api/products/{id}": {
-            "put": {
-              "summary": "Update product",
-              "parameters": [
-                {
-                  "name": "id",
-                  "in": "path",
-                  "required": true,
-                  "schema": {"type": "integer"}
-                }
-              ],
-              "responses": {
-                "200": {"description": "Product updated"}
-              }
-            },
-            "delete": {
-              "summary": "Delete product",
-              "parameters": [
-                {
-                  "name": "id",
-                  "in": "path",
-                  "required": true,
-                  "schema": {"type": "integer"}
-                }
-              ],
-              "responses": {
-                "200": {"description": "Product deleted"}
-              }
-            }
-          }
-        }
-      }
+    "backend": {
+      "service": "Supabase",
+      "database": "PostgreSQL",
+      "auth": "Supabase Auth",
+      "storage": "Supabase Storage",
+      "api": "PostgREST"
     },
-    {
-      "name": "Category Management API",
-      "description": "Gerenciamento de categorias de produtos com operações CRUD",
-      "files": [
-        "app/admin/page.tsx",
-        "lib/supabase.ts"
-      ],
-      "api_doc": {
-        "openapi": "3.0.0",
-        "info": {
-          "title": "Category Management API",
-          "version": "1.0.0"
-        },
-        "paths": {
-          "/api/categories": {
-            "get": {
-              "summary": "List all categories",
-              "responses": {
-                "200": {"description": "List of categories"}
-              }
-            },
-            "post": {
-              "summary": "Create new category",
-              "requestBody": {
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "type": "object",
-                      "properties": {
-                        "nome": {"type": "string"},
-                        "descricao": {"type": "string"}
-                      }
-                    }
-                  }
-                }
-              },
-              "responses": {
-                "201": {"description": "Category created"}
-              }
-            }
-          }
-        }
-      }
+    "deployment": {
+      "platform": "Vercel",
+      "environment": "Node.js"
     },
-    {
-      "name": "Shopping Cart API",
-      "description": "Sistema de carrinho de compras com gerenciamento de itens, quantidades e cálculos",
-      "files": [
-        "lib/cart-context.tsx",
-        "components/cart-footer.tsx"
-      ],
-      "api_doc": {
-        "openapi": "3.0.0",
-        "info": {
-          "title": "Shopping Cart API",
-          "version": "1.0.0"
-        },
-        "paths": {
-          "/api/cart/add": {
-            "post": {
-              "summary": "Add item to cart",
-              "requestBody": {
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "type": "object",
-                      "properties": {
-                        "product_id": {"type": "integer"},
-                        "quantity": {"type": "integer"},
-                        "customizations": {"type": "object"}
-                      }
-                    }
-                  }
-                }
-              },
-              "responses": {
-                "200": {"description": "Item added to cart"}
-              }
-            }
-          },
-          "/api/cart/remove": {
-            "post": {
-              "summary": "Remove item from cart",
-              "responses": {
-                "200": {"description": "Item removed"}
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "name": "Checkout API",
-      "description": "Sistema de finalização de pedidos com integração WhatsApp e múltiplas formas de pagamento",
-      "files": [
-        "app/checkout/page.tsx"
-      ],
-      "api_doc": {
-        "openapi": "3.0.0",
-        "info": {
-          "title": "Checkout API",
-          "version": "1.0.0"
-        },
-        "paths": {
-          "/api/checkout": {
-            "post": {
-              "summary": "Process order checkout",
-              "requestBody": {
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "type": "object",
-                      "properties": {
-                        "customer_info": {"type": "object"},
-                        "payment_method": {"type": "string"},
-                        "delivery_option": {"type": "string"},
-                        "items": {"type": "array"}
-                      }
-                    }
-                  }
-                }
-              },
-              "responses": {
-                "200": {"description": "Order processed successfully"},
-                "400": {"description": "Invalid order data"}
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "name": "Store Configuration API",
-      "description": "Configurações da pizzaria incluindo horários, formas de pagamento e informações de contato",
-      "files": [
-        "app/admin/config/page.tsx"
-      ],
-      "api_doc": {
-        "openapi": "3.0.0",
-        "info": {
-          "title": "Store Configuration API",
-          "version": "1.0.0"
-        },
-        "paths": {
-          "/api/config": {
-            "get": {
-              "summary": "Get store configuration",
-              "responses": {
-                "200": {"description": "Store configuration"}
-              }
-            },
-            "put": {
-              "summary": "Update store configuration",
-              "requestBody": {
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "type": "object",
-                      "properties": {
-                        "opening_hours": {"type": "object"},
-                        "payment_methods": {"type": "array"},
-                        "contact_info": {"type": "object"}
-                      }
-                    }
-                  }
-                }
-              },
-              "responses": {
-                "200": {"description": "Configuration updated"}
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "name": "Database Operations API",
-      "description": "Operações de banco de dados via Supabase com Row Level Security",
-      "files": [
-        "lib/supabase.ts",
-        "scripts/01-create-tables.sql",
-        "scripts/02-admin-setup.sql"
-      ],
-      "api_doc": {
-        "openapi": "3.0.0",
-        "info": {
-          "title": "Database Operations API",
-          "version": "1.0.0"
-        },
-        "paths": {
-          "/api/db/health": {
-            "get": {
-              "summary": "Check database health",
-              "responses": {
-                "200": {"description": "Database is healthy"}
-              }
-            }
-          },
-          "/api/db/migrate": {
-            "post": {
-              "summary": "Run database migrations",
-              "responses": {
-                "200": {"description": "Migrations completed"}
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "name": "Debug Tools API",
-      "description": "Ferramentas de debug para testar conexões e consultas ao banco de dados",
-      "files": [
-        "app/admin/debug/page.tsx"
-      ],
-      "api_doc": {
-        "openapi": "3.0.0",
-        "info": {
-          "title": "Debug Tools API",
-          "version": "1.0.0"
-        },
-        "paths": {
-          "/api/debug/connection": {
-            "get": {
-              "summary": "Test database connection",
-              "responses": {
-                "200": {"description": "Connection successful"}
-              }
-            }
-          },
-          "/api/debug/query": {
-            "post": {
-              "summary": "Execute debug query",
-              "requestBody": {
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "type": "object",
-                      "properties": {
-                        "query": {"type": "string"}
-                      }
-                    }
-                  }
-                }
-              },
-              "responses": {
-                "200": {"description": "Query executed"}
-              }
-            }
-          }
-        }
-      }
+    "development": {
+      "package_manager": "npm",
+      "linting": "ESLint",
+      "testing": "TestSprite"
     }
-  ]
+  },
+  "features": {
+    "customer_features": [
+      {
+        "name": "Homepage com Catálogo",
+        "description": "Exibição de produtos organizados por categorias com promoções em destaque",
+        "components": ["app/page.tsx", "components/product-card.tsx"]
+      },
+      {
+        "name": "Carrinho de Compras",
+        "description": "Gerenciamento completo do carrinho com adição, remoção e controle de quantidades",
+        "components": ["components/cart-modal.tsx", "lib/cart-context.tsx"]
+      },
+      {
+        "name": "Personalização de Produtos",
+        "description": "Customização de pizzas com sabores, tamanhos e adicionais",
+        "components": ["components/product-modal.tsx"]
+      },
+      {
+        "name": "Checkout e Finalização",
+        "description": "Coleta de dados do cliente, validação de endereço via ViaCEP e envio via WhatsApp",
+        "components": ["components/checkout-modal.tsx"]
+      },
+      {
+        "name": "Informações da Loja",
+        "description": "Modal com dados da pizzaria, horários e formas de pagamento",
+        "components": ["components/store-info-modal.tsx"]
+      }
+    ],
+    "admin_features": [
+      {
+        "name": "Autenticação Administrativa",
+        "description": "Sistema de login seguro para administradores com sessão persistente",
+        "components": ["app/admin/login/page.tsx", "lib/auth-context.tsx"]
+      },
+      {
+        "name": "Dashboard Administrativo",
+        "description": "Painel principal com estatísticas e navegação do sistema",
+        "components": ["app/admin/page.tsx", "components/admin-layout.tsx"]
+      },
+      {
+        "name": "Gerenciamento de Produtos",
+        "description": "CRUD completo de produtos com upload de imagens",
+        "components": ["app/admin/produtos/page.tsx"]
+      },
+      {
+        "name": "Configuração de Cardápio",
+        "description": "Gestão de categorias, tamanhos de pizza e opções de sabores",
+        "components": ["app/admin/produtos/cardapio/page.tsx"]
+      },
+      {
+        "name": "Configurações da Pizzaria",
+        "description": "Configuração de dados da empresa, tarifas e formas de pagamento",
+        "components": ["app/admin/configuracoes/page.tsx"]
+      },
+      {
+        "name": "Sistema de Debug",
+        "description": "Visualização de dados do banco e logs para análise",
+        "components": ["app/admin/debug/page.tsx"]
+      }
+    ],
+    "integrations": [
+      {
+        "name": "WhatsApp Integration",
+        "description": "Envio automático de pedidos via WhatsApp com formatação personalizada"
+      },
+      {
+        "name": "ViaCEP API",
+        "description": "Validação e preenchimento automático de endereços"
+      },
+      {
+        "name": "Supabase Storage",
+        "description": "Upload e gerenciamento de imagens de produtos"
+      }
+    ]
+  },
+  "database_schema": {
+    "tables": [
+      "pizzaria_config",
+      "produtos",
+      "categorias",
+      "tamanhos_pizza",
+      "opcoes_sabores",
+      "adicionais",
+      "promocoes",
+      "clientes",
+      "pedidos",
+      "admins"
+    ],
+    "key_relationships": [
+      "produtos -> categorias (many-to-one)",
+      "produtos -> tamanhos_pizza (many-to-many)",
+      "pedidos -> clientes (many-to-one)",
+      "pedidos -> produtos (many-to-many)"
+    ]
+  },
+  "architecture": {
+    "type": "Single Page Application (SPA)",
+    "pattern": "Client-Server with BaaS (Backend as a Service)",
+    "authentication": "JWT-based with Supabase Auth",
+    "data_flow": "React Context -> Supabase Client -> PostgreSQL",
+    "file_structure": {
+      "app/": "Next.js App Router pages and layouts",
+      "components/": "Reusable React components",
+      "lib/": "Utility functions and context providers",
+      "scripts/": "Database migration scripts",
+      "docs/": "Project documentation"
+    }
+  },
+  "current_status": {
+    "development_phase": "Frontend Development",
+    "database_status": "Implemented and Populated",
+    "known_issues": [
+      "PGRST116 errors in Supabase queries",
+      "Duplicate data in pizzaria_config table",
+      "Authentication system needs validation"
+    ],
+    "testing_status": "In Progress with TestSprite"
+  }
 }
